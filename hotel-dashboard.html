@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -374,7 +373,6 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
 </div>
 
 <!-- ACTIVITY LOGS -->
-
 <div class="sec" id="s-logs">
   <div class="sech">
     <div class="secr">
@@ -456,10 +454,7 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
   </div>
 </div>
 
-```
-</div></div>
-```
-
+    </div></div>
   <div class="bnav"><div class="bni">
     <div class="bnitem on" id="bn0" onclick="go('ov',null);setBN('bn0')"><div class="bnico">&#9646;&#9646;</div><div class="bnlbl">Overview</div></div>
     <div class="bnitem" id="bn1" onclick="go('req',null);setBN('bn1')"><div class="bnico">&#128718;</div><div class="bnlbl">Requests</div><div class="bndot" id="bndot">3</div></div>
@@ -479,7 +474,6 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Add Staff</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
 
 <!-- STAFF EDIT MODAL -->
-
 <div class="mov" id="medit-staff">
   <div class="modal">
     <div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div>
@@ -528,527 +522,526 @@ var openReqs=3,curBtn=null,curSec='',selStaff='',etaPresets=[5,10,15],pingCtx=nu
 
 function initPing(){try{pingCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
 function ping(){if(!pingCtx)return;try{var o=pingCtx.createOscillator(),g=pingCtx.createGain();o.connect(g);g.connect(pingCtx.destination);o.frequency.setValueAtTime(880,pingCtx.currentTime);o.frequency.exponentialRampToValueAtTime(440,pingCtx.currentTime+0.3);g.gain.setValueAtTime(0.4,pingCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,pingCtx.currentTime+0.4);o.start(pingCtx.currentTime);o.stop(pingCtx.currentTime+0.4);}catch(e){}}
-function flashTab(msg){clearInterval(flashInt);var orig=‘Arivo \u2014 Hotel Dashboard’,on=true;flashInt=setInterval(function(){document.title=on?msg:orig;on=!on;},700);setTimeout(function(){clearInterval(flashInt);document.title=orig;},8000);}
+function flashTab(msg){clearInterval(flashInt);var orig='Arivo \u2014 Hotel Dashboard',on=true;flashInt=setInterval(function(){document.title=on?msg:orig;on=!on;},700);setTimeout(function(){clearInterval(flashInt);document.title=orig;},8000);}
 
 // NOTIFICATIONS
 function notify(type,title,msg,sub){
-var band=document.getElementById(‘nband’);if(!band)return;
-var b=document.createElement(‘div’);b.className=‘nbanner ‘+type;
-b.innerHTML=’<div class="nbt">’+title+’</div><div class="nbm">’+msg+’</div>’+(sub?’<div class="nbs">’+sub+’</div>’:’’);
-b.onclick=function(){dismissBanner(b);};
-band.appendChild(b);
-setTimeout(function(){dismissBanner(b);},5000);
+  var band=document.getElementById('nband');if(!band)return;
+  var b=document.createElement('div');b.className='nbanner '+type;
+  b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');
+  b.onclick=function(){dismissBanner(b);};
+  band.appendChild(b);
+  setTimeout(function(){dismissBanner(b);},5000);
 }
 function dismissBanner(b){
-if(!b.parentNode)return;
-b.style.animation=‘slideOut .3s ease forwards’;
-setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);
+  if(!b.parentNode)return;
+  b.style.animation='slideOut .3s ease forwards';
+  setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);
 }
 
 function login(){
-var e=document.getElementById(‘le’).value.trim(),p=document.getElementById(‘lp’).value;
-if(e===‘manager@hotel.com’&&p===‘password123’){
-document.getElementById(‘lerr’).style.display=‘none’;
-document.getElementById(‘sl’).classList.remove(‘on’);
-document.getElementById(‘sd’).classList.add(‘on’);
-document.getElementById(‘odate’).textContent=new Date().toLocaleDateString(‘en-GB’,{weekday:‘long’,day:‘numeric’,month:‘long’,year:‘numeric’});
-var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split(‘T’)[0];
-[‘agc’,‘glc’].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
-initPing();
-logEvent(‘manager_login’,‘Manager logged in’,‘Manager’,’-’);
-loadGuestRequests();
-loadGuestMessages();
-subscribeToRequests();
-} else {document.getElementById(‘lerr’).style.display=‘block’;}
+  var e=document.getElementById('le').value.trim(),p=document.getElementById('lp').value;
+  if(e==='manager@hotel.com'&&p==='password123'){
+    document.getElementById('lerr').style.display='none';
+    document.getElementById('sl').classList.remove('on');
+    document.getElementById('sd').classList.add('on');
+    document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
+    ['agc','glc'].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
+    initPing();
+    logEvent('manager_login','Manager logged in','Manager','-');
+    loadGuestRequests();
+    loadGuestMessages();
+    subscribeToRequests();
+  } else {document.getElementById('lerr').style.display='block';}
 }
-document.getElementById(‘lp’).addEventListener(‘keydown’,function(e){if(e.key===‘Enter’)login();});
-function logout(){document.getElementById(‘sd’).classList.remove(‘on’);document.getElementById(‘sl’).classList.add(‘on’);}
+document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+function logout(){document.getElementById('sd').classList.remove('on');document.getElementById('sl').classList.add('on');}
 
 function go(name,el){
-document.querySelectorAll(’.sec’).forEach(function(s){s.classList.remove(‘on’);});
-document.querySelectorAll(’.ni’).forEach(function(n){n.classList.remove(‘on’);});
-var sec=document.getElementById(‘s-’+name);if(sec)sec.classList.add(‘on’);
-if(el)el.classList.add(‘on’);
-document.getElementById(‘ttl’).textContent=TITLES[name]||name;
-closeSidebar();window.scrollTo(0,0);
-if(name===‘logs’)renderLogReport();
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
+  var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');
+  if(el)el.classList.add('on');
+  document.getElementById('ttl').textContent=TITLES[name]||name;
+  closeSidebar();window.scrollTo(0,0);
+  if(name==='logs')renderLogReport();
 }
-function setBN(id){document.querySelectorAll(’.bnitem’).forEach(function(b){b.classList.remove(‘on’);});var el=document.getElementById(id);if(el)el.classList.add(‘on’);}
-function openSidebar(){document.getElementById(‘sbar’).classList.add(‘on’);document.getElementById(‘ov’).classList.add(‘on’);document.body.style.overflow=‘hidden’;}
-function closeSidebar(){document.getElementById(‘sbar’).classList.remove(‘on’);document.getElementById(‘ov’).classList.remove(‘on’);document.body.style.overflow=’’;}
-function openM(id){document.getElementById(id).classList.add(‘on’);document.body.style.overflow=‘hidden’;}
-function closeM(id){document.getElementById(id).classList.remove(‘on’);document.body.style.overflow=’’;}
-document.querySelectorAll(’.mov’).forEach(function(o){o.addEventListener(‘click’,function(e){if(e.target===o)closeM(o.id);});});
+function setBN(id){document.querySelectorAll('.bnitem').forEach(function(b){b.classList.remove('on');});var el=document.getElementById(id);if(el)el.classList.add('on');}
+function openSidebar(){document.getElementById('sbar').classList.add('on');document.getElementById('ov').classList.add('on');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sbar').classList.remove('on');document.getElementById('ov').classList.remove('on');document.body.style.overflow='';}
+function openM(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
+function closeM(id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}
+document.querySelectorAll('.mov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeM(o.id);});});
 
 // ETA POPUP
-function getPresets(){var rows=document.querySelectorAll(’.etarow input’),vals=[];rows.forEach(function(i){var v=parseInt(i.value);if(!isNaN(v)&&v>0)vals.push(v);});return vals.length?vals:[5,10,15];}
+function getPresets(){var rows=document.querySelectorAll('.etarow input'),vals=[];rows.forEach(function(i){var v=parseInt(i.value);if(!isNaN(v)&&v>0)vals.push(v);});return vals.length?vals:[5,10,15];}
 function renderEtaOpts(){
-var presets=getPresets(),c=document.getElementById(‘etaopts’);c.innerHTML=’’;
-for(var i=0;i<presets.length;i++){
-var d=document.createElement(‘div’);d.className=‘etaopt’;d.setAttribute(‘data-mins’,presets[i]);
-d.innerHTML=’<div><div class="etamins">’+presets[i]+’ min’+(selStaff?’ \u2192 ‘+selStaff:’’)+’</div><div class="etadesc">Reminder fires after ‘+presets[i]+’ min if not completed</div></div><span>\u2192</span>’;
-d.addEventListener(‘click’,function(){doETA(parseInt(this.getAttribute(‘data-mins’)));});
-c.appendChild(d);
-}
-var now=document.createElement(‘div’);now.className=‘etaopt etanow’;now.setAttribute(‘data-mins’,‘0’);
-now.innerHTML=’<div><div>Done now</div><div class="etadesc">Mark completed immediately</div></div><span>\u2713</span>’;
-now.addEventListener(‘click’,function(){doETA(0);});c.appendChild(now);
+  var presets=getPresets(),c=document.getElementById('etaopts');c.innerHTML='';
+  for(var i=0;i<presets.length;i++){
+    var d=document.createElement('div');d.className='etaopt';d.setAttribute('data-mins',presets[i]);
+    d.innerHTML='<div><div class="etamins">'+presets[i]+' min'+(selStaff?' \u2192 '+selStaff:'')+'</div><div class="etadesc">Reminder fires after '+presets[i]+' min if not completed</div></div><span>\u2192</span>';
+    d.addEventListener('click',function(){doETA(parseInt(this.getAttribute('data-mins')));});
+    c.appendChild(d);
+  }
+  var now=document.createElement('div');now.className='etaopt etanow';now.setAttribute('data-mins','0');
+  now.innerHTML='<div><div>Done now</div><div class="etadesc">Mark completed immediately</div></div><span>\u2713</span>';
+  now.addEventListener('click',function(){doETA(0);});c.appendChild(now);
 }
 function openETA(btn){
-curBtn=btn;var row=btn.closest(’.row’);
-document.getElementById(‘etalbl’).textContent=row?row.querySelector(’.rt’).textContent:‘Request’;
-selStaff=’’;document.querySelectorAll(’.schap’).forEach(function(c){c.classList.remove(‘on’);});
-document.getElementById(‘etcm’).value=’’;renderEtaOpts();
-document.getElementById(‘etapop’).classList.add(‘on’);document.body.style.overflow=‘hidden’;
+  curBtn=btn;var row=btn.closest('.row');
+  document.getElementById('etalbl').textContent=row?row.querySelector('.rt').textContent:'Request';
+  selStaff='';document.querySelectorAll('.schap').forEach(function(c){c.classList.remove('on');});
+  document.getElementById('etcm').value='';renderEtaOpts();
+  document.getElementById('etapop').classList.add('on');document.body.style.overflow='hidden';
 }
-function closeETA(){document.getElementById(‘etapop’).classList.remove(‘on’);document.body.style.overflow=’’;curBtn=null;}
+function closeETA(){document.getElementById('etapop').classList.remove('on');document.body.style.overflow='';curBtn=null;}
 function pickStaff(chip){
-document.querySelectorAll(’.schap’).forEach(function(c){c.classList.remove(‘on’);});chip.classList.add(‘on’);selStaff=chip.textContent;
-document.querySelectorAll(’#etaopts .etamins’).forEach(function(lbl){var m=lbl.textContent.split(’ ‘)[0];lbl.textContent=m+’ min \u2192 ‘+selStaff;});
+  document.querySelectorAll('.schap').forEach(function(c){c.classList.remove('on');});chip.classList.add('on');selStaff=chip.textContent;
+  document.querySelectorAll('#etaopts .etamins').forEach(function(lbl){var m=lbl.textContent.split(' ')[0];lbl.textContent=m+' min \u2192 '+selStaff;});
 }
-function useCustom(){var m=parseInt(document.getElementById(‘etcm’).value);if(isNaN(m)||m<1||m>240){toast(‘Enter 1\u2013240 min’,‘err’);return;}doETA(m);}
+function useCustom(){var m=parseInt(document.getElementById('etcm').value);if(isNaN(m)||m<1||m>240){toast('Enter 1\u2013240 min','err');return;}doETA(m);}
 function doETA(mins){
-var btn=curBtn;closeETA();if(!btn)return;
-var row=btn.closest(’.row’);
-var taskTitle=row?row.querySelector(’.rt’).textContent:‘Request’;
-var guestLine=row&&row.querySelector(’.rs’)?row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim():’’;
-if(mins===0){
-finalDone(row,btn,taskTitle,guestLine);
-} else {
-if(row){
-row.querySelector(’.dot’).className=‘dot pr’;
-var badge=row.querySelector(’.badge’);if(badge){badge.className=‘badge pr’;badge.textContent=‘In Progress’;}
-syncRequestRow(row, ‘progress’);
-btn.textContent=‘Done’;btn.onclick=function(){openETA(btn);};
-var ex=row.querySelector(’.echip’);if(ex)ex.remove();
-var chip=document.createElement(‘span’);chip.className=‘echip’;
-chip.textContent=‘ETA ‘+mins+’ min’+(selStaff?’ \u2014 ‘+selStaff:’’);
-chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
-}
-toast(‘ETA: ‘+mins+’ min’+(selStaff?’ \u2014 ‘+selStaff:’’));
-// Notify guest their request is being handled
-notify(‘guest’,’💬 Guest Notified’,‘Your request is being taken care of \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 ETA: ‘+mins+’ min \u00b7 Sent to guest app’);
-var savedChip=chip;
-var tid=setTimeout(function(){
-ping();flashTab(‘ETA Overdue!’);toast(‘Reminder: ETA passed’);
-if(savedChip&&savedChip.parentNode){savedChip.style.background=‘var(–rdim)’;savedChip.style.color=‘var(–red)’;savedChip.textContent=‘Overdue!’;}
-// Alert manager
-notify(‘warn’,’⏰ ETA Overdue’,‘No update on: ‘+taskTitle+’.’,(selStaff?selStaff+’ \u00b7 ‘:’’)+‘Please follow up with staff’);
-},mins*60*1000);
-if(row)row.dataset.tid=String(tid);
-}
+  var btn=curBtn;closeETA();if(!btn)return;
+  var row=btn.closest('.row');
+  var taskTitle=row?row.querySelector('.rt').textContent:'Request';
+  var guestLine=row&&row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+  if(mins===0){
+    finalDone(row,btn,taskTitle,guestLine);
+  } else {
+    if(row){
+      row.querySelector('.dot').className='dot pr';
+      var badge=row.querySelector('.badge');if(badge){badge.className='badge pr';badge.textContent='In Progress';}
+      syncRequestRow(row, 'progress');
+      btn.textContent='Done';btn.onclick=function(){openETA(btn);};
+      var ex=row.querySelector('.echip');if(ex)ex.remove();
+      var chip=document.createElement('span');chip.className='echip';
+      chip.textContent='ETA '+mins+' min'+(selStaff?' \u2014 '+selStaff:'');
+      chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
+    }
+    toast('ETA: '+mins+' min'+(selStaff?' \u2014 '+selStaff:''));
+    // Notify guest their request is being handled
+    notify('guest','&#128172; Guest Notified','Your request is being taken care of \u2014 '+taskTitle+'.',guestLine+' \u00b7 ETA: '+mins+' min \u00b7 Sent to guest app');
+    var savedChip=chip;
+    var tid=setTimeout(function(){
+      ping();flashTab('ETA Overdue!');toast('Reminder: ETA passed');
+      if(savedChip&&savedChip.parentNode){savedChip.style.background='var(--rdim)';savedChip.style.color='var(--red)';savedChip.textContent='Overdue!';}
+      // Alert manager
+      notify('warn','&#9200; ETA Overdue','No update on: '+taskTitle+'.',(selStaff?selStaff+' \u00b7 ':'')+'Please follow up with staff');
+    },mins*60*1000);
+    if(row)row.dataset.tid=String(tid);
+  }
 }
 function adjustETA(chip){
-var row=chip.closest(’.row’);var cur=chip.textContent.replace(/[^0-9]/g,’’);
-var v=prompt(‘Adjust ETA (minutes remaining):’,cur||‘10’);if(v===null)return;
-var m=parseInt(v);if(isNaN(m)||m<1){toast(‘Invalid time’,‘err’);return;}
-var sl=chip.textContent.includes(’\u2014’)?’ \u2014 ‘+chip.textContent.split(’\u2014’)[1].trim():’’;
-chip.textContent=‘ETA ‘+m+’ min’+sl;chip.style.background=’’;chip.style.color=’’;
-if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
-var taskTitle=row?row.querySelector(’.rt’).textContent:‘Request’;
-var savedChip=chip;
-var tid=setTimeout(function(){ping();if(savedChip&&savedChip.parentNode){savedChip.style.background=‘var(–rdim)’;savedChip.style.color=‘var(–red)’;savedChip.textContent=‘Overdue!’;}notify(‘warn’,’⏰ ETA Overdue’,‘No update on: ‘+taskTitle+’.’,‘Please follow up with staff’);toast(‘ETA passed’);},m*60*1000);
-if(row)row.dataset.tid=String(tid);
-toast(‘ETA updated to ‘+m+’ min’);
+  var row=chip.closest('.row');var cur=chip.textContent.replace(/[^0-9]/g,'');
+  var v=prompt('Adjust ETA (minutes remaining):',cur||'10');if(v===null)return;
+  var m=parseInt(v);if(isNaN(m)||m<1){toast('Invalid time','err');return;}
+  var sl=chip.textContent.includes('\u2014')?' \u2014 '+chip.textContent.split('\u2014')[1].trim():'';
+  chip.textContent='ETA '+m+' min'+sl;chip.style.background='';chip.style.color='';
+  if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
+  var taskTitle=row?row.querySelector('.rt').textContent:'Request';
+  var savedChip=chip;
+  var tid=setTimeout(function(){ping();if(savedChip&&savedChip.parentNode){savedChip.style.background='var(--rdim)';savedChip.style.color='var(--red)';savedChip.textContent='Overdue!';}notify('warn','&#9200; ETA Overdue','No update on: '+taskTitle+'.','Please follow up with staff');toast('ETA passed');},m*60*1000);
+  if(row)row.dataset.tid=String(tid);
+  toast('ETA updated to '+m+' min');
 }
 function finalDone(row,btn,taskTitle,guestLine){
-if(!taskTitle&&row)taskTitle=row.querySelector(’.rt’).textContent;
-if(!guestLine&&row&&row.querySelector(’.rs’))guestLine=row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim();
-if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
-if(row){row.querySelector(’.dot’).className=‘dot dn’;var b=row.querySelector(’.badge’);if(b){b.className=‘badge dn’;b.textContent=‘Done’;}var c=row.querySelector(’.echip’);if(c)c.remove();}
-if(btn)btn.remove();
-openReqs=Math.max(0,openReqs-1);updateCnts();
-// Notify guest request is complete
-if(taskTitle)notify(‘guest’,’✓ Guest Notified’,‘Your request has been completed \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 Sent to guest app’);
-// Notify manager (simulates staff app completing a task)
-if(taskTitle)notify(‘mgr’,’📤 Task Complete’,‘Staff completed: ‘+taskTitle+’.’,(selStaff?selStaff+’ marked as done’:‘Completed by staff’));
+  if(!taskTitle&&row)taskTitle=row.querySelector('.rt').textContent;
+  if(!guestLine&&row&&row.querySelector('.rs'))guestLine=row.querySelector('.rs').textContent.split('\u00b7')[0].trim();
+  if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
+  if(row){row.querySelector('.dot').className='dot dn';var b=row.querySelector('.badge');if(b){b.className='badge dn';b.textContent='Done';}var c=row.querySelector('.echip');if(c)c.remove();}
+  if(btn)btn.remove();
+  openReqs=Math.max(0,openReqs-1);updateCnts();
+  // Notify guest request is complete
+  if(taskTitle)notify('guest','&#10003; Guest Notified','Your request has been completed \u2014 '+taskTitle+'.',guestLine+' \u00b7 Sent to guest app');
+  // Notify manager (simulates staff app completing a task)
+  if(taskTitle)notify('mgr','&#128228; Task Complete','Staff completed: '+taskTitle+'.',(selStaff?selStaff+' marked as done':'Completed by staff'));
 }
 function updateCnts(){
-var s=document.getElementById(‘sr’);if(s)s.textContent=openReqs;
-var b=document.getElementById(‘rbadge’);if(b){b.textContent=openReqs;b.style.display=openReqs>0?’’:‘none’;}
-var bn=document.getElementById(‘bndot’);if(bn){bn.textContent=openReqs;bn.style.display=openReqs>0?’’:‘none’;}
-var l=document.getElementById(‘rcntlbl’);if(l)l.textContent=openReqs+’ open’;
+  var s=document.getElementById('sr');if(s)s.textContent=openReqs;
+  var b=document.getElementById('rbadge');if(b){b.textContent=openReqs;b.style.display=openReqs>0?'':'none';}
+  var bn=document.getElementById('bndot');if(bn){bn.textContent=openReqs;bn.style.display=openReqs>0?'':'none';}
+  var l=document.getElementById('rcntlbl');if(l)l.textContent=openReqs+' open';
 }
 function claimReq(btn){
-var row=btn.closest(’.row’);if(!row)return;
-var taskTitle=row.querySelector(’.rt’).textContent;
-var guestLine=row.querySelector(’.rs’)?row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim():’’;
-row.querySelector(’.dot’).className=‘dot cl’;
-var b=row.querySelector(’.badge’);if(b){b.className=‘badge cl’;b.textContent=‘Claimed’;}
-btn.remove();
-var s=row.querySelector(’.rs’);if(s)s.textContent+=(’ \u00b7 Claimed by you’);
-toast(‘Request claimed’);
-syncRequestRow(row, ‘claim’);
-logEvent(‘req_claim’,‘Request claimed: ‘+taskTitle,guestLine,’’);
-// Notify guest their request has been picked up
-notify(‘guest’,’💬 Guest Notified’,‘We have received your request and are on it \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 Sent to guest app’);
+  var row=btn.closest('.row');if(!row)return;
+  var taskTitle=row.querySelector('.rt').textContent;
+  var guestLine=row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+  row.querySelector('.dot').className='dot cl';
+  var b=row.querySelector('.badge');if(b){b.className='badge cl';b.textContent='Claimed';}
+  btn.remove();
+  var s=row.querySelector('.rs');if(s)s.textContent+=(' \u00b7 Claimed by you');
+  toast('Request claimed');
+  syncRequestRow(row, 'claim');
+  logEvent('req_claim','Request claimed: '+taskTitle,guestLine,'');
+  // Notify guest their request has been picked up
+  notify('guest','&#128172; Guest Notified','We have received your request and are on it \u2014 '+taskTitle+'.',guestLine+' \u00b7 Sent to guest app');
 }
-function markAll(){document.querySelectorAll(’#reqlist .btn’).forEach(function(b){if(b.textContent===‘Done’){var r=b.closest(’.row’);if(r)finalDone(r,b);}});toast(‘All done’);}
+function markAll(){document.querySelectorAll('#reqlist .btn').forEach(function(b){if(b.textContent==='Done'){var r=b.closest('.row');if(r)finalDone(r,b);}});toast('All done');}
 
-var demos=[{t:‘Extra towels’,r:‘7’,g:‘Sarah Chen’},{t:‘Late checkout’,r:‘3’,g:‘David Park’},{t:‘Extra blanket’,r:‘6’,g:‘Elena Webb’},{t:‘Taxi booking’,r:‘14’,g:‘James Mitchell’}];
+var demos=[{t:'Extra towels',r:'7',g:'Sarah Chen'},{t:'Late checkout',r:'3',g:'David Park'},{t:'Extra blanket',r:'6',g:'Elena Webb'},{t:'Taxi booking',r:'14',g:'James Mitchell'}];
 function simReq(){
-var d=demos[Math.floor(Math.random()*demos.length)];openReqs++;updateCnts();
-var list=document.getElementById(‘reqlist’);
-var row=document.createElement(‘div’);row.className=‘row’;
-var dot=document.createElement(‘div’);dot.className=‘dot nw’;
-var ri=document.createElement(‘div’);ri.className=‘ri’;ri.innerHTML=’<div class="rt">’+d.t+’ \u2014 Room ‘+d.r+’</div><div class="rs">’+d.g+’ \u00b7 just now</div>’;
-var badge=document.createElement(‘div’);badge.className=‘badge nw’;badge.textContent=‘New’;
-var cb=document.createElement(‘button’);cb.className=‘btn btn-s’;cb.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;cb.textContent=‘Claim’;cb.onclick=function(){claimReq(cb);};
-var db=document.createElement(‘button’);db.className=‘btn btn-s’;db.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;db.textContent=‘Done’;db.onclick=function(){openETA(db);};
-row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(cb);row.appendChild(db);
-list.insertBefore(row,list.firstChild);ping();flashTab(‘New Request!’);toast(d.t+’ from Room ‘+d.r);
+  var d=demos[Math.floor(Math.random()*demos.length)];openReqs++;updateCnts();
+  var list=document.getElementById('reqlist');
+  var row=document.createElement('div');row.className='row';
+  var dot=document.createElement('div');dot.className='dot nw';
+  var ri=document.createElement('div');ri.className='ri';ri.innerHTML='<div class="rt">'+d.t+' \u2014 Room '+d.r+'</div><div class="rs">'+d.g+' \u00b7 just now</div>';
+  var badge=document.createElement('div');badge.className='badge nw';badge.textContent='New';
+  var cb=document.createElement('button');cb.className='btn btn-s';cb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';cb.textContent='Claim';cb.onclick=function(){claimReq(cb);};
+  var db=document.createElement('button');db.className='btn btn-s';db.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';db.textContent='Done';db.onclick=function(){openETA(db);};
+  row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(cb);row.appendChild(db);
+  list.insertBefore(row,list.firstChild);ping();flashTab('New Request!');toast(d.t+' from Room '+d.r);
 }
-function addEtaOpt(){var l=document.getElementById(‘etalist’),d=document.createElement(‘div’);d.className=‘fg etarow’;d.style.cssText=‘display:flex;gap:8px;align-items:center’;d.innerHTML=’<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">✕</div>’;l.appendChild(d);}
-function rmETA(btn){if(document.querySelectorAll(’.etarow’).length<=1){toast(‘Need at least one option’);return;}btn.closest(’.etarow’).remove();}
-function saveEtaOpts(){etaPresets=getPresets();toast(‘ETA options saved: ‘+etaPresets.join(’, ‘)+’ min’);}
-function openAR(sid,sn){curSec=sid;document.getElementById(‘arsl’).textContent=sn;document.getElementById(‘ark’).value=’’;document.getElementById(‘arv’).value=’’;openM(‘marow’);}
-function addSec(){var t=document.getElementById(‘nst’).value.trim(),ic=document.getElementById(‘nsi’).value.trim();if(!t){toast(‘Enter a section title’,‘err’);return;}var id=‘sec-’+t.toLowerCase().replace(/\s+/g,’-’);var el=document.createElement(‘div’);el.className=‘isec’;el.id=id;var ico=ic||’📌’;el.innerHTML=’<div class="ish"><div class="ist"><div class="ith">’+ico+’</div>’+t+’</div><div style="display:flex;gap:5px"><div class="icb" id="sab-'+id+'">＋</div><div class="icb del" onclick="delSec(\''+id+'\')">✕</div></div></div><button class="addrow" id="sarb-'+id+'">＋ Add first row</button>’;document.getElementById(‘s-info’).appendChild(el);document.getElementById(‘sab-’+id).onclick=function(){openAR(id,t);};document.getElementById(‘sarb-’+id).onclick=function(){openAR(id,t);};closeM(‘msec’);document.getElementById(‘nst’).value=’’;document.getElementById(‘nsi’).value=’’;toast(‘Section “’+t+’” created’);}
-function addRow(){var k=document.getElementById(‘ark’).value.trim(),v=document.getElementById(‘arv’).value.trim();if(!k||!v){toast(‘Fill in both fields’,‘err’);return;}var sec=document.getElementById(curSec);if(!sec)return;var ab=sec.querySelector(’.addrow’);var r=document.createElement(‘div’);r.className=‘irow’;r.innerHTML=’<div class="irk">’+k+’</div><div class="irv" contenteditable="true">’+v+’</div><div class="iract"><div class="icb del" onclick="delRow(this)">✕</div></div>’;sec.insertBefore(r,ab);closeM(‘marow’);document.getElementById(‘ark’).value=’’;document.getElementById(‘arv’).value=’’;toast(‘Row added’);}
-function delRow(btn){if(confirm(‘Delete row?’)){btn.closest(’.irow’).remove();toast(‘Row deleted’);}}
-function delSec(id){if(confirm(‘Delete section?’)){document.getElementById(id).remove();toast(‘Section deleted’);}}
-function addRec(){var n=document.getElementById(‘arn’).value.trim(),c=document.getElementById(‘arc’).value.trim(),e=document.getElementById(‘are’).value.trim();if(!n){toast(‘Enter a place name’,‘err’);return;}var r=document.createElement(‘div’);r.className=‘rrow’;r.innerHTML=’<div class="rthumb">’+(e||’📍’)+’</div><div class="rinfo"><div class="rn">’+n+’</div><div class="rc">’+c+’</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb">✏</div><div class="icb del" onclick="delRec(this)">✕</div></div>’;document.getElementById(‘reclist’).appendChild(r);closeM(‘mrec’);document.getElementById(‘arn’).value=’’;document.getElementById(‘arc’).value=’’;document.getElementById(‘are’).value=’’;toast(’”’+n+’” added’);}
-function addFac(){var n=document.getElementById(‘afn’).value.trim(),d=document.getElementById(‘afd’).value.trim(),e=document.getElementById(‘afe’).value.trim();if(!n){toast(‘Enter a facility name’,‘err’);return;}var r=document.createElement(‘div’);r.className=‘rrow’;r.innerHTML=’<div class="rthumb">’+(e||’🏠’)+’</div><div class="rinfo"><div class="rn">’+n+’</div><div class="rc">’+d+’</div></div><div style="display:flex;gap:5px"><div class="icb">✏</div><div class="icb del" onclick="delRec(this)">✕</div></div>’;document.getElementById(‘faclist’).appendChild(r);closeM(‘mfac’);document.getElementById(‘afn’).value=’’;document.getElementById(‘afd’).value=’’;document.getElementById(‘afe’).value=’’;toast(’”’+n+’” added to facilities’);}
-function delRec(btn){var el=btn.closest(’.rrow’).querySelector(’.rn’);if(confirm(‘Remove “’+el.textContent+’”?’)){btn.closest(’.rrow’).remove();toast(‘Removed’);}}
-function addGuest(){var n=document.getElementById(‘agn’).value.trim(),r=document.getElementById(‘agr’).value.trim(),c=document.getElementById(‘agc’).value;if(!n||!r){toast(‘Fill in name and room’,‘err’);return;}var ini=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);var d=c?new Date(c).toLocaleDateString(‘en-GB’,{day:‘numeric’,month:‘short’}):‘TBC’;var row=document.createElement(‘div’);row.className=‘grow’;row.innerHTML=’<div class="gav">’+ini+’</div><div class="gi"><div class="gn">’+n+’</div><div class="gs">Room ‘+r+’ \u00b7 Out ‘+d+’</div></div><span class="pill in">Active</span>’;var mb=document.createElement(‘button’);mb.className=‘btn btn-s’;mb.style.cssText=‘margin-left:8px;font-size:11px;padding:5px 9px’;mb.textContent=‘Msg’;mb.onclick=function(){openMsgM(n,‘Room ‘+r);};row.appendChild(mb);document.getElementById(‘glist’).appendChild(row);var sg=document.getElementById(‘sg’);if(sg)sg.textContent=parseInt(sg.textContent)+1;closeM(‘mag’);document.getElementById(‘agn’).value=’’;document.getElementById(‘agr’).value=’’;toast(‘Guest added’);}
+function addEtaOpt(){var l=document.getElementById('etalist'),d=document.createElement('div');d.className='fg etarow';d.style.cssText='display:flex;gap:8px;align-items:center';d.innerHTML='<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">&#10005;</div>';l.appendChild(d);}
+function rmETA(btn){if(document.querySelectorAll('.etarow').length<=1){toast('Need at least one option');return;}btn.closest('.etarow').remove();}
+function saveEtaOpts(){etaPresets=getPresets();toast('ETA options saved: '+etaPresets.join(', ')+' min');}
+function openAR(sid,sn){curSec=sid;document.getElementById('arsl').textContent=sn;document.getElementById('ark').value='';document.getElementById('arv').value='';openM('marow');}
+function addSec(){var t=document.getElementById('nst').value.trim(),ic=document.getElementById('nsi').value.trim();if(!t){toast('Enter a section title','err');return;}var id='sec-'+t.toLowerCase().replace(/\s+/g,'-');var el=document.createElement('div');el.className='isec';el.id=id;var ico=ic||'&#128204;';el.innerHTML='<div class="ish"><div class="ist"><div class="ith">'+ico+'</div>'+t+'</div><div style="display:flex;gap:5px"><div class="icb" id="sab-'+id+'">&#65291;</div><div class="icb del" onclick="delSec(\''+id+'\')">&#10005;</div></div></div><button class="addrow" id="sarb-'+id+'">&#65291; Add first row</button>';document.getElementById('s-info').appendChild(el);document.getElementById('sab-'+id).onclick=function(){openAR(id,t);};document.getElementById('sarb-'+id).onclick=function(){openAR(id,t);};closeM('msec');document.getElementById('nst').value='';document.getElementById('nsi').value='';toast('Section "'+t+'" created');}
+function addRow(){var k=document.getElementById('ark').value.trim(),v=document.getElementById('arv').value.trim();if(!k||!v){toast('Fill in both fields','err');return;}var sec=document.getElementById(curSec);if(!sec)return;var ab=sec.querySelector('.addrow');var r=document.createElement('div');r.className='irow';r.innerHTML='<div class="irk">'+k+'</div><div class="irv" contenteditable="true">'+v+'</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';sec.insertBefore(r,ab);closeM('marow');document.getElementById('ark').value='';document.getElementById('arv').value='';toast('Row added');}
+function delRow(btn){if(confirm('Delete row?')){btn.closest('.irow').remove();toast('Row deleted');}}
+function delSec(id){if(confirm('Delete section?')){document.getElementById(id).remove();toast('Section deleted');}}
+function addRec(){var n=document.getElementById('arn').value.trim(),c=document.getElementById('arc').value.trim(),e=document.getElementById('are').value.trim();if(!n){toast('Enter a place name','err');return;}var r=document.createElement('div');r.className='rrow';r.innerHTML='<div class="rthumb">'+(e||'&#128205;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+c+'</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('reclist').appendChild(r);closeM('mrec');document.getElementById('arn').value='';document.getElementById('arc').value='';document.getElementById('are').value='';toast('"'+n+'" added');}
+function addFac(){var n=document.getElementById('afn').value.trim(),d=document.getElementById('afd').value.trim(),e=document.getElementById('afe').value.trim();if(!n){toast('Enter a facility name','err');return;}var r=document.createElement('div');r.className='rrow';r.innerHTML='<div class="rthumb">'+(e||'&#127968;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+d+'</div></div><div style="display:flex;gap:5px"><div class="icb">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('faclist').appendChild(r);closeM('mfac');document.getElementById('afn').value='';document.getElementById('afd').value='';document.getElementById('afe').value='';toast('"'+n+'" added to facilities');}
+function delRec(btn){var el=btn.closest('.rrow').querySelector('.rn');if(confirm('Remove "'+el.textContent+'"?')){btn.closest('.rrow').remove();toast('Removed');}}
+function addGuest(){var n=document.getElementById('agn').value.trim(),r=document.getElementById('agr').value.trim(),c=document.getElementById('agc').value;if(!n||!r){toast('Fill in name and room','err');return;}var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var d=c?new Date(c).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';var row=document.createElement('div');row.className='grow';row.innerHTML='<div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+n+'</div><div class="gs">Room '+r+' \u00b7 Out '+d+'</div></div><span class="pill in">Active</span>';var mb=document.createElement('button');mb.className='btn btn-s';mb.style.cssText='margin-left:8px;font-size:11px;padding:5px 9px';mb.textContent='Msg';mb.onclick=function(){openMsgM(n,'Room '+r);};row.appendChild(mb);document.getElementById('glist').appendChild(row);var sg=document.getElementById('sg');if(sg)sg.textContent=parseInt(sg.textContent)+1;closeM('mag');document.getElementById('agn').value='';document.getElementById('agr').value='';toast('Guest added');}
 function killSess(n){
-if(confirm(‘Kill session for ‘+n+’? They will be immediately signed out.’)){
-// Write kill signal to localStorage — guest app picks it up
-var payload=JSON.stringify({type:‘kill’,name:n,time:Date.now()});
-localStorage.setItem(‘arivo_dashboard_to_guest’,payload);
-window.dispatchEvent(new StorageEvent(‘storage’,{key:‘arivo_dashboard_to_guest’,newValue:payload}));
-toast(‘Session killed for ‘+n);
-// Remove from sessions list
-var rows=document.querySelectorAll(’.srow’);
-rows.forEach(function(row){
-var sn=row.querySelector(’.sn’);
-if(sn&&sn.textContent.indexOf(n)>=0)row.remove();
-});
+  if(confirm('Kill session for '+n+'? They will be immediately signed out.')){
+    // Write kill signal to localStorage — guest app picks it up
+    var payload=JSON.stringify({type:'kill',name:n,time:Date.now()});
+    localStorage.setItem('arivo_dashboard_to_guest',payload);
+    window.dispatchEvent(new StorageEvent('storage',{key:'arivo_dashboard_to_guest',newValue:payload}));
+    toast('Session killed for '+n);
+    // Remove from sessions list
+    var rows=document.querySelectorAll('.srow');
+    rows.forEach(function(row){
+      var sn=row.querySelector('.sn');
+      if(sn&&sn.textContent.indexOf(n)>=0)row.remove();
+    });
+  }
 }
-}
-function genBypass(){var g=document.getElementById(‘bpg’).value.trim(),r=document.getElementById(‘bpr’).value.trim();if(!g){toast(‘Enter guest name’,‘err’);return;}var c=Math.floor(1000+Math.random()*9000).toString();document.getElementById(‘bypname’).textContent=g+(r?’ (Room ‘+r+’)’:’’);document.getElementById(‘bypcode’).textContent=c;document.getElementById(‘bypres’).style.display=‘block’;toast(‘Code: ‘+c+’ valid 15 min’);}
-function openMsgM(n,r){document.getElementById(‘msgto2’).textContent=n+’ \u2014 ‘+r;document.getElementById(‘msgb2’).value=’’;openM(‘mmsg’);}
-function sendMsgM(){var b=document.getElementById(‘msgb2’).value.trim();if(!b){toast(‘Type a message’,‘err’);return;}closeM(‘mmsg’);toast(‘Message sent to ‘+document.getElementById(‘msgto2’).textContent);}
-function sendMsg(){var t=document.getElementById(‘msgto’).value,b=document.getElementById(‘msgbody’).value.trim();if(!b){toast(‘Type a message’,‘err’);return;}toast(‘Message sent to: ‘+t);document.getElementById(‘msgbody’).value=’’;}
-function loadTpl(t){var tpls={checkout:‘Your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!’,welcome:‘Welcome to the hotel! We hope your room is perfect. Please ask through the app or dial 0 if you need anything.’};document.getElementById(‘msgbody’).value=tpls[t]||’’;}
-function genLink(){var n=document.getElementById(‘gln’).value.trim(),r=document.getElementById(‘glr’).value.trim();if(!n||!r){toast(‘Enter name and room’,‘err’);return;}var ref=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase()+’-’+r.padStart(3,‘0’);document.getElementById(‘glurl’).textContent=‘guest.arivo.app/maison-bath?ref=’+ref;document.getElementById(‘glres’).style.display=‘block’;toast(‘Link generated for ‘+n);}
-function addStaff(){var n=document.getElementById(‘sfn’).value.trim(),role=document.getElementById(‘sfr’).value;if(!n){toast(‘Enter name’,‘err’);return;}var ini=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);var cs=[‘rgba(61,214,140,.1)’,‘rgba(96,165,250,.1)’,‘rgba(201,168,76,.1)’],ts=[‘var(–grn)’,‘var(–blu)’,‘var(–gold)’],ci=Math.floor(Math.random()*3);var r=document.createElement(‘div’);r.className=‘srow’;r.innerHTML=’<div class="sav" style="background:'+cs[ci]+';color:'+ts[ci]+'">’+ini+’</div><div class="sin"><div class="sn">’+n+’</div><div class="ss">’+role+’ \u00b7 Active</div></div><div class="icb del" onclick="toast(\'Staff removed\')">✕</div>’;document.getElementById(‘stafflist’).appendChild(r);var chips=document.getElementById(‘schips’);var chip=document.createElement(‘div’);chip.className=‘schap’;chip.textContent=n.split(’ ‘)[0]+’.’;chip.onclick=function(){pickStaff(chip);};chips.appendChild(chip);closeM(‘mstaff’);document.getElementById(‘sfn’).value=’’;toast(n+’ added’);}
-function saveCreds(t){if(t===‘name’){var n=document.getElementById(‘cname’).value.trim(),e=document.getElementById(‘cemail’).value.trim();if(!n||!e){toast(‘Fill in name and email’,‘err’);return;}if(!e.includes(’@’)){toast(‘Invalid email’,‘err’);return;}var un=document.getElementById(‘uname’);if(un)un.textContent=n;var ua=document.getElementById(‘uav’);if(ua)ua.textContent=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);toast(‘Name and email updated’);}else{var cur=document.getElementById(‘cpc’).value,nw=document.getElementById(‘cpn’).value,cf=document.getElementById(‘cpcf’).value,err=document.getElementById(‘cperr’);if(!cur||!nw||!cf){toast(‘Fill in all password fields’,‘err’);return;}if(nw.length<8){toast(‘Password must be 8+ characters’,‘err’);return;}if(nw!==cf){err.style.display=‘block’;return;}err.style.display=‘none’;[‘cpc’,‘cpn’,‘cpcf’].forEach(function(id){document.getElementById(id).value=’’;});toast(‘Password updated’);}}
-function toast(msg,type){var t=document.getElementById(‘toast’);t.className=type||’’;t.textContent=msg;t.classList.add(‘on’);setTimeout(function(){t.classList.remove(‘on’);},2800);}
+function genBypass(){var g=document.getElementById('bpg').value.trim(),r=document.getElementById('bpr').value.trim();if(!g){toast('Enter guest name','err');return;}var c=Math.floor(1000+Math.random()*9000).toString();document.getElementById('bypname').textContent=g+(r?' (Room '+r+')':'');document.getElementById('bypcode').textContent=c;document.getElementById('bypres').style.display='block';toast('Code: '+c+' valid 15 min');}
+function openMsgM(n,r){document.getElementById('msgto2').textContent=n+' \u2014 '+r;document.getElementById('msgb2').value='';openM('mmsg');}
+function sendMsgM(){var b=document.getElementById('msgb2').value.trim();if(!b){toast('Type a message','err');return;}closeM('mmsg');toast('Message sent to '+document.getElementById('msgto2').textContent);}
+function sendMsg(){var t=document.getElementById('msgto').value,b=document.getElementById('msgbody').value.trim();if(!b){toast('Type a message','err');return;}toast('Message sent to: '+t);document.getElementById('msgbody').value='';}
+function loadTpl(t){var tpls={checkout:'Your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!',welcome:'Welcome to the hotel! We hope your room is perfect. Please ask through the app or dial 0 if you need anything.'};document.getElementById('msgbody').value=tpls[t]||'';}
+function genLink(){var n=document.getElementById('gln').value.trim(),r=document.getElementById('glr').value.trim();if(!n||!r){toast('Enter name and room','err');return;}var ref=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase()+'-'+r.padStart(3,'0');document.getElementById('glurl').textContent='guest.arivo.app/maison-bath?ref='+ref;document.getElementById('glres').style.display='block';toast('Link generated for '+n);}
+function addStaff(){var n=document.getElementById('sfn').value.trim(),role=document.getElementById('sfr').value;if(!n){toast('Enter name','err');return;}var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var cs=['rgba(61,214,140,.1)','rgba(96,165,250,.1)','rgba(201,168,76,.1)'],ts=['var(--grn)','var(--blu)','var(--gold)'],ci=Math.floor(Math.random()*3);var r=document.createElement('div');r.className='srow';r.innerHTML='<div class="sav" style="background:'+cs[ci]+';color:'+ts[ci]+'">'+ini+'</div><div class="sin"><div class="sn">'+n+'</div><div class="ss">'+role+' \u00b7 Active</div></div><div class="icb del" onclick="toast(\'Staff removed\')">&#10005;</div>';document.getElementById('stafflist').appendChild(r);var chips=document.getElementById('schips');var chip=document.createElement('div');chip.className='schap';chip.textContent=n.split(' ')[0]+'.';chip.onclick=function(){pickStaff(chip);};chips.appendChild(chip);closeM('mstaff');document.getElementById('sfn').value='';toast(n+' added');}
+function saveCreds(t){if(t==='name'){var n=document.getElementById('cname').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e){toast('Fill in name and email','err');return;}if(!e.includes('@')){toast('Invalid email','err');return;}var un=document.getElementById('uname');if(un)un.textContent=n;var ua=document.getElementById('uav');if(ua)ua.textContent=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);toast('Name and email updated');}else{var cur=document.getElementById('cpc').value,nw=document.getElementById('cpn').value,cf=document.getElementById('cpcf').value,err=document.getElementById('cperr');if(!cur||!nw||!cf){toast('Fill in all password fields','err');return;}if(nw.length<8){toast('Password must be 8+ characters','err');return;}if(nw!==cf){err.style.display='block';return;}err.style.display='none';['cpc','cpn','cpcf'].forEach(function(id){document.getElementById(id).value='';});toast('Password updated');}}
+function toast(msg,type){var t=document.getElementById('toast');t.className=type||'';t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800);}
 
 // ── STAFF CREDENTIALS EDIT / DELETE ──
 var currentEditRow = null;
 
 function editStaff(btn) {
-var row = btn.closest(’.srow’);
-if (!row) return;
-currentEditRow = row;
-var name = row.querySelector(’.sn’) ? row.querySelector(’.sn’).textContent : ‘’;
-var roleStatus = row.querySelector(’.ss’) ? row.querySelector(’.ss’).textContent : ‘’;
-var parts = roleStatus.split(’·’);
-var role = parts[0] ? parts[0].trim() : ‘’;
-var status = parts[1] ? parts[1].trim() : ‘Active’;
-document.getElementById(‘edit-sfn’).value = name;
-document.getElementById(‘edit-sfe’).value = ‘’;
-// Set role dropdown
-var roleSelect = document.getElementById(‘edit-sfr’);
-for (var i = 0; i < roleSelect.options.length; i++) {
-if (roleSelect.options[i].value === role) { roleSelect.selectedIndex = i; break; }
-}
-// Set status dropdown
-var statusSelect = document.getElementById(‘edit-sfs’);
-for (var j = 0; j < statusSelect.options.length; j++) {
-if (statusSelect.options[j].value === status) { statusSelect.selectedIndex = j; break; }
-}
-openM(‘medit-staff’);
+  var row = btn.closest('.srow');
+  if (!row) return;
+  currentEditRow = row;
+  var name = row.querySelector('.sn') ? row.querySelector('.sn').textContent : '';
+  var roleStatus = row.querySelector('.ss') ? row.querySelector('.ss').textContent : '';
+  var parts = roleStatus.split('·');
+  var role = parts[0] ? parts[0].trim() : '';
+  var status = parts[1] ? parts[1].trim() : 'Active';
+  document.getElementById('edit-sfn').value = name;
+  document.getElementById('edit-sfe').value = '';
+  // Set role dropdown
+  var roleSelect = document.getElementById('edit-sfr');
+  for (var i = 0; i < roleSelect.options.length; i++) {
+    if (roleSelect.options[i].value === role) { roleSelect.selectedIndex = i; break; }
+  }
+  // Set status dropdown
+  var statusSelect = document.getElementById('edit-sfs');
+  for (var j = 0; j < statusSelect.options.length; j++) {
+    if (statusSelect.options[j].value === status) { statusSelect.selectedIndex = j; break; }
+  }
+  openM('medit-staff');
 }
 
 function saveStaffEdit() {
-var name = document.getElementById(‘edit-sfn’).value.trim();
-var role = document.getElementById(‘edit-sfr’).value;
-var status = document.getElementById(‘edit-sfs’).value;
-if (!name) { toast(‘Please enter a name’, ‘err’); return; }
-if (!currentEditRow) return;
-var ini = name.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);
-currentEditRow.querySelector(’.sav’).textContent = ini;
-currentEditRow.querySelector(’.sn’).textContent = name;
-currentEditRow.querySelector(’.ss’).textContent = role + ’ · ’ + status;
-// Update staff chip in ETA popup if exists
-var chips = document.getElementById(‘schips’);
-if (chips) {
-var chipName = name.split(’ ‘)[0] + ‘.’;
-// Try to find an existing chip to update (match by old initials)
-// Simplest: we just update matching chips
-chips.querySelectorAll(’.schap’).forEach(function(c) {
-if (c.dataset.staffRow === currentEditRow.id) {
-c.textContent = chipName;
-}
-});
-}
-closeM(‘medit-staff’);
-toast(name + ’ updated’);
-currentEditRow = null;
+  var name = document.getElementById('edit-sfn').value.trim();
+  var role = document.getElementById('edit-sfr').value;
+  var status = document.getElementById('edit-sfs').value;
+  if (!name) { toast('Please enter a name', 'err'); return; }
+  if (!currentEditRow) return;
+  var ini = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  currentEditRow.querySelector('.sav').textContent = ini;
+  currentEditRow.querySelector('.sn').textContent = name;
+  currentEditRow.querySelector('.ss').textContent = role + ' · ' + status;
+  // Update staff chip in ETA popup if exists
+  var chips = document.getElementById('schips');
+  if (chips) {
+    var chipName = name.split(' ')[0] + '.';
+    // Try to find an existing chip to update (match by old initials)
+    // Simplest: we just update matching chips
+    chips.querySelectorAll('.schap').forEach(function(c) {
+      if (c.dataset.staffRow === currentEditRow.id) {
+        c.textContent = chipName;
+      }
+    });
+  }
+  closeM('medit-staff');
+  toast(name + ' updated');
+  currentEditRow = null;
 }
 
 function revokeStaffAccess(name) {
-var revoked = JSON.parse(localStorage.getItem(‘arivo_revoked_staff’) || ‘[]’);
-if (revoked.indexOf(name) < 0) revoked.push(name);
-localStorage.setItem(‘arivo_revoked_staff’, JSON.stringify(revoked));
-window.dispatchEvent(new StorageEvent(‘storage’, {key:‘arivo_revoked_staff’, newValue:JSON.stringify(revoked)}));
+  var revoked = JSON.parse(localStorage.getItem('arivo_revoked_staff') || '[]');
+  if (revoked.indexOf(name) < 0) revoked.push(name);
+  localStorage.setItem('arivo_revoked_staff', JSON.stringify(revoked));
+  window.dispatchEvent(new StorageEvent('storage', {key:'arivo_revoked_staff', newValue:JSON.stringify(revoked)}));
 }
 
 function removeStaff(btn) {
-var row = btn.closest(’.srow’);
-if (!row) return;
-var name = row.querySelector(’.sn’) ? row.querySelector(’.sn’).textContent : ‘this staff member’;
-if (!confirm(‘Remove ’ + name + ‘? This cannot be undone.’)) return;
-revokeStaffAccess(name);
-logEvent(‘staff_removed’,‘Staff removed: ‘+name,‘Manager’,’-’);
-row.remove();
-toast(name + ’ removed — access revoked’);
+  var row = btn.closest('.srow');
+  if (!row) return;
+  var name = row.querySelector('.sn') ? row.querySelector('.sn').textContent : 'this staff member';
+  if (!confirm('Remove ' + name + '? This cannot be undone.')) return;
+  revokeStaffAccess(name);
+  logEvent('staff_removed','Staff removed: '+name,'Manager','-');
+  row.remove();
+  toast(name + ' removed — access revoked');
 }
 
 function removeStaffById() {
-if (!currentEditRow) return;
-var name = currentEditRow.querySelector(’.sn’) ? currentEditRow.querySelector(’.sn’).textContent : ‘this staff member’;
-if (!confirm(‘Remove ’ + name + ‘? This cannot be undone.’)) return;
-revokeStaffAccess(name);
-currentEditRow.remove();
-closeM(‘medit-staff’);
-toast(name + ’ removed — access revoked’);
-currentEditRow = null;
+  if (!currentEditRow) return;
+  var name = currentEditRow.querySelector('.sn') ? currentEditRow.querySelector('.sn').textContent : 'this staff member';
+  if (!confirm('Remove ' + name + '? This cannot be undone.')) return;
+  revokeStaffAccess(name);
+  currentEditRow.remove();
+  closeM('medit-staff');
+  toast(name + ' removed — access revoked');
+  currentEditRow = null;
 }
 
 // ── REQUEST SYNC: Overview ↔ Requests ──
 // Both sections share the same row IDs so actions sync across both
 function syncRequestRow(sourceRow, action) {
-var title = sourceRow.querySelector(’.rt’) ? sourceRow.querySelector(’.rt’).textContent : ‘’;
-if (!title) return;
-// Normalise: lowercase, strip room numbers, entities, punctuation — just first 3 words
-function normalise(t) {
-return t.toLowerCase()
-.replace(/—|–|-/g, ’ ‘)  // em/en dash to space
-.replace(/[^a-z0-9 ]/g, ’ ‘)        // strip punctuation
-.trim()
-.split(/\s+/).slice(0, 2).join(’ ‘); // first 2 words — reliable cross-section match
-}
-var srcKey = normalise(title);
-var allRows = document.querySelectorAll(’#reqlist .row, #s-ov .row’);
-allRows.forEach(function(row) {
-if (row === sourceRow) return;
-var rt = row.querySelector(’.rt’);
-if (!rt) return;
-if (normalise(rt.textContent) !== srcKey) return;
-// Same key — apply state
-if (action === ‘claim’) {
-row.querySelector(’.dot’).className = ‘dot cl’;
-var b = row.querySelector(’.badge’);
-if (b) { b.className = ‘badge cl’; b.textContent = ‘Claimed’; }
-row.querySelectorAll(’.btn-s’).forEach(function(b) {
-if (b.textContent === ‘Claim’) b.remove();
-});
-var rs = row.querySelector(’.rs’);
-if (rs && rs.textContent.indexOf(‘Claimed’) < 0) rs.textContent += ’ · Claimed by you’;
-} else if (action === ‘done’) {
-row.querySelector(’.dot’).className = ‘dot dn’;
-var bd = row.querySelector(’.badge’);
-if (bd) { bd.className = ‘badge dn’; bd.textContent = ‘Done’; }
-var chip = row.querySelector(’.echip’); if (chip) chip.remove();
-row.querySelectorAll(’.btn-s’).forEach(function(b) { b.remove(); });
-} else if (action === ‘progress’) {
-row.querySelector(’.dot’).className = ‘dot pr’;
-var bp = row.querySelector(’.badge’);
-if (bp) { bp.className = ‘badge pr’; bp.textContent = ‘In Progress’; }
-// Also remove Claim button from the synced row
-row.querySelectorAll(’.btn-s’).forEach(function(b) {
-if (b.textContent === ‘Claim’) b.remove();
-});
-}
-});
+  var title = sourceRow.querySelector('.rt') ? sourceRow.querySelector('.rt').textContent : '';
+  if (!title) return;
+  // Normalise: lowercase, strip room numbers, entities, punctuation — just first 3 words
+  function normalise(t) {
+    return t.toLowerCase()
+      .replace(/—|–|-/g, ' ')  // em/en dash to space
+      .replace(/[^a-z0-9 ]/g, ' ')        // strip punctuation
+      .trim()
+      .split(/\s+/).slice(0, 2).join(' '); // first 2 words — reliable cross-section match
+  }
+  var srcKey = normalise(title);
+  var allRows = document.querySelectorAll('#reqlist .row, #s-ov .row');
+  allRows.forEach(function(row) {
+    if (row === sourceRow) return;
+    var rt = row.querySelector('.rt');
+    if (!rt) return;
+    if (normalise(rt.textContent) !== srcKey) return;
+    // Same key — apply state
+    if (action === 'claim') {
+      row.querySelector('.dot').className = 'dot cl';
+      var b = row.querySelector('.badge');
+      if (b) { b.className = 'badge cl'; b.textContent = 'Claimed'; }
+      row.querySelectorAll('.btn-s').forEach(function(b) {
+        if (b.textContent === 'Claim') b.remove();
+      });
+      var rs = row.querySelector('.rs');
+      if (rs && rs.textContent.indexOf('Claimed') < 0) rs.textContent += ' · Claimed by you';
+    } else if (action === 'done') {
+      row.querySelector('.dot').className = 'dot dn';
+      var bd = row.querySelector('.badge');
+      if (bd) { bd.className = 'badge dn'; bd.textContent = 'Done'; }
+      var chip = row.querySelector('.echip'); if (chip) chip.remove();
+      row.querySelectorAll('.btn-s').forEach(function(b) { b.remove(); });
+    } else if (action === 'progress') {
+      row.querySelector('.dot').className = 'dot pr';
+      var bp = row.querySelector('.badge');
+      if (bp) { bp.className = 'badge pr'; bp.textContent = 'In Progress'; }
+      // Also remove Claim button from the synced row
+      row.querySelectorAll('.btn-s').forEach(function(b) {
+        if (b.textContent === 'Claim') b.remove();
+      });
+    }
+  });
 }
 
 // ── ACTIVITY LOGGING ──
 function logEvent(action, detail, user, room){
-var logs = JSON.parse(localStorage.getItem(‘arivo_activity_log’)||’[]’);
-logs.push({
-ts: new Date().toISOString(),
-action: action,
-detail: detail,
-user: user || ‘Manager’,
-room: room || ‘-’,
-source: ‘dashboard’
-});
-localStorage.setItem(‘arivo_activity_log’, JSON.stringify(logs));
+  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
+  logs.push({
+    ts: new Date().toISOString(),
+    action: action,
+    detail: detail,
+    user: user || 'Manager',
+    room: room || '-',
+    source: 'dashboard'
+  });
+  localStorage.setItem('arivo_activity_log', JSON.stringify(logs));
 }
 
 function getActivityLog(){
-return JSON.parse(localStorage.getItem(‘arivo_activity_log’)||’[]’);
+  return JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
 }
 
 function clearActivityLog(){
-if(confirm(‘Clear all activity logs? This cannot be undone.’)) {
-localStorage.removeItem(‘arivo_activity_log’);
-renderLogReport();
-toast(‘Logs cleared’);
-}
+  if(confirm('Clear all activity logs? This cannot be undone.')) {
+    localStorage.removeItem('arivo_activity_log');
+    renderLogReport();
+    toast('Logs cleared');
+  }
 }
 
 function renderLogReport(){
-var container = document.getElementById(‘log-entries’);
-if(!container) return;
-var logs = getActivityLog().reverse(); // newest first
-if(!logs.length){
-container.innerHTML = ‘<div style="text-align:center;padding:30px;color:var(--tx3);font-size:13px;">No activity logged yet. Activity appears here as guests and staff use the system.</div>’;
-return;
-}
-container.innerHTML = ‘’;
-logs.forEach(function(log){
-var row = document.createElement(‘div’);
-row.style.cssText = ‘display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(–bor);’;
-var d = new Date(log.ts);
-var timeStr = d.toLocaleDateString(‘en-GB’,{day:‘numeric’,month:‘short’,hour:‘2-digit’,minute:‘2-digit’});
-var srcColor = log.source===‘guest_app’?‘var(–gold)’:log.source===‘staff_app’?‘var(–blu)’:‘var(–grn)’;
-var actionLabel = {
-‘guest_register’:‘Registered’,
-‘guest_rating’:‘Rating’,
-‘guest_request’:‘Request’,
-‘guest_issue’:‘Maintenance’,
-‘guest_message’:‘Message’,
-‘messages_read’:‘Read Receipt’,
-‘req_claim’:‘Claimed’,
-‘req_done’:‘Completed’,
-‘req_eta’:‘ETA Set’,
-‘msg_sent’:‘Msg Sent’,
-‘staff_login’:‘Staff Login’,
-‘staff_logout’:‘Staff Logout’,
-‘staff_removed’:‘Staff Removed’,
-‘guest_checkout’:‘Checkout’
-}[log.action] || log.action;
-row.innerHTML =
-‘<div style="flex-shrink:0;width:80px;font-size:10px;color:var(--tx3);padding-top:2px;">’+timeStr+’</div>’+
-‘<div style="flex-shrink:0;background:rgba(201,168,76,0.1);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:'+srcColor+';white-space:nowrap;">’+actionLabel+’</div>’+
-‘<div style="flex:1;min-width:0;">’+
-‘<div style="font-size:12px;color:var(--tx);font-weight:500;">’+log.detail+’</div>’+
-‘<div style="font-size:11px;color:var(--tx3);margin-top:2px;">’+(log.user||’’)+(log.room&&log.room!==’-’?’ · Room ‘+log.room:’’)+’</div>’+
-‘</div>’;
-container.appendChild(row);
-});
+  var container = document.getElementById('log-entries');
+  if(!container) return;
+  var logs = getActivityLog().reverse(); // newest first
+  if(!logs.length){
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tx3);font-size:13px;">No activity logged yet. Activity appears here as guests and staff use the system.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  logs.forEach(function(log){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bor);';
+    var d = new Date(log.ts);
+    var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var srcColor = log.source==='guest_app'?'var(--gold)':log.source==='staff_app'?'var(--blu)':'var(--grn)';
+    var actionLabel = {
+      'guest_register':'Registered',
+      'guest_rating':'Rating',
+      'guest_request':'Request',
+      'guest_issue':'Maintenance',
+      'guest_message':'Message',
+      'messages_read':'Read Receipt',
+      'req_claim':'Claimed',
+      'req_done':'Completed',
+      'req_eta':'ETA Set',
+      'msg_sent':'Msg Sent',
+      'staff_login':'Staff Login',
+      'staff_logout':'Staff Logout',
+      'staff_removed':'Staff Removed',
+      'guest_checkout':'Checkout'
+    }[log.action] || log.action;
+    row.innerHTML =
+      '<div style="flex-shrink:0;width:80px;font-size:10px;color:var(--tx3);padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;background:rgba(201,168,76,0.1);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:'+srcColor+';white-space:nowrap;">'+actionLabel+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-size:12px;color:var(--tx);font-weight:500;">'+log.detail+'</div>'+
+        '<div style="font-size:11px;color:var(--tx3);margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+'</div>'+
+      '</div>';
+    container.appendChild(row);
+  });
 }
 
 function exportLogs(){
-var logs = getActivityLog();
-var csv = ‘Timestamp,Action,Detail,User,Room,Source\n’;
-logs.forEach(function(l){
-csv += [l.ts,l.action,’”’+(l.detail||’’).replace(/”/g,’””’)+’”’,l.user||’’,l.room||’’,l.source||’’].join(’,’)+’\n’;
-});
-var blob = new Blob([csv],{type:‘text/csv’});
-var a = document.createElement(‘a’);
-a.href = URL.createObjectURL(blob);
-a.download = ‘arivo-activity-log-’+new Date().toISOString().split(‘T’)[0]+’.csv’;
-a.click();
-toast(‘Log exported as CSV’);
+  var logs = getActivityLog();
+  var csv = 'Timestamp,Action,Detail,User,Room,Source\n';
+  logs.forEach(function(l){
+    csv += [l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
+  });
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'arivo-activity-log-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  toast('Log exported as CSV');
 }
 
 // ── SUPABASE REAL-TIME CONNECTION ──
 function notifyGuest(type,text,reqId,status,staffName){
-var payload={type:type,text:text||null,reqId:reqId||null,status:status||null,staffName:staffName||null,ts:Date.now()};
-localStorage.setItem(‘arivo_dashboard_to_guest’,JSON.stringify(payload));
-// Also write to Supabase messages table for cross-device delivery
-if(type===‘message’&&text){
-db.from(‘messages’).insert({
-hotel_id:HOTEL_ID,
-guest_id:null,
-direction:‘hotel_to_guest’,
-sender_name:‘Hotel Team’,
-body:text
-}).catch(function(){});
-}
+  var payload={type:type,text:text||null,reqId:reqId||null,status:status||null,staffName:staffName||null,ts:Date.now()};
+  localStorage.setItem('arivo_dashboard_to_guest',JSON.stringify(payload));
+  // Also write to Supabase messages table for cross-device delivery
+  if(type==='message'&&text){
+    db.from('messages').insert({
+      hotel_id:HOTEL_ID,
+      guest_id:null,
+      direction:'hotel_to_guest',
+      sender_name:'Hotel Team',
+      body:text
+    }).catch(function(){});
+  }
 }
 
 function addRequestRow(req){
-var list=document.getElementById(‘reqlist’);
-if(!list)return;
-if(document.getElementById(‘req-’+req.id))return;
-var row=document.createElement(‘div’);row.className=‘row’;row.id=‘req-’+req.id;
-var dot=document.createElement(‘div’);dot.className=‘dot nw’;
-var ri=document.createElement(‘div’);ri.className=‘ri’;
-ri.innerHTML=’<div class="rt">’+(req.type||‘Request’)+’ — Room ‘+(req.room||req.guest_room||’?’)+’</div>’+
-‘<div class="rs">’+(req.guest_name||req.guest||‘Guest’)+’ · ‘+(req.detail||’’).slice(0,50)+’</div>’;
-var badge=document.createElement(‘div’);badge.className=‘badge nw’;badge.textContent=‘New’;
-var clm=document.createElement(‘button’);clm.className=‘btn btn-s’;clm.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;clm.textContent=‘Claim’;
-clm.onclick=function(){claimReq(clm);};
-var dn=document.createElement(‘button’);dn.className=‘btn btn-s’;dn.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;dn.textContent=‘Done’;
-dn.onclick=function(){openETA(dn);};
-row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(clm);row.appendChild(dn);
-list.insertBefore(row,list.firstChild);
-openReqs++;updateCnts();
-ping();flashTab(‘New Request!’);
-notify(‘mgr’,’🛎 New Request’,(req.type||‘Request’)+’ from Room ‘+(req.room||’?’),’’);
+  var list=document.getElementById('reqlist');
+  if(!list)return;
+  if(document.getElementById('req-'+req.id))return;
+  var row=document.createElement('div');row.className='row';row.id='req-'+req.id;
+  var dot=document.createElement('div');dot.className='dot nw';
+  var ri=document.createElement('div');ri.className='ri';
+  ri.innerHTML='<div class="rt">'+(req.type||'Request')+' — Room '+(req.room||req.guest_room||'?')+'</div>'+
+    '<div class="rs">'+(req.guest_name||req.guest||'Guest')+' · '+(req.detail||'').slice(0,50)+'</div>';
+  var badge=document.createElement('div');badge.className='badge nw';badge.textContent='New';
+  var clm=document.createElement('button');clm.className='btn btn-s';clm.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';clm.textContent='Claim';
+  clm.onclick=function(){claimReq(clm);};
+  var dn=document.createElement('button');dn.className='btn btn-s';dn.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';dn.textContent='Done';
+  dn.onclick=function(){openETA(dn);};
+  row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(clm);row.appendChild(dn);
+  list.insertBefore(row,list.firstChild);
+  openReqs++;updateCnts();
+  ping();flashTab('New Request!');
+  notify('mgr','&#128718; New Request',(req.type||'Request')+' from Room '+(req.room||'?'),'');
 }
 
 function loadGuestRequests(){
-// Load open requests from Supabase
-db.from(‘requests’)
-.select(’*, guests(name,room)’)
-.eq(‘hotel_id’,HOTEL_ID)
-.in(‘status’,[‘new’,‘claimed’])
-.order(‘created_at’,{ascending:false})
-.then(function(result){
-if(!result.data)return;
-result.data.forEach(function(req){
-req.guest_name=req.guests?req.guests.name:‘Guest’;
-req.room=req.guests?req.guests.room:’?’;
-addRequestRow(req);
-});
-});
-// Also check localStorage for same-browser requests
-var lsReqs=JSON.parse(localStorage.getItem(‘arivo_requests’)||’[]’);
-lsReqs.forEach(function(req){addRequestRow(req);});
+  // Load open requests from Supabase
+  db.from('requests')
+    .select('*, guests(name,room)')
+    .eq('hotel_id',HOTEL_ID)
+    .in('status',['new','claimed'])
+    .order('created_at',{ascending:false})
+    .then(function(result){
+      if(!result.data)return;
+      result.data.forEach(function(req){
+        req.guest_name=req.guests?req.guests.name:'Guest';
+        req.room=req.guests?req.guests.room:'?';
+        addRequestRow(req);
+      });
+    });
+  // Also check localStorage for same-browser requests
+  var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  lsReqs.forEach(function(req){addRequestRow(req);});
 }
 
 function loadGuestMessages(){
-db.from(‘messages’)
-.select(’*’).eq(‘hotel_id’,HOTEL_ID).eq(‘direction’,‘guest_to_hotel’).eq(‘read’,false)
-.then(function(result){
-if(result.data&&result.data.length){
-toast(result.data.length+’ unread message’+(result.data.length>1?‘s’:’’)+’ from guests’,‘warn’);
-}
-});
+  db.from('messages')
+    .select('*').eq('hotel_id',HOTEL_ID).eq('direction','guest_to_hotel').eq('read',false)
+    .then(function(result){
+      if(result.data&&result.data.length){
+        toast(result.data.length+' unread message'+(result.data.length>1?'s':'')+' from guests','warn');
+      }
+    });
 }
 
 function subscribeToRequests(){
-db.channel(‘db-requests’)
-.on(‘postgres_changes’,{event:‘INSERT’,schema:‘public’,table:‘requests’,filter:‘hotel_id=eq.’+HOTEL_ID},function(payload){
-db.from(‘guests’).select(‘name,room’).eq(‘id’,payload.new.guest_id).single().then(function(r){
-var req=Object.assign({},payload.new,{guest_name:r.data?r.data.name:‘Guest’,room:r.data?r.data.room:’?’});
-addRequestRow(req);
-});
-})
-.on(‘postgres_changes’,{event:‘INSERT’,schema:‘public’,table:‘messages’,filter:‘hotel_id=eq.’+HOTEL_ID},function(payload){
-if(payload.new.direction===‘guest_to_hotel’){
-toast(‘Message from ‘+payload.new.sender_name+’: ‘+payload.new.body.slice(0,40),‘warn’);
-notify(‘mgr’,’💬 Guest Message’,payload.new.body,payload.new.sender_name);
-}
-})
-.on(‘postgres_changes’,{event:‘INSERT’,schema:‘public’,table:‘ratings’,filter:‘hotel_id=eq.’+HOTEL_ID},function(payload){
-if(payload.new.stars<=3){
-var p=document.getElementById(‘palert’);if(p)p.classList.add(‘on’);
-ping();flashTab(‘⚠️ Low Rating!’);
-notify(‘warn’,‘★ Low Rating’,‘Guest rated ‘+payload.new.stars+’ stars.’,‘Priority alert’);
-}
-})
-.on(‘postgres_changes’,{event:‘UPDATE’,schema:‘public’,table:‘messages’},function(payload){
-if(payload.new.read&&!payload.old.read&&payload.new.direction===‘hotel_to_guest’){
-notify(‘mgr’,’✓ Read’,‘Guest read your message.’,’’);
-}
-})
-.subscribe();
+  db.channel('db-requests')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'requests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
+      db.from('guests').select('name,room').eq('id',payload.new.guest_id).single().then(function(r){
+        var req=Object.assign({},payload.new,{guest_name:r.data?r.data.name:'Guest',room:r.data?r.data.room:'?'});
+        addRequestRow(req);
+      });
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
+      if(payload.new.direction==='guest_to_hotel'){
+        toast('Message from '+payload.new.sender_name+': '+payload.new.body.slice(0,40),'warn');
+        notify('mgr','&#128172; Guest Message',payload.new.body,payload.new.sender_name);
+      }
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'ratings',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
+      if(payload.new.stars<=3){
+        var p=document.getElementById('palert');if(p)p.classList.add('on');
+        ping();flashTab('⚠️ Low Rating!');
+        notify('warn','★ Low Rating','Guest rated '+payload.new.stars+' stars.','Priority alert');
+      }
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},function(payload){
+      if(payload.new.read&&!payload.old.read&&payload.new.direction==='hotel_to_guest'){
+        notify('mgr','&#10003; Read','Guest read your message.','');
+      }
+    })
+    .subscribe();
 }
 
 // Also keep localStorage listener for same-browser testing
-window.addEventListener(‘storage’,function(e){
-if(e.key===‘arivo_requests’)loadGuestRequests();
-if(e.key===‘arivo_guest_messages’)loadGuestMessages();DOCTYPE html>
-
+window.addEventListener('storage',function(e){
+  if(e.key==='arivo_requests')loadGuestRequests();
+  if(e.key==='arivo_guest_messages')loadGuestMessages();DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1423,7 +1416,6 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
 </div>
 
 <!-- ACTIVITY LOGS -->
-
 <div class="sec" id="s-logs">
   <div class="sech">
     <div class="secr">
@@ -1505,10 +1497,7 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
   </div>
 </div>
 
-```
-</div></div>
-```
-
+    </div></div>
   <div class="bnav"><div class="bni">
     <div class="bnitem on" id="bn0" onclick="go('ov',null);setBN('bn0')"><div class="bnico">&#9646;&#9646;</div><div class="bnlbl">Overview</div></div>
     <div class="bnitem" id="bn1" onclick="go('req',null);setBN('bn1')"><div class="bnico">&#128718;</div><div class="bnlbl">Requests</div><div class="bndot" id="bndot">3</div></div>
@@ -1528,7 +1517,6 @@ const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Add Staff</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
 
 <!-- STAFF EDIT MODAL -->
-
 <div class="mov" id="medit-staff">
   <div class="modal">
     <div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div>
@@ -1577,564 +1565,412 @@ var openReqs=3,curBtn=null,curSec='',selStaff='',etaPresets=[5,10,15],pingCtx=nu
 
 function initPing(){try{pingCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
 function ping(){if(!pingCtx)return;try{var o=pingCtx.createOscillator(),g=pingCtx.createGain();o.connect(g);g.connect(pingCtx.destination);o.frequency.setValueAtTime(880,pingCtx.currentTime);o.frequency.exponentialRampToValueAtTime(440,pingCtx.currentTime+0.3);g.gain.setValueAtTime(0.4,pingCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,pingCtx.currentTime+0.4);o.start(pingCtx.currentTime);o.stop(pingCtx.currentTime+0.4);}catch(e){}}
-function flashTab(msg){clearInterval(flashInt);var orig=‘Arivo \u2014 Hotel Dashboard’,on=true;flashInt=setInterval(function(){document.title=on?msg:orig;on=!on;},700);setTimeout(function(){clearInterval(flashInt);document.title=orig;},8000);}
+function flashTab(msg){clearInterval(flashInt);var orig='Arivo \u2014 Hotel Dashboard',on=true;flashInt=setInterval(function(){document.title=on?msg:orig;on=!on;},700);setTimeout(function(){clearInterval(flashInt);document.title=orig;},8000);}
 
 // NOTIFICATIONS
 function notify(type,title,msg,sub){
-var band=document.getElementById(‘nband’);if(!band)return;
-var b=document.createElement(‘div’);b.className=‘nbanner ‘+type;
-b.innerHTML=’<div class="nbt">’+title+’</div><div class="nbm">’+msg+’</div>’+(sub?’<div class="nbs">’+sub+’</div>’:’’);
-b.onclick=function(){dismissBanner(b);};
-band.appendChild(b);
-setTimeout(function(){dismissBanner(b);},5000);
+  var band=document.getElementById('nband');if(!band)return;
+  var b=document.createElement('div');b.className='nbanner '+type;
+  b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');
+  b.onclick=function(){dismissBanner(b);};
+  band.appendChild(b);
+  setTimeout(function(){dismissBanner(b);},5000);
 }
 function dismissBanner(b){
-if(!b.parentNode)return;
-b.style.animation=‘slideOut .3s ease forwards’;
-setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);
+  if(!b.parentNode)return;
+  b.style.animation='slideOut .3s ease forwards';
+  setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);
 }
 
 function login(){
-var e=document.getElementById(‘le’).value.trim(),p=document.getElementById(‘lp’).value;
-if(e===‘manager@hotel.com’&&p===‘password123’){
-document.getElementById(‘lerr’).style.display=‘none’;
-document.getElementById(‘sl’).classList.remove(‘on’);
-document.getElementById(‘sd’).classList.add(‘on’);
-document.getElementById(‘odate’).textContent=new Date().toLocaleDateString(‘en-GB’,{weekday:‘long’,day:‘numeric’,month:‘long’,year:‘numeric’});
-var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split(‘T’)[0];
-[‘agc’,‘glc’].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
-initPing();
-logEvent(‘manager_login’,‘Manager logged in’,‘Manager’,’-’);
-loadGuestRequests();
-loadGuestMessages();
-subscribeToRequests();
-} else {document.getElementById(‘lerr’).style.display=‘block’;}
+  var e=document.getElementById('le').value.trim(),p=document.getElementById('lp').value;
+  if(e==='manager@hotel.com'&&p==='password123'){
+    document.getElementById('lerr').style.display='none';
+    document.getElementById('sl').classList.remove('on');
+    document.getElementById('sd').classList.add('on');
+    document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
+    ['agc','glc'].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
+    initPing();
+    logEvent('manager_login','Manager logged in','Manager','-');
+    loadGuestRequests();
+    loadGuestMessages();
+    subscribeToRequests();
+  } else {document.getElementById('lerr').style.display='block';}
 }
-document.getElementById(‘lp’).addEventListener(‘keydown’,function(e){if(e.key===‘Enter’)login();});
-function logout(){document.getElementById(‘sd’).classList.remove(‘on’);document.getElementById(‘sl’).classList.add(‘on’);}
+document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+function logout(){document.getElementById('sd').classList.remove('on');document.getElementById('sl').classList.add('on');}
 
 function go(name,el){
-document.querySelectorAll(’.sec’).forEach(function(s){s.classList.remove(‘on’);});
-document.querySelectorAll(’.ni’).forEach(function(n){n.classList.remove(‘on’);});
-var sec=document.getElementById(‘s-’+name);if(sec)sec.classList.add(‘on’);
-if(el)el.classList.add(‘on’);
-document.getElementById(‘ttl’).textContent=TITLES[name]||name;
-closeSidebar();window.scrollTo(0,0);
-if(name===‘logs’)renderLogReport();
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
+  var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');
+  if(el)el.classList.add('on');
+  document.getElementById('ttl').textContent=TITLES[name]||name;
+  closeSidebar();window.scrollTo(0,0);
+  if(name==='logs')renderLogReport();
 }
-function setBN(id){document.querySelectorAll(’.bnitem’).forEach(function(b){b.classList.remove(‘on’);});var el=document.getElementById(id);if(el)el.classList.add(‘on’);}
-function openSidebar(){document.getElementById(‘sbar’).classList.add(‘on’);document.getElementById(‘ov’).classList.add(‘on’);document.body.style.overflow=‘hidden’;}
-function closeSidebar(){document.getElementById(‘sbar’).classList.remove(‘on’);document.getElementById(‘ov’).classList.remove(‘on’);document.body.style.overflow=’’;}
-function openM(id){document.getElementById(id).classList.add(‘on’);document.body.style.overflow=‘hidden’;}
-function closeM(id){document.getElementById(id).classList.remove(‘on’);document.body.style.overflow=’’;}
-document.querySelectorAll(’.mov’).forEach(function(o){o.addEventListener(‘click’,function(e){if(e.target===o)closeM(o.id);});});
+function setBN(id){document.querySelectorAll('.bnitem').forEach(function(b){b.classList.remove('on');});var el=document.getElementById(id);if(el)el.classList.add('on');}
+function openSidebar(){document.getElementById('sbar').classList.add('on');document.getElementById('ov').classList.add('on');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sbar').classList.remove('on');document.getElementById('ov').classList.remove('on');document.body.style.overflow='';}
+function openM(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
+function closeM(id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}
+document.querySelectorAll('.mov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeM(o.id);});});
 
 // ETA POPUP
-function getPresets(){var rows=document.querySelectorAll(’.etarow input’),vals=[];rows.forEach(function(i){var v=parseInt(i.value);if(!isNaN(v)&&v>0)vals.push(v);});return vals.length?vals:[5,10,15];}
+function getPresets(){var rows=document.querySelectorAll('.etarow input'),vals=[];rows.forEach(function(i){var v=parseInt(i.value);if(!isNaN(v)&&v>0)vals.push(v);});return vals.length?vals:[5,10,15];}
 function renderEtaOpts(){
-var presets=getPresets(),c=document.getElementById(‘etaopts’);c.innerHTML=’’;
-for(var i=0;i<presets.length;i++){
-var d=document.createElement(‘div’);d.className=‘etaopt’;d.setAttribute(‘data-mins’,presets[i]);
-d.innerHTML=’<div><div class="etamins">’+presets[i]+’ min’+(selStaff?’ \u2192 ‘+selStaff:’’)+’</div><div class="etadesc">Reminder fires after ‘+presets[i]+’ min if not completed</div></div><span>\u2192</span>’;
-d.addEventListener(‘click’,function(){doETA(parseInt(this.getAttribute(‘data-mins’)));});
-c.appendChild(d);
-}
-var now=document.createElement(‘div’);now.className=‘etaopt etanow’;now.setAttribute(‘data-mins’,‘0’);
-now.innerHTML=’<div><div>Done now</div><div class="etadesc">Mark completed immediately</div></div><span>\u2713</span>’;
-now.addEventListener(‘click’,function(){doETA(0);});c.appendChild(now);
+  var presets=getPresets(),c=document.getElementById('etaopts');c.innerHTML='';
+  for(var i=0;i<presets.length;i++){
+    var d=document.createElement('div');d.className='etaopt';d.setAttribute('data-mins',presets[i]);
+    d.innerHTML='<div><div class="etamins">'+presets[i]+' min'+(selStaff?' \u2192 '+selStaff:'')+'</div><div class="etadesc">Reminder fires after '+presets[i]+' min if not completed</div></div><span>\u2192</span>';
+    d.addEventListener('click',function(){doETA(parseInt(this.getAttribute('data-mins')));});
+    c.appendChild(d);
+  }
+  var now=document.createElement('div');now.className='etaopt etanow';now.setAttribute('data-mins','0');
+  now.innerHTML='<div><div>Done now</div><div class="etadesc">Mark completed immediately</div></div><span>\u2713</span>';
+  now.addEventListener('click',function(){doETA(0);});c.appendChild(now);
 }
 function openETA(btn){
-curBtn=btn;var row=btn.closest(’.row’);
-document.getElementById(‘etalbl’).textContent=row?row.querySelector(’.rt’).textContent:‘Request’;
-selStaff=’’;document.querySelectorAll(’.schap’).forEach(function(c){c.classList.remove(‘on’);});
-document.getElementById(‘etcm’).value=’’;renderEtaOpts();
-document.getElementById(‘etapop’).classList.add(‘on’);document.body.style.overflow=‘hidden’;
+  curBtn=btn;var row=btn.closest('.row');
+  document.getElementById('etalbl').textContent=row?row.querySelector('.rt').textContent:'Request';
+  selStaff='';document.querySelectorAll('.schap').forEach(function(c){c.classList.remove('on');});
+  document.getElementById('etcm').value='';renderEtaOpts();
+  document.getElementById('etapop').classList.add('on');document.body.style.overflow='hidden';
 }
-function closeETA(){document.getElementById(‘etapop’).classList.remove(‘on’);document.body.style.overflow=’’;curBtn=null;}
+function closeETA(){document.getElementById('etapop').classList.remove('on');document.body.style.overflow='';curBtn=null;}
 function pickStaff(chip){
-document.querySelectorAll(’.schap’).forEach(function(c){c.classList.remove(‘on’);});chip.classList.add(‘on’);selStaff=chip.textContent;
-document.querySelectorAll(’#etaopts .etamins’).forEach(function(lbl){var m=lbl.textContent.split(’ ‘)[0];lbl.textContent=m+’ min \u2192 ‘+selStaff;});
+  document.querySelectorAll('.schap').forEach(function(c){c.classList.remove('on');});chip.classList.add('on');selStaff=chip.textContent;
+  document.querySelectorAll('#etaopts .etamins').forEach(function(lbl){var m=lbl.textContent.split(' ')[0];lbl.textContent=m+' min \u2192 '+selStaff;});
 }
-function useCustom(){var m=parseInt(document.getElementById(‘etcm’).value);if(isNaN(m)||m<1||m>240){toast(‘Enter 1\u2013240 min’,‘err’);return;}doETA(m);}
+function useCustom(){var m=parseInt(document.getElementById('etcm').value);if(isNaN(m)||m<1||m>240){toast('Enter 1\u2013240 min','err');return;}doETA(m);}
 function doETA(mins){
-var btn=curBtn;closeETA();if(!btn)return;
-var row=btn.closest(’.row’);
-var taskTitle=row?row.querySelector(’.rt’).textContent:‘Request’;
-var guestLine=row&&row.querySelector(’.rs’)?row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim():’’;
-if(mins===0){
-finalDone(row,btn,taskTitle,guestLine);
-} else {
-if(row){
-row.querySelector(’.dot’).className=‘dot pr’;
-var badge=row.querySelector(’.badge’);if(badge){badge.className=‘badge pr’;badge.textContent=‘In Progress’;}
-syncRequestRow(row, ‘progress’);
-btn.textContent=‘Done’;btn.onclick=function(){openETA(btn);};
-var ex=row.querySelector(’.echip’);if(ex)ex.remove();
-var chip=document.createElement(‘span’);chip.className=‘echip’;
-chip.textContent=‘ETA ‘+mins+’ min’+(selStaff?’ \u2014 ‘+selStaff:’’);
-chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
-}
-toast(‘ETA: ‘+mins+’ min’+(selStaff?’ \u2014 ‘+selStaff:’’));
-// Notify guest their request is being handled
-notify(‘guest’,’💬 Guest Notified’,‘Your request is being taken care of \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 ETA: ‘+mins+’ min \u00b7 Sent to guest app’);
-var savedChip=chip;
-var tid=setTimeout(function(){
-ping();flashTab(‘ETA Overdue!’);toast(‘Reminder: ETA passed’);
-if(savedChip&&savedChip.parentNode){savedChip.style.background=‘var(–rdim)’;savedChip.style.color=‘var(–red)’;savedChip.textContent=‘Overdue!’;}
-// Alert manager
-notify(‘warn’,’⏰ ETA Overdue’,‘No update on: ‘+taskTitle+’.’,(selStaff?selStaff+’ \u00b7 ‘:’’)+‘Please follow up with staff’);
-},mins*60*1000);
-if(row)row.dataset.tid=String(tid);
-}
+  var btn=curBtn;closeETA();if(!btn)return;
+  var row=btn.closest('.row');
+  var taskTitle=row?row.querySelector('.rt').textContent:'Request';
+  var guestLine=row&&row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+  if(mins===0){
+    finalDone(row,btn,taskTitle,guestLine);
+  } else {
+    if(row){
+      row.querySelector('.dot').className='dot pr';
+      var badge=row.querySelector('.badge');if(badge){badge.className='badge pr';badge.textContent='In Progress';}
+      syncRequestRow(row, 'progress');
+      btn.textContent='Done';btn.onclick=function(){openETA(btn);};
+      var ex=row.querySelector('.echip');if(ex)ex.remove();
+      var chip=document.createElement('span');chip.className='echip';
+      chip.textContent='ETA '+mins+' min'+(selStaff?' \u2014 '+selStaff:'');
+      chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
+    }
+    toast('ETA: '+mins+' min'+(selStaff?' \u2014 '+selStaff:''));
+    // Notify guest their request is being handled
+    notify('guest','&#128172; Guest Notified','Your request is being taken care of \u2014 '+taskTitle+'.',guestLine+' \u00b7 ETA: '+mins+' min \u00b7 Sent to guest app');
+    var savedChip=chip;
+    var tid=setTimeout(function(){
+      ping();flashTab('ETA Overdue!');toast('Reminder: ETA passed');
+      if(savedChip&&savedChip.parentNode){savedChip.style.background='var(--rdim)';savedChip.style.color='var(--red)';savedChip.textContent='Overdue!';}
+      // Alert manager
+      notify('warn','&#9200; ETA Overdue','No update on: '+taskTitle+'.',(selStaff?selStaff+' \u00b7 ':'')+'Please follow up with staff');
+    },mins*60*1000);
+    if(row)row.dataset.tid=String(tid);
+  }
 }
 function adjustETA(chip){
-var row=chip.closest(’.row’);var cur=chip.textContent.replace(/[^0-9]/g,’’);
-var v=prompt(‘Adjust ETA (minutes remaining):’,cur||‘10’);if(v===null)return;
-var m=parseInt(v);if(isNaN(m)||m<1){toast(‘Invalid time’,‘err’);return;}
-var sl=chip.textContent.includes(’\u2014’)?’ \u2014 ‘+chip.textContent.split(’\u2014’)[1].trim():’’;
-chip.textContent=‘ETA ‘+m+’ min’+sl;chip.style.background=’’;chip.style.color=’’;
-if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
-var taskTitle=row?row.querySelector(’.rt’).textContent:‘Request’;
-var savedChip=chip;
-var tid=setTimeout(function(){ping();if(savedChip&&savedChip.parentNode){savedChip.style.background=‘var(–rdim)’;savedChip.style.color=‘var(–red)’;savedChip.textContent=‘Overdue!’;}notify(‘warn’,’⏰ ETA Overdue’,‘No update on: ‘+taskTitle+’.’,‘Please follow up with staff’);toast(‘ETA passed’);},m*60*1000);
-if(row)row.dataset.tid=String(tid);
-toast(‘ETA updated to ‘+m+’ min’);
+  var row=chip.closest('.row');var cur=chip.textContent.replace(/[^0-9]/g,'');
+  var v=prompt('Adjust ETA (minutes remaining):',cur||'10');if(v===null)return;
+  var m=parseInt(v);if(isNaN(m)||m<1){toast('Invalid time','err');return;}
+  var sl=chip.textContent.includes('\u2014')?' \u2014 '+chip.textContent.split('\u2014')[1].trim():'';
+  chip.textContent='ETA '+m+' min'+sl;chip.style.background='';chip.style.color='';
+  if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
+  var taskTitle=row?row.querySelector('.rt').textContent:'Request';
+  var savedChip=chip;
+  var tid=setTimeout(function(){ping();if(savedChip&&savedChip.parentNode){savedChip.style.background='var(--rdim)';savedChip.style.color='var(--red)';savedChip.textContent='Overdue!';}notify('warn','&#9200; ETA Overdue','No update on: '+taskTitle+'.','Please follow up with staff');toast('ETA passed');},m*60*1000);
+  if(row)row.dataset.tid=String(tid);
+  toast('ETA updated to '+m+' min');
 }
 function finalDone(row,btn,taskTitle,guestLine){
-if(!taskTitle&&row)taskTitle=row.querySelector(’.rt’).textContent;
-if(!guestLine&&row&&row.querySelector(’.rs’))guestLine=row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim();
-if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
-if(row){row.querySelector(’.dot’).className=‘dot dn’;var b=row.querySelector(’.badge’);if(b){b.className=‘badge dn’;b.textContent=‘Done’;}var c=row.querySelector(’.echip’);if(c)c.remove();}
-if(btn)btn.remove();
-openReqs=Math.max(0,openReqs-1);updateCnts();
-// Notify guest request is complete
-if(taskTitle)notify(‘guest’,’✓ Guest Notified’,‘Your request has been completed \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 Sent to guest app’);
-// Notify manager (simulates staff app completing a task)
-if(taskTitle)notify(‘mgr’,’📤 Task Complete’,‘Staff completed: ‘+taskTitle+’.’,(selStaff?selStaff+’ marked as done’:‘Completed by staff’));
+  if(!taskTitle&&row)taskTitle=row.querySelector('.rt').textContent;
+  if(!guestLine&&row&&row.querySelector('.rs'))guestLine=row.querySelector('.rs').textContent.split('\u00b7')[0].trim();
+  if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
+  if(row){row.querySelector('.dot').className='dot dn';var b=row.querySelector('.badge');if(b){b.className='badge dn';b.textContent='Done';}var c=row.querySelector('.echip');if(c)c.remove();}
+  if(btn)btn.remove();
+  openReqs=Math.max(0,openReqs-1);updateCnts();
+  // Notify guest request is complete
+  if(taskTitle)notify('guest','&#10003; Guest Notified','Your request has been completed \u2014 '+taskTitle+'.',guestLine+' \u00b7 Sent to guest app');
+  // Notify manager (simulates staff app completing a task)
+  if(taskTitle)notify('mgr','&#128228; Task Complete','Staff completed: '+taskTitle+'.',(selStaff?selStaff+' marked as done':'Completed by staff'));
 }
 function updateCnts(){
-var s=document.getElementById(‘sr’);if(s)s.textContent=openReqs;
-var b=document.getElementById(‘rbadge’);if(b){b.textContent=openReqs;b.style.display=openReqs>0?’’:‘none’;}
-var bn=document.getElementById(‘bndot’);if(bn){bn.textContent=openReqs;bn.style.display=openReqs>0?’’:‘none’;}
-var l=document.getElementById(‘rcntlbl’);if(l)l.textContent=openReqs+’ open’;
+  var s=document.getElementById('sr');if(s)s.textContent=openReqs;
+  var b=document.getElementById('rbadge');if(b){b.textContent=openReqs;b.style.display=openReqs>0?'':'none';}
+  var bn=document.getElementById('bndot');if(bn){bn.textContent=openReqs;bn.style.display=openReqs>0?'':'none';}
+  var l=document.getElementById('rcntlbl');if(l)l.textContent=openReqs+' open';
 }
 function claimReq(btn){
-var row=btn.closest(’.row’);if(!row)return;
-var taskTitle=row.querySelector(’.rt’).textContent;
-var guestLine=row.querySelector(’.rs’)?row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim():’’;
-row.querySelector(’.dot’).className=‘dot cl’;
-var b=row.querySelector(’.badge’);if(b){b.className=‘badge cl’;b.textContent=‘Claimed’;}
-btn.remove();
-var s=row.querySelector(’.rs’);if(s)s.textContent+=(’ \u00b7 Claimed by you’);
-toast(‘Request claimed’);
-syncRequestRow(row, ‘claim’);
-logEvent(‘req_claim’,‘Request claimed: ‘+taskTitle,guestLine,’’);
-// Notify guest their request has been picked up
-notify(‘guest’,’💬 Guest Notified’,‘We have received your request and are on it \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 Sent to guest app’);
+  var row=btn.closest('.row');if(!row)return;
+  var taskTitle=row.querySelector('.rt').textContent;
+  var guestLine=row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+  row.querySelector('.dot').className='dot cl';
+  var b=row.querySelector('.badge');if(b){b.className='badge cl';b.textContent='Claimed';}
+  btn.remove();
+  var s=row.querySelector('.rs');if(s)s.textContent+=(' \u00b7 Claimed by you');
+  toast('Request claimed');
+  syncRequestRow(row, 'claim');
+  logEvent('req_claim','Request claimed: '+taskTitle,guestLine,'');
+  // Notify guest their request has been picked up
+  notify('guest','&#128172; Guest Notified','We have received your request and are on it \u2014 '+taskTitle+'.',guestLine+' \u00b7 Sent to guest app');
 }
-function markAll(){document.querySelectorAll(’#reqlist .btn’).forEach(function(b){if(b.textContent===‘Done’){var r=b.closest(’.row’);if(r)finalDone(r,b);}});toast(‘All done’);}
+function markAll(){document.querySelectorAll('#reqlist .btn').forEach(function(b){if(b.textContent==='Done'){var r=b.closest('.row');if(r)finalDone(r,b);}});toast('All done');}
 
-var demos=[{t:‘Extra towels’,r:‘7’,g:‘Sarah Chen’},{t:‘Late checkout’,r:‘3’,g:‘David Park’},{t:‘Extra blanket’,r:‘6’,g:‘Elena Webb’},{t:‘Taxi booking’,r:‘14’,g:‘James Mitchell’}];
+var demos=[{t:'Extra towels',r:'7',g:'Sarah Chen'},{t:'Late checkout',r:'3',g:'David Park'},{t:'Extra blanket',r:'6',g:'Elena Webb'},{t:'Taxi booking',r:'14',g:'James Mitchell'}];
 function simReq(){
-var d=demos[Math.floor(Math.random()*demos.length)];openReqs++;updateCnts();
-var list=document.getElementById(‘reqlist’);
-var row=document.createElement(‘div’);row.className=‘row’;
-var dot=document.createElement(‘div’);dot.className=‘dot nw’;
-var ri=document.createElement(‘div’);ri.className=‘ri’;ri.innerHTML=’<div class="rt">’+d.t+’ \u2014 Room ‘+d.r+’</div><div class="rs">’+d.g+’ \u00b7 just now</div>’;
-var badge=document.createElement(‘div’);badge.className=‘badge nw’;badge.textContent=‘New’;
-var cb=document.createElement(‘button’);cb.className=‘btn btn-s’;cb.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;cb.textContent=‘Claim’;cb.onclick=function(){claimReq(cb);};
-var db=document.createElement(‘button’);db.className=‘btn btn-s’;db.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;db.textContent=‘Done’;db.onclick=function(){openETA(db);};
-row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(cb);row.appendChild(db);
-list.insertBefore(row,list.firstChild);ping();flashTab(‘New Request!’);toast(d.t+’ from Room ‘+d.r);
+  var d=demos[Math.floor(Math.random()*demos.length)];openReqs++;updateCnts();
+  var list=document.getElementById('reqlist');
+  var row=document.createElement('div');row.className='row';
+  var dot=document.createElement('div');dot.className='dot nw';
+  var ri=document.createElement('div');ri.className='ri';ri.innerHTML='<div class="rt">'+d.t+' \u2014 Room '+d.r+'</div><div class="rs">'+d.g+' \u00b7 just now</div>';
+  var badge=document.createElement('div');badge.className='badge nw';badge.textContent='New';
+  var cb=document.createElement('button');cb.className='btn btn-s';cb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';cb.textContent='Claim';cb.onclick=function(){claimReq(cb);};
+  var db=document.createElement('button');db.className='btn btn-s';db.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';db.textContent='Done';db.onclick=function(){openETA(db);};
+  row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(cb);row.appendChild(db);
+  list.insertBefore(row,list.firstChild);ping();flashTab('New Request!');toast(d.t+' from Room '+d.r);
 }
-function addEtaOpt(){var l=document.getElementById(‘etalist’),d=document.createElement(‘div’);d.className=‘fg etarow’;d.style.cssText=‘display:flex;gap:8px;align-items:center’;d.innerHTML=’<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">✕</div>’;l.appendChild(d);}
-function rmETA(btn){if(document.querySelectorAll(’.etarow’).length<=1){toast(‘Need at least one option’);return;}btn.closest(’.etarow’).remove();}
-function saveEtaOpts(){etaPresets=getPresets();toast(‘ETA options saved: ‘+etaPresets.join(’, ‘)+’ min’);}
-function openAR(sid,sn){curSec=sid;document.getElementById(‘arsl’).textContent=sn;document.getElementById(‘ark’).value=’’;document.getElementById(‘arv’).value=’’;openM(‘marow’);}
-function addSec(){var t=document.getElementById(‘nst’).value.trim(),ic=document.getElementById(‘nsi’).value.trim();if(!t){toast(‘Enter a section title’,‘err’);return;}var id=‘sec-’+t.toLowerCase().replace(/\s+/g,’-’);var el=document.createElement(‘div’);el.className=‘isec’;el.id=id;var ico=ic||’📌’;el.innerHTML=’<div class="ish"><div class="ist"><div class="ith">’+ico+’</div>’+t+’</div><div style="display:flex;gap:5px"><div class="icb" id="sab-'+id+'">＋</div><div class="icb del" onclick="delSec(\''+id+'\')">✕</div></div></div><button class="addrow" id="sarb-'+id+'">＋ Add first row</button>’;document.getElementById(‘s-info’).appendChild(el);document.getElementById(‘sab-’+id).onclick=function(){openAR(id,t);};document.getElementById(‘sarb-’+id).onclick=function(){openAR(id,t);};closeM(‘msec’);document.getElementById(‘nst’).value=’’;document.getElementById(‘nsi’).value=’’;toast(‘Section “’+t+’” created’);}
-function addRow(){var k=document.getElementById(‘ark’).value.trim(),v=document.getElementById(‘arv’).value.trim();if(!k||!v){toast(‘Fill in both fields’,‘err’);return;}var sec=document.getElementById(curSec);if(!sec)return;var ab=sec.querySelector(’.addrow’);var r=document.createElement(‘div’);r.className=‘irow’;r.innerHTML=’<div class="irk">’+k+’</div><div class="irv" contenteditable="true">’+v+’</div><div class="iract"><div class="icb del" onclick="delRow(this)">✕</div></div>’;sec.insertBefore(r,ab);closeM(‘marow’);document.getElementById(‘ark’).value=’’;document.getElementById(‘arv’).value=’’;toast(‘Row added’);}
-function delRow(btn){if(confirm(‘Delete row?’)){btn.closest(’.irow’).remove();toast(‘Row deleted’);}}
-function delSec(id){if(confirm(‘Delete section?’)){document.getElementById(id).remove();toast(‘Section deleted’);}}
-function addRec(){var n=document.getElementById(‘arn’).value.trim(),c=document.getElementById(‘arc’).value.trim(),e=document.getElementById(‘are’).value.trim();if(!n){toast(‘Enter a place name’,‘err’);return;}var r=document.createElement(‘div’);r.className=‘rrow’;r.innerHTML=’<div class="rthumb">’+(e||’📍’)+’</div><div class="rinfo"><div class="rn">’+n+’</div><div class="rc">’+c+’</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb">✏</div><div class="icb del" onclick="delRec(this)">✕</div></div>’;document.getElementById(‘reclist’).appendChild(r);closeM(‘mrec’);document.getElementById(‘arn’).value=’’;document.getElementById(‘arc’).value=’’;document.getElementById(‘are’).value=’’;toast(’”’+n+’” added’);}
-function addFac(){var n=document.getElementById(‘afn’).value.trim(),d=document.getElementById(‘afd’).value.trim(),e=document.getElementById(‘afe’).value.trim();if(!n){toast(‘Enter a facility name’,‘err’);return;}var r=document.createElement(‘div’);r.className=‘rrow’;r.innerHTML=’<div class="rthumb">’+(e||’🏠’)+’</div><div class="rinfo"><div class="rn">’+n+’</div><div class="rc">’+d+’</div></div><div style="display:flex;gap:5px"><div class="icb">✏</div><div class="icb del" onclick="delRec(this)">✕</div></div>’;document.getElementById(‘faclist’).appendChild(r);closeM(‘mfac’);document.getElementById(‘afn’).value=’’;document.getElementById(‘afd’).value=’’;document.getElementById(‘afe’).value=’’;toast(’”’+n+’” added to facilities’);}
-function delRec(btn){var el=btn.closest(’.rrow’).querySelector(’.rn’);if(confirm(‘Remove “’+el.textContent+’”?’)){btn.closest(’.rrow’).remove();toast(‘Removed’);}}
-function addGuest(){var n=document.getElementById(‘agn’).value.trim(),r=document.getElementById(‘agr’).value.trim(),c=document.getElementById(‘agc’).value;if(!n||!r){toast(‘Fill in name and room’,‘err’);return;}var ini=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);var d=c?new Date(c).toLocaleDateString(‘en-GB’,{day:‘numeric’,month:‘short’}):‘TBC’;var row=document.createElement(‘div’);row.className=‘grow’;row.innerHTML=’<div class="gav">’+ini+’</div><div class="gi"><div class="gn">’+n+’</div><div class="gs">Room ‘+r+’ \u00b7 Out ‘+d+’</div></div><span class="pill in">Active</span>’;var mb=document.createElement(‘button’);mb.className=‘btn btn-s’;mb.style.cssText=‘margin-left:8px;font-size:11px;padding:5px 9px’;mb.textContent=‘Msg’;mb.onclick=function(){openMsgM(n,‘Room ‘+r);};row.appendChild(mb);document.getElementById(‘glist’).appendChild(row);var sg=document.getElementById(‘sg’);if(sg)sg.textContent=parseInt(sg.textContent)+1;closeM(‘mag’);document.getElementById(‘agn’).value=’’;document.getElementById(‘agr’).value=’’;toast(‘Guest added’);}
+function addEtaOpt(){var l=document.getElementById('etalist'),d=document.createElement('div');d.className='fg etarow';d.style.cssText='display:flex;gap:8px;align-items:center';d.innerHTML='<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">&#10005;</div>';l.appendChild(d);}
+function rmETA(btn){if(document.querySelectorAll('.etarow').length<=1){toast('Need at least one option');return;}btn.closest('.etarow').remove();}
+function saveEtaOpts(){etaPresets=getPresets();toast('ETA options saved: '+etaPresets.join(', ')+' min');}
+function openAR(sid,sn){curSec=sid;document.getElementById('arsl').textContent=sn;document.getElementById('ark').value='';document.getElementById('arv').value='';openM('marow');}
+function addSec(){var t=document.getElementById('nst').value.trim(),ic=document.getElementById('nsi').value.trim();if(!t){toast('Enter a section title','err');return;}var id='sec-'+t.toLowerCase().replace(/\s+/g,'-');var el=document.createElement('div');el.className='isec';el.id=id;var ico=ic||'&#128204;';el.innerHTML='<div class="ish"><div class="ist"><div class="ith">'+ico+'</div>'+t+'</div><div style="display:flex;gap:5px"><div class="icb" id="sab-'+id+'">&#65291;</div><div class="icb del" onclick="delSec(\''+id+'\')">&#10005;</div></div></div><button class="addrow" id="sarb-'+id+'">&#65291; Add first row</button>';document.getElementById('s-info').appendChild(el);document.getElementById('sab-'+id).onclick=function(){openAR(id,t);};document.getElementById('sarb-'+id).onclick=function(){openAR(id,t);};closeM('msec');document.getElementById('nst').value='';document.getElementById('nsi').value='';toast('Section "'+t+'" created');}
+function addRow(){var k=document.getElementById('ark').value.trim(),v=document.getElementById('arv').value.trim();if(!k||!v){toast('Fill in both fields','err');return;}var sec=document.getElementById(curSec);if(!sec)return;var ab=sec.querySelector('.addrow');var r=document.createElement('div');r.className='irow';r.innerHTML='<div class="irk">'+k+'</div><div class="irv" contenteditable="true">'+v+'</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';sec.insertBefore(r,ab);closeM('marow');document.getElementById('ark').value='';document.getElementById('arv').value='';toast('Row added');}
+function delRow(btn){if(confirm('Delete row?')){btn.closest('.irow').remove();toast('Row deleted');}}
+function delSec(id){if(confirm('Delete section?')){document.getElementById(id).remove();toast('Section deleted');}}
+function addRec(){var n=document.getElementById('arn').value.trim(),c=document.getElementById('arc').value.trim(),e=document.getElementById('are').value.trim();if(!n){toast('Enter a place name','err');return;}var r=document.createElement('div');r.className='rrow';r.innerHTML='<div class="rthumb">'+(e||'&#128205;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+c+'</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('reclist').appendChild(r);closeM('mrec');document.getElementById('arn').value='';document.getElementById('arc').value='';document.getElementById('are').value='';toast('"'+n+'" added');}
+function addFac(){var n=document.getElementById('afn').value.trim(),d=document.getElementById('afd').value.trim(),e=document.getElementById('afe').value.trim();if(!n){toast('Enter a facility name','err');return;}var r=document.createElement('div');r.className='rrow';r.innerHTML='<div class="rthumb">'+(e||'&#127968;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+d+'</div></div><div style="display:flex;gap:5px"><div class="icb">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('faclist').appendChild(r);closeM('mfac');document.getElementById('afn').value='';document.getElementById('afd').value='';document.getElementById('afe').value='';toast('"'+n+'" added to facilities');}
+function delRec(btn){var el=btn.closest('.rrow').querySelector('.rn');if(confirm('Remove "'+el.textContent+'"?')){btn.closest('.rrow').remove();toast('Removed');}}
+function addGuest(){var n=document.getElementById('agn').value.trim(),r=document.getElementById('agr').value.trim(),c=document.getElementById('agc').value;if(!n||!r){toast('Fill in name and room','err');return;}var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var d=c?new Date(c).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';var row=document.createElement('div');row.className='grow';row.innerHTML='<div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+n+'</div><div class="gs">Room '+r+' \u00b7 Out '+d+'</div></div><span class="pill in">Active</span>';var mb=document.createElement('button');mb.className='btn btn-s';mb.style.cssText='margin-left:8px;font-size:11px;padding:5px 9px';mb.textContent='Msg';mb.onclick=function(){openMsgM(n,'Room '+r);};row.appendChild(mb);document.getElementById('glist').appendChild(row);var sg=document.getElementById('sg');if(sg)sg.textContent=parseInt(sg.textContent)+1;closeM('mag');document.getElementById('agn').value='';document.getElementById('agr').value='';toast('Guest added');}
 function killSess(n){
-if(confirm(‘Kill session for ‘+n+’? They will be immediately signed out.’)){
-// Write kill signal to localStorage — guest app picks it up
-var payload=JSON.stringify({type:‘kill’,name:n,time:Date.now()});
-localStorage.setItem(‘arivo_dashboard_to_guest’,payload);
-window.dispatchEvent(new StorageEvent(‘storage’,{key:‘arivo_dashboard_to_guest’,newValue:payload}));
-toast(‘Session killed for ‘+n);
-// Remove from sessions list
-var rows=document.querySelectorAll(’.srow’);
-rows.forEach(function(row){
-var sn=row.querySelector(’.sn’);
-if(sn&&sn.textContent.indexOf(n)>=0)row.remove();
-});
+  if(confirm('Kill session for '+n+'? They will be immediately signed out.')){
+    // Write kill signal to localStorage — guest app picks it up
+    var payload=JSON.stringify({type:'kill',name:n,time:Date.now()});
+    localStorage.setItem('arivo_dashboard_to_guest',payload);
+    window.dispatchEvent(new StorageEvent('storage',{key:'arivo_dashboard_to_guest',newValue:payload}));
+    toast('Session killed for '+n);
+    // Remove from sessions list
+    var rows=document.querySelectorAll('.srow');
+    rows.forEach(function(row){
+      var sn=row.querySelector('.sn');
+      if(sn&&sn.textContent.indexOf(n)>=0)row.remove();
+    });
+  }
 }
-}
-function genBypass(){var g=document.getElementById(‘bpg’).value.trim(),r=document.getElementById(‘bpr’).value.trim();if(!g){toast(‘Enter guest name’,‘err’);return;}var c=Math.floor(1000+Math.random()*9000).toString();document.getElementById(‘bypname’).textContent=g+(r?’ (Room ‘+r+’)’:’’);document.getElementById(‘bypcode’).textContent=c;document.getElementById(‘bypres’).style.display=‘block’;toast(‘Code: ‘+c+’ valid 15 min’);}
-function openMsgM(n,r){document.getElementById(‘msgto2’).textContent=n+’ \u2014 ‘+r;document.getElementById(‘msgb2’).value=’’;openM(‘mmsg’);}
-function sendMsgM(){var b=document.getElementById(‘msgb2’).value.trim();if(!b){toast(‘Type a message’,‘err’);return;}closeM(‘mmsg’);toast(‘Message sent to ‘+document.getElementById(‘msgto2’).textContent);}
-function sendMsg(){var t=document.getElementById(‘msgto’).value,b=document.getElementById(‘msgbody’).value.trim();if(!b){toast(‘Type a message’,‘err’);return;}toast(‘Message sent to: ‘+t);document.getElementById(‘msgbody’).value=’’;}
-function loadTpl(t){var tpls={checkout:‘Your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!’,welcome:‘Welcome to the hotel! We hope your room is perfect. Please ask through the app or dial 0 if you need anything.’};document.getElementById(‘msgbody’).value=tpls[t]||’’;}
-function genLink(){var n=document.getElementById(‘gln’).value.trim(),r=document.getElementById(‘glr’).value.trim();if(!n||!r){toast(‘Enter name and room’,‘err’);return;}var ref=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase()+’-’+r.padStart(3,‘0’);document.getElementById(‘glurl’).textContent=‘guest.arivo.app/maison-bath?ref=’+ref;document.getElementById(‘glres’).style.display=‘block’;toast(‘Link generated for ‘+n);}
-function addStaff(){var n=document.getElementById(‘sfn’).value.trim(),role=document.getElementById(‘sfr’).value;if(!n){toast(‘Enter name’,‘err’);return;}var ini=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);var cs=[‘rgba(61,214,140,.1)’,‘rgba(96,165,250,.1)’,‘rgba(201,168,76,.1)’],ts=[‘var(–grn)’,‘var(–blu)’,‘var(–gold)’],ci=Math.floor(Math.random()*3);var r=document.createElement(‘div’);r.className=‘srow’;r.innerHTML=’<div class="sav" style="background:'+cs[ci]+';color:'+ts[ci]+'">’+ini+’</div><div class="sin"><div class="sn">’+n+’</div><div class="ss">’+role+’ \u00b7 Active</div></div><div class="icb del" onclick="toast(\'Staff removed\')">✕</div>’;document.getElementById(‘stafflist’).appendChild(r);var chips=document.getElementById(‘schips’);var chip=document.createElement(‘div’);chip.className=‘schap’;chip.textContent=n.split(’ ‘)[0]+’.’;chip.onclick=function(){pickStaff(chip);};chips.appendChild(chip);closeM(‘mstaff’);document.getElementById(‘sfn’).value=’’;toast(n+’ added’);}
-function saveCreds(t){if(t===‘name’){var n=document.getElementById(‘cname’).value.trim(),e=document.getElementById(‘cemail’).value.trim();if(!n||!e){toast(‘Fill in name and email’,‘err’);return;}if(!e.includes(’@’)){toast(‘Invalid email’,‘err’);return;}var un=document.getElementById(‘uname’);if(un)un.textContent=n;var ua=document.getElementById(‘uav’);if(ua)ua.textContent=n.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);toast(‘Name and email updated’);}else{var cur=document.getElementById(‘cpc’).value,nw=document.getElementById(‘cpn’).value,cf=document.getElementById(‘cpcf’).value,err=document.getElementById(‘cperr’);if(!cur||!nw||!cf){toast(‘Fill in all password fields’,‘err’);return;}if(nw.length<8){toast(‘Password must be 8+ characters’,‘err’);return;}if(nw!==cf){err.style.display=‘block’;return;}err.style.display=‘none’;[‘cpc’,‘cpn’,‘cpcf’].forEach(function(id){document.getElementById(id).value=’’;});toast(‘Password updated’);}}
-function toast(msg,type){var t=document.getElementById(‘toast’);t.className=type||’’;t.textContent=msg;t.classList.add(‘on’);setTimeout(function(){t.classList.remove(‘on’);},2800);}
+function genBypass(){var g=document.getElementById('bpg').value.trim(),r=document.getElementById('bpr').value.trim();if(!g){toast('Enter guest name','err');return;}var c=Math.floor(1000+Math.random()*9000).toString();document.getElementById('bypname').textContent=g+(r?' (Room '+r+')':'');document.getElementById('bypcode').textContent=c;document.getElementById('bypres').style.display='block';toast('Code: '+c+' valid 15 min');}
+function openMsgM(n,r){document.getElementById('msgto2').textContent=n+' \u2014 '+r;document.getElementById('msgb2').value='';openM('mmsg');}
+function sendMsgM(){var b=document.getElementById('msgb2').value.trim();if(!b){toast('Type a message','err');return;}closeM('mmsg');toast('Message sent to '+document.getElementById('msgto2').textContent);}
+function sendMsg(){var t=document.getElementById('msgto').value,b=document.getElementById('msgbody').value.trim();if(!b){toast('Type a message','err');return;}toast('Message sent to: '+t);document.getElementById('msgbody').value='';}
+function loadTpl(t){var tpls={checkout:'Your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!',welcome:'Welcome to the hotel! We hope your room is perfect. Please ask through the app or dial 0 if you need anything.'};document.getElementById('msgbody').value=tpls[t]||'';}
+function genLink(){var n=document.getElementById('gln').value.trim(),r=document.getElementById('glr').value.trim();if(!n||!r){toast('Enter name and room','err');return;}var ref=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase()+'-'+r.padStart(3,'0');document.getElementById('glurl').textContent='guest.arivo.app/maison-bath?ref='+ref;document.getElementById('glres').style.display='block';toast('Link generated for '+n);}
+function addStaff(){var n=document.getElementById('sfn').value.trim(),role=document.getElementById('sfr').value;if(!n){toast('Enter name','err');return;}var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var cs=['rgba(61,214,140,.1)','rgba(96,165,250,.1)','rgba(201,168,76,.1)'],ts=['var(--grn)','var(--blu)','var(--gold)'],ci=Math.floor(Math.random()*3);var r=document.createElement('div');r.className='srow';r.innerHTML='<div class="sav" style="background:'+cs[ci]+';color:'+ts[ci]+'">'+ini+'</div><div class="sin"><div class="sn">'+n+'</div><div class="ss">'+role+' \u00b7 Active</div></div><div class="icb del" onclick="toast(\'Staff removed\')">&#10005;</div>';document.getElementById('stafflist').appendChild(r);var chips=document.getElementById('schips');var chip=document.createElement('div');chip.className='schap';chip.textContent=n.split(' ')[0]+'.';chip.onclick=function(){pickStaff(chip);};chips.appendChild(chip);closeM('mstaff');document.getElementById('sfn').value='';toast(n+' added');}
+function saveCreds(t){if(t==='name'){var n=document.getElementById('cname').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e){toast('Fill in name and email','err');return;}if(!e.includes('@')){toast('Invalid email','err');return;}var un=document.getElementById('uname');if(un)un.textContent=n;var ua=document.getElementById('uav');if(ua)ua.textContent=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);toast('Name and email updated');}else{var cur=document.getElementById('cpc').value,nw=document.getElementById('cpn').value,cf=document.getElementById('cpcf').value,err=document.getElementById('cperr');if(!cur||!nw||!cf){toast('Fill in all password fields','err');return;}if(nw.length<8){toast('Password must be 8+ characters','err');return;}if(nw!==cf){err.style.display='block';return;}err.style.display='none';['cpc','cpn','cpcf'].forEach(function(id){document.getElementById(id).value='';});toast('Password updated');}}
+function toast(msg,type){var t=document.getElementById('toast');t.className=type||'';t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800);}
 
 // ── STAFF CREDENTIALS EDIT / DELETE ──
 var currentEditRow = null;
 
 function editStaff(btn) {
-var row = btn.closest(’.srow’);
-if (!row) return;
-currentEditRow = row;
-var name = row.querySelector(’.sn’) ? row.querySelector(’.sn’).textContent : ‘’;
-var roleStatus = row.querySelector(’.ss’) ? row.querySelector(’.ss’).textContent : ‘’;
-var parts = roleStatus.split(’·’);
-var role = parts[0] ? parts[0].trim() : ‘’;
-var status = parts[1] ? parts[1].trim() : ‘Active’;
-document.getElementById(‘edit-sfn’).value = name;
-document.getElementById(‘edit-sfe’).value = ‘’;
-// Set role dropdown
-var roleSelect = document.getElementById(‘edit-sfr’);
-for (var i = 0; i < roleSelect.options.length; i++) {
-if (roleSelect.options[i].value === role) { roleSelect.selectedIndex = i; break; }
-}
-// Set status dropdown
-var statusSelect = document.getElementById(‘edit-sfs’);
-for (var j = 0; j < statusSelect.options.length; j++) {
-if (statusSelect.options[j].value === status) { statusSelect.selectedIndex = j; break; }
-}
-openM(‘medit-staff’);
+  var row = btn.closest('.srow');
+  if (!row) return;
+  currentEditRow = row;
+  var name = row.querySelector('.sn') ? row.querySelector('.sn').textContent : '';
+  var roleStatus = row.querySelector('.ss') ? row.querySelector('.ss').textContent : '';
+  var parts = roleStatus.split('·');
+  var role = parts[0] ? parts[0].trim() : '';
+  var status = parts[1] ? parts[1].trim() : 'Active';
+  document.getElementById('edit-sfn').value = name;
+  document.getElementById('edit-sfe').value = '';
+  // Set role dropdown
+  var roleSelect = document.getElementById('edit-sfr');
+  for (var i = 0; i < roleSelect.options.length; i++) {
+    if (roleSelect.options[i].value === role) { roleSelect.selectedIndex = i; break; }
+  }
+  // Set status dropdown
+  var statusSelect = document.getElementById('edit-sfs');
+  for (var j = 0; j < statusSelect.options.length; j++) {
+    if (statusSelect.options[j].value === status) { statusSelect.selectedIndex = j; break; }
+  }
+  openM('medit-staff');
 }
 
 function saveStaffEdit() {
-var name = document.getElementById(‘edit-sfn’).value.trim();
-var role = document.getElementById(‘edit-sfr’).value;
-var status = document.getElementById(‘edit-sfs’).value;
-if (!name) { toast(‘Please enter a name’, ‘err’); return; }
-if (!currentEditRow) return;
-var ini = name.split(’ ‘).map(function(w){return w[0];}).join(’’).toUpperCase().slice(0,2);
-currentEditRow.querySelector(’.sav’).textContent = ini;
-currentEditRow.querySelector(’.sn’).textContent = name;
-currentEditRow.querySelector(’.ss’).textContent = role + ’ · ’ + status;
-// Update staff chip in ETA popup if exists
-var chips = document.getElementById(‘schips’);
-if (chips) {
-var chipName = name.split(’ ‘)[0] + ‘.’;
-// Try to find an existing chip to update (match by old initials)
-// Simplest: we just update matching chips
-chips.querySelectorAll(’.schap’).forEach(function(c) {
-if (c.dataset.staffRow === currentEditRow.id) {
-c.textContent = chipName;
-}
-});
-}
-closeM(‘medit-staff’);
-toast(name + ’ updated’);
-currentEditRow = null;
+  var name = document.getElementById('edit-sfn').value.trim();
+  var role = document.getElementById('edit-sfr').value;
+  var status = document.getElementById('edit-sfs').value;
+  if (!name) { toast('Please enter a name', 'err'); return; }
+  if (!currentEditRow) return;
+  var ini = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  currentEditRow.querySelector('.sav').textContent = ini;
+  currentEditRow.querySelector('.sn').textContent = name;
+  currentEditRow.querySelector('.ss').textContent = role + ' · ' + status;
+  // Update staff chip in ETA popup if exists
+  var chips = document.getElementById('schips');
+  if (chips) {
+    var chipName = name.split(' ')[0] + '.';
+    // Try to find an existing chip to update (match by old initials)
+    // Simplest: we just update matching chips
+    chips.querySelectorAll('.schap').forEach(function(c) {
+      if (c.dataset.staffRow === currentEditRow.id) {
+        c.textContent = chipName;
+      }
+    });
+  }
+  closeM('medit-staff');
+  toast(name + ' updated');
+  currentEditRow = null;
 }
 
 function revokeStaffAccess(name) {
-var revoked = JSON.parse(localStorage.getItem(‘arivo_revoked_staff’) || ‘[]’);
-if (revoked.indexOf(name) < 0) revoked.push(name);
-localStorage.setItem(‘arivo_revoked_staff’, JSON.stringify(revoked));
-window.dispatchEvent(new StorageEvent(‘storage’, {key:‘arivo_revoked_staff’, newValue:JSON.stringify(revoked)}));
+  var revoked = JSON.parse(localStorage.getItem('arivo_revoked_staff') || '[]');
+  if (revoked.indexOf(name) < 0) revoked.push(name);
+  localStorage.setItem('arivo_revoked_staff', JSON.stringify(revoked));
+  window.dispatchEvent(new StorageEvent('storage', {key:'arivo_revoked_staff', newValue:JSON.stringify(revoked)}));
 }
 
 function removeStaff(btn) {
-var row = btn.closest(’.srow’);
-if (!row) return;
-var name = row.querySelector(’.sn’) ? row.querySelector(’.sn’).textContent : ‘this staff member’;
-if (!confirm(‘Remove ’ + name + ‘? This cannot be undone.’)) return;
-revokeStaffAccess(name);
-logEvent(‘staff_removed’,‘Staff removed: ‘+name,‘Manager’,’-’);
-row.remove();
-toast(name + ’ removed — access revoked’);
+  var row = btn.closest('.srow');
+  if (!row) return;
+  var name = row.querySelector('.sn') ? row.querySelector('.sn').textContent : 'this staff member';
+  if (!confirm('Remove ' + name + '? This cannot be undone.')) return;
+  revokeStaffAccess(name);
+  logEvent('staff_removed','Staff removed: '+name,'Manager','-');
+  row.remove();
+  toast(name + ' removed — access revoked');
 }
 
 function removeStaffById() {
-if (!currentEditRow) return;
-var name = currentEditRow.querySelector(’.sn’) ? currentEditRow.querySelector(’.sn’).textContent : ‘this staff member’;
-if (!confirm(‘Remove ’ + name + ‘? This cannot be undone.’)) return;
-revokeStaffAccess(name);
-currentEditRow.remove();
-closeM(‘medit-staff’);
-toast(name + ’ removed — access revoked’);
-currentEditRow = null;
+  if (!currentEditRow) return;
+  var name = currentEditRow.querySelector('.sn') ? currentEditRow.querySelector('.sn').textContent : 'this staff member';
+  if (!confirm('Remove ' + name + '? This cannot be undone.')) return;
+  revokeStaffAccess(name);
+  currentEditRow.remove();
+  closeM('medit-staff');
+  toast(name + ' removed — access revoked');
+  currentEditRow = null;
 }
 
 // ── REQUEST SYNC: Overview ↔ Requests ──
 // Both sections share the same row IDs so actions sync across both
 function syncRequestRow(sourceRow, action) {
-var title = sourceRow.querySelector(’.rt’) ? sourceRow.querySelector(’.rt’).textContent : ‘’;
-if (!title) return;
-// Normalise: lowercase, strip room numbers, entities, punctuation — just first 3 words
-function normalise(t) {
-return t.toLowerCase()
-.replace(/—|–|-/g, ’ ‘)  // em/en dash to space
-.replace(/[^a-z0-9 ]/g, ’ ‘)        // strip punctuation
-.trim()
-.split(/\s+/).slice(0, 2).join(’ ‘); // first 2 words — reliable cross-section match
-}
-var srcKey = normalise(title);
-var allRows = document.querySelectorAll(’#reqlist .row, #s-ov .row’);
-allRows.forEach(function(row) {
-if (row === sourceRow) return;
-var rt = row.querySelector(’.rt’);
-if (!rt) return;
-if (normalise(rt.textContent) !== srcKey) return;
-// Same key — apply state
-if (action === ‘claim’) {
-row.querySelector(’.dot’).className = ‘dot cl’;
-var b = row.querySelector(’.badge’);
-if (b) { b.className = ‘badge cl’; b.textContent = ‘Claimed’; }
-row.querySelectorAll(’.btn-s’).forEach(function(b) {
-if (b.textContent === ‘Claim’) b.remove();
-});
-var rs = row.querySelector(’.rs’);
-if (rs && rs.textContent.indexOf(‘Claimed’) < 0) rs.textContent += ’ · Claimed by you’;
-} else if (action === ‘done’) {
-row.querySelector(’.dot’).className = ‘dot dn’;
-var bd = row.querySelector(’.badge’);
-if (bd) { bd.className = ‘badge dn’; bd.textContent = ‘Done’; }
-var chip = row.querySelector(’.echip’); if (chip) chip.remove();
-row.querySelectorAll(’.btn-s’).forEach(function(b) { b.remove(); });
-} else if (action === ‘progress’) {
-row.querySelector(’.dot’).className = ‘dot pr’;
-var bp = row.querySelector(’.badge’);
-if (bp) { bp.className = ‘badge pr’; bp.textContent = ‘In Progress’; }
-// Also remove Claim button from the synced row
-row.querySelectorAll(’.btn-s’).forEach(function(b) {
-if (b.textContent === ‘Claim’) b.remove();
-});
-}
-});
-}
-
-// ── ACTIVITY LOGGING ──
-function logEvent(action, detail, user, room){
-var logs = JSON.parse(localStorage.getItem(‘arivo_activity_log’)||’[]’);
-logs.push({
-ts: new Date().toISOString(),
-action: action,
-detail: detail,
-user: user || ‘Manager’,
-room: room || ‘-’,
-source: ‘dashboard’
-});
-localStorage.setItem(‘arivo_activity_log’, JSON.stringify(logs));
+  var title = sourceRow.querySelector('.rt') ? sourceRow.querySelector('.rt').textContent : '';
+  if (!title) return;
+  // Normalise: lowercase, strip room numbers, entities, punctuation — just first 3 words
+  function normalise(t) {
+    return t.toLowerCase()
+      .replace(/—|–|-/g, ' ')  // em/en dash to space
+      .replace(/[^a-z0-9 ]/g, ' ')        // strip punctuation
+      .trim()
+      .split(/\s+/).slice(0, 2).join(' '); // first 2 words — reliable cross-section match
+  }
+  var srcKey = normalise(title);
+  var allRows = document.querySelectorAll('#reqlist .row, #s-ov .row');
+  allRows.forEach(function(row) {
+    if (row === sourceRow) return;
+    var rt = row.querySelector('.rt');
+    if (!rt) return;
+    if (normalise(rt.textContent) !== srcKey) return;
+    // Same key — apply state
+    if (action === 'claim') {
+      row.querySelector('.dot').className = 'dot cl';
+      var b = row.querySelector('.badge');
+      if (b) { b.className = 'badge cl'; b.textContent = 'Claimed'; }
+      row.querySelectorAll('.btn-s').forEach(function(b) {
+        if (b.textContent === 'Claim') b.remove();
+      });
+      var rs = row.querySelector('.rs');
+      if (rs && rs.textContent.indexOf('Claimed') < 0) rs.textContent += ' · Claimed by you';
+    } else if (action === 'done') {
+      row.querySelector('.dot').className = 'dot dn';
+      var bd = row.querySelector('.badge');
+      if (bd) { bd.className = 'badge dn'; bd.textContent = 'Done'; }
+      var chip = row.querySelector('.echip'); if (chip) chip.remove();
+      row.querySelectorAll('.btn-s').forEach(function(b) { b.remove(); });
+    } else if (action === 'progress') {
+      row.querySelector('.dot').className = 'dot pr';
+      var bp = row.querySelector('.badge');
+      if (bp) { bp.className = 'badge pr'; bp.textContent = 'In Progress'; }
+      // Also remove Claim button from the synced row
+      row.querySelectorAll('.btn-s').forEach(function(b) {
+        if (b.textContent === 'Claim') b.remove();
+      });
+    }
+  });
 }
 
 function getActivityLog(){
-return JSON.parse(localStorage.getItem(‘arivo_activity_log’)||’[]’);
+  return JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
 }
 
 function clearActivityLog(){
-if(confirm(‘Clear all activity logs? This cannot be undone.’)) {
-localStorage.removeItem(‘arivo_activity_log’);
-renderLogReport();
-toast(‘Logs cleared’);
-}
+  if(confirm('Clear all activity logs? This cannot be undone.')) {
+    localStorage.removeItem('arivo_activity_log');
+    renderLogReport();
+    toast('Logs cleared');
+  }
 }
 
 function renderLogReport(){
-var container = document.getElementById(‘log-entries’);
-if(!container) return;
-var logs = getActivityLog().reverse(); // newest first
-if(!logs.length){
-container.innerHTML = ‘<div style="text-align:center;padding:30px;color:var(--tx3);font-size:13px;">No activity logged yet. Activity appears here as guests and staff use the system.</div>’;
-return;
-}
-container.innerHTML = ‘’;
-logs.forEach(function(log){
-var row = document.createElement(‘div’);
-row.style.cssText = ‘display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(–bor);’;
-var d = new Date(log.ts);
-var timeStr = d.toLocaleDateString(‘en-GB’,{day:‘numeric’,month:‘short’,hour:‘2-digit’,minute:‘2-digit’});
-var srcColor = log.source===‘guest_app’?‘var(–gold)’:log.source===‘staff_app’?‘var(–blu)’:‘var(–grn)’;
-var actionLabel = {
-‘guest_register’:‘Registered’,
-‘guest_rating’:‘Rating’,
-‘guest_request’:‘Request’,
-‘guest_issue’:‘Maintenance’,
-‘guest_message’:‘Message’,
-‘messages_read’:‘Read Receipt’,
-‘req_claim’:‘Claimed’,
-‘req_done’:‘Completed’,
-‘req_eta’:‘ETA Set’,
-‘msg_sent’:‘Msg Sent’,
-‘staff_login’:‘Staff Login’,
-‘staff_logout’:‘Staff Logout’,
-‘staff_removed’:‘Staff Removed’,
-‘guest_checkout’:‘Checkout’
-}[log.action] || log.action;
-row.innerHTML =
-‘<div style="flex-shrink:0;width:80px;font-size:10px;color:var(--tx3);padding-top:2px;">’+timeStr+’</div>’+
-‘<div style="flex-shrink:0;background:rgba(201,168,76,0.1);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:'+srcColor+';white-space:nowrap;">’+actionLabel+’</div>’+
-‘<div style="flex:1;min-width:0;">’+
-‘<div style="font-size:12px;color:var(--tx);font-weight:500;">’+log.detail+’</div>’+
-‘<div style="font-size:11px;color:var(--tx3);margin-top:2px;">’+(log.user||’’)+(log.room&&log.room!==’-’?’ · Room ‘+log.room:’’)+’</div>’+
-‘</div>’;
-container.appendChild(row);
-});
+  var container = document.getElementById('log-entries');
+  if(!container) return;
+  var logs = getActivityLog().reverse(); // newest first
+  if(!logs.length){
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tx3);font-size:13px;">No activity logged yet. Activity appears here as guests and staff use the system.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  logs.forEach(function(log){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bor);';
+    var d = new Date(log.ts);
+    var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var srcColor = log.source==='guest_app'?'var(--gold)':log.source==='staff_app'?'var(--blu)':'var(--grn)';
+    var actionLabel = {
+      'guest_register':'Registered',
+      'guest_rating':'Rating',
+      'guest_request':'Request',
+      'guest_issue':'Maintenance',
+      'guest_message':'Message',
+      'messages_read':'Read Receipt',
+      'req_claim':'Claimed',
+      'req_done':'Completed',
+      'req_eta':'ETA Set',
+      'msg_sent':'Msg Sent',
+      'staff_login':'Staff Login',
+      'staff_logout':'Staff Logout',
+      'staff_removed':'Staff Removed',
+      'guest_checkout':'Checkout'
+    }[log.action] || log.action;
+    row.innerHTML =
+      '<div style="flex-shrink:0;width:80px;font-size:10px;color:var(--tx3);padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;background:rgba(201,168,76,0.1);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:'+srcColor+';white-space:nowrap;">'+actionLabel+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-size:12px;color:var(--tx);font-weight:500;">'+log.detail+'</div>'+
+        '<div style="font-size:11px;color:var(--tx3);margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+'</div>'+
+      '</div>';
+    container.appendChild(row);
+  });
 }
 
 function exportLogs(){
-var logs = getActivityLog();
-var csv = ‘Timestamp,Action,Detail,User,Room,Source\n’;
-logs.forEach(function(l){
-csv += [l.ts,l.action,’”’+(l.detail||’’).replace(/”/g,’””’)+’”’,l.user||’’,l.room||’’,l.source||’’].join(’,’)+’\n’;
-});
-var blob = new Blob([csv],{type:‘text/csv’});
-var a = document.createElement(‘a’);
-a.href = URL.createObjectURL(blob);
-a.download = ‘arivo-activity-log-’+new Date().toISOString().split(‘T’)[0]+’.csv’;
-a.click();
-toast(‘Log exported as CSV’);
+  var logs = getActivityLog();
+  var csv = 'Timestamp,Action,Detail,User,Room,Source\n';
+  logs.forEach(function(l){
+    csv += [l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
+  });
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'arivo-activity-log-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  toast('Log exported as CSV');
 }
 
-// ── SHARED STORAGE (localStorage bridge to guest app) ──
-function loadGuestRequests(){
-var requests=JSON.parse(localStorage.getItem(‘arivo_requests’)||’[]’);
-var list=document.getElementById(‘reqlist’);
-if(!list||!requests.length)return;
-requests.forEach(function(req){
-// Avoid duplicates
-if(document.getElementById(‘req-’+req.id))return;
-var row=document.createElement(‘div’);row.className=‘row’;row.id=‘req-’+req.id;
-var dot=document.createElement(‘div’);dot.className=‘dot nw’;
-var ri=document.createElement(‘div’);ri.className=‘ri’;
-var photoTag=req.photo?’<span style="font-size:10px;background:var(--bdim);color:var(--blu);padding:2px 6px;border-radius:5px;margin-left:6px;">📷 Photo</span>’:’’;
-ri.innerHTML=’<div class="rt">’+req.type+(req.room?’ \u2014 Room ‘+req.room:’’)+’</div>’+
-‘<div class="rs">’+(req.guest||‘Guest’)+’ \u00b7 ‘+req.detail.slice(0,50)+(req.detail.length>50?’…’:’’)+photoTag+’</div>’;
-var badge=document.createElement(‘div’);badge.className=‘badge nw’;badge.textContent=‘New’;
-var cb=document.createElement(‘button’);cb.className=‘btn btn-s’;cb.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;cb.textContent=‘Claim’;
-cb.onclick=function(){claimReqFromStorage(cb,row,req);};
-var db=document.createElement(‘button’);db.className=‘btn btn-s’;db.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;db.textContent=‘Done’;
-db.onclick=function(){openETA(db);};
-row.appendChild(dot);row.appendChild(ri);row.appendChild(badge);row.appendChild(cb);row.appendChild(db);
-// If photo attached, add view button
-if(req.photo){
-var vb=document.createElement(‘button’);vb.className=‘btn btn-s’;vb.style.cssText=‘margin-left:4px;padding:5px 9px;font-size:11px’;vb.textContent=’📷’;
-vb.onclick=function(){var w=window.open();w.document.write(’<img src="'+req.photo+'" style="max-width:100%">’);};
-row.appendChild(vb);
-}
-list.insertBefore(row,list.firstChild);
-openReqs++;updateCnts();
-});
-}
-
-function claimReqFromStorage(btn,row,req){
-claimReq(btn);
-// Write status back to localStorage so guest app can read it
-notifyGuest(‘status’,null,req.id,‘claimed’,selStaff||‘Hotel Team’);
-notify(‘guest’,’💬 Guest Notified’,‘Your request has been received \u2014 ‘+req.type+’.’,req.guest+’ \u00b7 Room ‘+req.room+’ \u00b7 Sent to guest app’);
-}
-
-function loadGuestMessages(){
-var msgs=JSON.parse(localStorage.getItem(‘arivo_guest_messages’)||’[]’);
-if(!msgs.length)return;
-// Show unread count on Messages nav
-var unread=msgs.filter(function(m){return !m.read;});
-if(unread.length){
-var badge=document.getElementById(‘rbadge’);
-// Add a messages indicator if there are unread guest messages
-toast(unread.length+’ new message’+(unread.length>1?‘s’:’’)+’ from guests’,‘warn’);
-}
-}
-
-function notifyGuest(type,text,reqId,status,staffName){
-var payload={type:type,text:text||null,reqId:reqId||null,status:status||null,staffName:staffName||null,ts:Date.now()};
-localStorage.setItem(‘arivo_dashboard_to_guest’,JSON.stringify(payload));
-}
-
-// Patch sendMsg to also write to localStorage so guest sees it
-var _origSendMsg=sendMsg;
-function sendMsg(){
-var to=document.getElementById(‘msgto’).value;
-var body=document.getElementById(‘msgbody’).value.trim();
-if(!body){toast(‘Type a message’,‘err’);return;}
-// Write to shared storage
-notifyGuest(‘message’,body,null,null,null);
-logEvent(‘msg_sent’,‘Manager sent message to ‘+to+’: ‘+body.slice(0,60),‘Manager’,’-’);
-toast(‘Message sent to: ‘+to);
-document.getElementById(‘msgbody’).value=’’;
-// Fire notification banner
-notify(‘guest’,’💬 Guest Notified’,body.slice(0,60)+(body.length>60?’…’:’’),to+’ \u00b7 Sent to guest app’);
-}
-
-// Patch sendMsgM to also write to localStorage
-var _origSendMsgM=sendMsgM;
-function sendMsgM(){
-var body=document.getElementById(‘msgb2’).value.trim();
-if(!body){toast(‘Type a message’,‘err’);return;}
-notifyGuest(‘message’,body,null,null,null);
-closeM(‘mmsg’);
-var to=document.getElementById(‘msgto2’).textContent;
-toast(‘Message sent to ‘+to);
-notify(‘guest’,’💬 Guest Notified’,body.slice(0,60)+(body.length>60?’…’:’’),to+’ \u00b7 Sent to guest app’);
-}
-
-// Patch finalDone to notify guest via localStorage
-var _origFinalDone=finalDone;
-function finalDone(row,btn,taskTitle,guestLine){
-if(!taskTitle&&row)taskTitle=row.querySelector(’.rt’)?row.querySelector(’.rt’).textContent:‘Request’;
-if(!guestLine&&row&&row.querySelector(’.rs’))guestLine=row.querySelector(’.rs’).textContent.split(’\u00b7’)[0].trim();
-if(row&&row.dataset.tid)clearTimeout(parseInt(row.dataset.tid));
-if(row){row.querySelector(’.dot’).className=‘dot dn’;var b=row.querySelector(’.badge’);if(b){b.className=‘badge dn’;b.textContent=‘Done’;}var c=row.querySelector(’.echip’);if(c)c.remove();}
-if(btn)btn.remove();
-openReqs=Math.max(0,openReqs-1);updateCnts();
-if(row)syncRequestRow(row, ‘done’);
-// Notify guest via localStorage
-notifyGuest(‘status’,null,null,‘done’,selStaff||‘Hotel Team’);
-if(taskTitle)notify(‘guest’,’✓ Guest Notified’,‘Your request has been completed \u2014 ‘+taskTitle+’.’,guestLine+’ \u00b7 Sent to guest app’);
-if(taskTitle)notify(‘mgr’,’📤 Task Complete’,‘Staff completed: ‘+taskTitle+’.’,(selStaff?selStaff+’ marked as done’:‘Completed by staff’));
-}
-
-// Poll for new guest requests and messages every 3 seconds
-setInterval(function(){
-loadGuestRequests();
-loadGuestMessages();
-},3000);
-
-// Also listen for storage events (when both apps open in same browser)
-window.addEventListener(‘storage’,function(e){
-if(e.key===‘arivo_requests’){loadGuestRequests();}
-if(e.key===‘arivo_guest_messages’){loadGuestMessages();}
-if(e.key===‘arivo_messages_read’){
-var data=JSON.parse(e.newValue||’{}’);
-if(data.guest&&data.room){
-notify(‘mgr’,’✓ Message Read’,data.guest+’ (Room ‘+data.room+’) has read your message.’,’’);
-logEvent(‘messages_read’,‘Messages read by ‘+data.guest,‘Manager’,data.room);
-}
-}
-if(e.key===‘arivo_activity_log’){
-// Refresh log panel if open
-var logSec=document.getElementById(‘s-logs’);
-if(logSec&&logSec.classList.contains(‘on’))renderLogReport();
-}
-if(e.key===‘arivo_rating’){
-var data=JSON.parse(e.newValue||’{}’);
-if(data.stars<=3){
-var palert=document.getElementById(‘palert’);
-if(palert){
-palert.classList.add(‘on’);
-var proom=document.getElementById(‘proom’);
-if(proom)proom.textContent=data.room||’-’;
-var pam=document.getElementById(‘pam’);
-if(pam)pam.innerHTML=‘Guest in Room ‘+data.room+’ rated their stay <strong style="color:var(--red)">’+data.stars+’ star’+(data.stars>1?‘s’:’’)+’</strong>. Please attend immediately.’;
-}
-ping();
-flashTab(‘⚠️ Low Rating Alert!’);
-notify(‘warn’,‘★ Low Rating Alert’,‘Room ‘+data.room+’ rated ‘+data.stars+’ star’+(data.stars>1?‘s’:’’)+’. Please attend immediately.’,‘Priority — go to Requests’);
-}
-}
-});
 </script>
-
 </body>
 </html>
