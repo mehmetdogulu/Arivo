@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Product Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --forest: #1E3A2F;
+    --forest-mid: #2C5040;
+    --gold: #B8933F;
+    --gold-light: #D4AF6A;
+    --cream: #F8F4ED;
+    --cream-dark: #EDE6D4;
+    --charcoal: #1A1A1A;
+    --muted: #6B6355;
+    --white: #FEFCF8;
+    --phase1: #2C5040;
+    --phase2: #B8933F;
+    --phase3: #4A6FA5;
+    --phase4: #7A4A7A;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    line-height: 1.6;
+  }
+
+  /* Cover Page */
+  .cover {
+    background: var(--forest);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: rgba(184,147,63,0.08);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .cover-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 88px;
+    font-weight: 300;
+    color: #FEFCF8;
+    line-height: 0.95;
+    margin-bottom: 12px;
+  }
+  .cover-title em { font-style: italic; color: var(--gold-light); }
+  .cover-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 60px;
+    font-style: italic;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+  }
+  .cover-meta-item { }
+  .cover-meta-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .cover-meta-value {
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+  }
+  .cover-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, transparent 100%);
+  }
+
+  /* Main Content */
+  .content { max-width: 960px; margin: 0 auto; padding: 80px 60px; }
+
+  /* Section Headers */
+  .section-header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--forest);
+    line-height: 1.1;
+  }
+  .section-title em { font-style: italic; }
+
+  /* Executive Summary */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  .summary-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid var(--cream-dark);
+  }
+  .summary-card.highlight {
+    background: var(--forest);
+    border-color: var(--forest);
+    grid-column: 1 / -1;
+  }
+  .summary-card-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .summary-card.highlight .summary-card-label { color: var(--gold-light); }
+  .summary-card-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--forest);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .summary-card.highlight .summary-card-value { color: var(--white); font-size: 22px; font-weight: 300; line-height: 1.5; }
+  .summary-card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* Phases */
+  .phase-block {
+    margin-bottom: 56px;
+    page-break-inside: avoid;
+  }
+  .phase-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .phase-badge {
+    min-width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    flex-shrink: 0;
+  }
+  .phase-badge span { font-size: 22px; font-weight: 300; line-height: 1; }
+  .ph1 { background: var(--phase1); }
+  .ph2 { background: var(--phase2); }
+  .ph3 { background: var(--phase3); }
+  .ph4 { background: var(--phase4); }
+
+  .phase-meta { flex: 1; }
+  .phase-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--forest);
+    margin-bottom: 4px;
+  }
+  .phase-timeline {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  .phase-desc {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.65;
+    margin-bottom: 20px;
+    padding-left: 76px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-left: 76px;
+  }
+  .feature-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid var(--cream-dark);
+  }
+  .feature-card.wide { grid-column: 1 / -1; }
+  .feature-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+  .feature-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+  .feature-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* PMS Table */
+  .pms-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 48px;
+    font-size: 13px;
+  }
+  .pms-table th {
+    background: var(--forest);
+    color: var(--gold-light);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .pms-table th:first-child { border-radius: 10px 0 0 0; }
+  .pms-table th:last-child { border-radius: 0 10px 0 0; }
+  .pms-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--cream-dark);
+    vertical-align: top;
+  }
+  .pms-table tr:last-child td { border-bottom: none; }
+  .pms-table tr:nth-child(even) td { background: var(--white); }
+  .pms-name { font-weight: 600; color: var(--forest); }
+  .pms-market { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .badge.rest { background: rgba(44,80,64,0.1); color: var(--phase1); }
+  .badge.webhook { background: rgba(74,111,165,0.1); color: var(--phase3); }
+  .badge.soap { background: rgba(184,147,63,0.15); color: var(--gold); }
+  .badge.p1 { background: rgba(44,80,64,0.1); color: var(--phase1); }
+  .badge.p2 { background: rgba(184,147,63,0.15); color: var(--gold); }
+  .badge.p3 { background: rgba(74,111,165,0.1); color: var(--phase3); }
+
+  /* Revenue Model */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .pricing-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 24px;
+    border: 1px solid var(--cream-dark);
+    text-align: center;
+  }
+  .pricing-card.featured {
+    background: var(--forest);
+    border-color: var(--forest);
+  }
+  .pricing-tier {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .pricing-card.featured .pricing-tier { color: var(--gold-light); }
+  .pricing-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: var(--forest);
+    line-height: 1;
+  }
+  .pricing-card.featured .pricing-price { color: var(--white); }
+  .pricing-period {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.5); }
+  .pricing-features { text-align: left; font-size: 12px; }
+  .pricing-feature {
+    padding: 5px 0;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 300;
+  }
+  .pricing-card.featured .pricing-feature { color: rgba(255,255,255,0.7); }
+  .pricing-feature::before { content: '✓'; color: var(--gold); font-weight: 600; }
+  .pricing-card.featured .pricing-feature::before { color: var(--gold-light); }
+
+  /* Tech Stack */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .tech-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--cream-dark);
+  }
+  .tech-layer {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .tech-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 4px;
+  }
+  .tech-why { font-size: 11px; color: var(--muted); font-weight: 300; line-height: 1.4; }
+
+  /* Timeline Bar */
+  .timeline {
+    margin-bottom: 56px;
+  }
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 16px;
+  }
+  .timeline-label {
+    width: 140px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--charcoal);
+    flex-shrink: 0;
+  }
+  .timeline-bar-wrap {
+    flex: 1;
+    background: var(--cream-dark);
+    border-radius: 6px;
+    height: 28px;
+    position: relative;
+    overflow: visible;
+  }
+  .timeline-bar {
+    height: 100%;
+    border-radius: 6px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+  }
+  .timeline-bar-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .timeline-months {
+    display: flex;
+    gap: 0;
+    padding-left: 156px;
+    margin-bottom: 4px;
+  }
+  .timeline-month {
+    flex: 1;
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    height: 1px;
+    background: var(--cream-dark);
+    margin: 56px 0;
+  }
+
+  /* Page break hint */
+  .page-break { page-break-before: always; padding-top: 60px; }
+
+  /* Self Check-in Flow */
+  .checkin-flow {
+    margin: 32px 0;
+    position: relative;
+  }
+  .checkin-step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 0;
+    position: relative;
+  }
+  .checkin-step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .checkin-step-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    z-index: 1;
+    border: 2px solid transparent;
+  }
+  .checkin-step-num.block { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
+  .checkin-step-num.warn { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+  .checkin-step-num.go { background: rgba(44,80,64,0.1); color: var(--phase1); border-color: rgba(44,80,64,0.25); }
+  .checkin-step-num.clear { background: var(--phase1); color: white; border-color: var(--phase1); }
+  .checkin-connector {
+    width: 2px;
+    flex: 1;
+    min-height: 32px;
+    background: var(--cream-dark);
+    margin: 4px 0;
+  }
+  .checkin-step-body {
+    flex: 1;
+    padding-bottom: 28px;
+  }
+  .checkin-step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+    padding-top: 10px;
+  }
+  .checkin-step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.55;
+  }
+  .checkin-outcome {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .checkin-outcome.blocked { background: #FEE2E2; color: #B91C1C; }
+  .checkin-outcome.hold { background: #FEF3C7; color: #92400E; }
+  .checkin-outcome.pass { background: rgba(44,80,64,0.1); color: var(--phase1); }
+  .checkin-outcome.complete { background: var(--phase1); color: white; }
+
+  /* Add-on pricing card */
+  .addon-card {
+    background: var(--white);
+    border: 2px dashed var(--gold);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-top: 20px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .addon-price-block { text-align: center; flex-shrink: 0; }
+  .addon-plus { font-size: 28px; color: var(--gold); font-weight: 300; margin-bottom: 4px; }
+  .addon-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: var(--forest);
+    line-height: 1;
+  }
+  .addon-period { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .addon-divider { width: 1px; background: var(--cream-dark); align-self: stretch; }
+  .addon-info { flex: 1; }
+  .addon-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .addon-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+  .addon-desc { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.55; }
+  .addon-req { font-size: 11px; color: var(--gold); margin-top: 8px; font-weight: 500; }
+
+  @media print {
+    .cover { min-height: auto; padding: 60px; }
+    .cover-title { font-size: 64px; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-eyebrow">Product Roadmap · Confidential</div>
+  <div class="cover-title">Ari<em>vo</em></div>
+  <div class="cover-subtitle">The intelligent guest experience platform for independent hotels</div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value">1.0 — March 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Horizon</div>
+      <div class="cover-meta-value">18 Months</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Target Market</div>
+      <div class="cover-meta-value">Boutique & Independent Hotels</div>
+    </div>
+  </div>
+  <div class="cover-line"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- Executive Summary -->
+  <div class="section-header">
+    <div class="section-eyebrow">01 — Executive Summary</div>
+    <div class="section-title">The <em>opportunity</em></div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card highlight">
+      <div class="summary-card-label">The Problem We Solve</div>
+      <div class="summary-card-value">Independent and boutique hotels are competing with global chains that have multi-million pound technology stacks. They lack the budget for enterprise software, yet guests expect the same seamless digital experience. Arivo bridges this gap — a beautifully designed, AI-powered guest platform that plugs into existing PMS systems or replaces them entirely for smaller properties.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Global Market</div>
+      <div class="summary-card-value">500K+</div>
+      <div class="summary-card-desc">Independent hotels worldwide without adequate guest technology</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Target ARR (Year 2)</div>
+      <div class="summary-card-value">£2M+</div>
+      <div class="summary-card-desc">Based on 500 properties at avg. £330/month</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Phases</div>
+      <div class="summary-card-value">4</div>
+      <div class="summary-card-desc">MVP → PMS Integration → Mini-PMS → AI Upsell Engine</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Time to Revenue</div>
+      <div class="summary-card-value">3 mo</div>
+      <div class="summary-card-desc">Phase 1 ships in 8 weeks, first paying customers by month 3</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Roadmap Phases -->
+  <div class="section-header">
+    <div class="section-eyebrow">02 — Product Phases</div>
+    <div class="section-title">What we're <em>building</em></div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-badge ph1"><span>1</span>Phase</div>
+      <div class="phase-meta">
+        <div class="phase-title">Guest Experience MVP</div>
+        <div class="phase-timeline">Months 1–3 · The foundation</div>
+      </div>
+    </div>
+    <p class="phase-desc">The fully working guest-facing web app, accessible via QR code in the room. No app download required. Hotels get a branded portal their guests genuinely want to use — and staff see a real reduction in repetitive front-desk calls from day one.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🏨</span>
+        <div class="feature-name">Digital Welcome Book</div>
+        <div class="feature-desc">WiFi, checkout times, house rules, key contacts — all in one beautiful, mobile-optimised page.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📍</span>
+        <div class="feature-name">Local Recommendations</div>
+        <div class="feature-desc">Hotel-curated guide to restaurants, attractions, and hidden gems. Staff picks, walk times, price guides.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🛎</span>
+        <div class="feature-name">Guest Request Hub</div>
+        <div class="feature-desc">One-tap requests for towels, taxis, late checkout, and more. Routed directly to staff via WhatsApp.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">✨</span>
+        <div class="feature-name">AI Concierge</div>
+        <div class="feature-desc">Claude-powered chat assistant, trained on the hotel's specific info. Answers questions 24/7.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💬</span>
+        <div class="feature-name">WhatsApp Integration</div>
+        <div class="feature-desc">All requests and AI conversations can escalate to WhatsApp — the channel staff and guests already use.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-name">Hotel Branding</div>
+        <div class="feature-desc">Full white-label: hotel logo, brand colours, custom domain. Looks like their app, powered by Arivo.</div>
+      </div>
+      <div class="feature-card wide">
+        <span class="feature-icon">⚙️</span>
+        <div class="feature-name">Hotel Admin Panel</div>
+        <div class="feature-desc">Hotels can manage their own content (or we manage it for them). Update WiFi, recommendations, room info, and view all guest requests in a simple dashboard. No technical knowledge required.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-badge ph2"><span>2</span>Phase</div>
+      <div class="phase-meta">
+        <div class="phase-title">PMS Integrations</div>
+        <div class="phase-timeline">Months 3–8 · Connect to existing systems</div>
+      </div>
+    </div>
+    <p class="phase-desc">Deep integrations with the leading PMS platforms used by independent and boutique hotels. Guest data auto-populates — names, room numbers, stay dates — and all requests are logged back into the PMS automatically. This is what transforms Arivo from a nice tool into an operational necessity.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Mews Integration</div>
+        <div class="feature-desc">REST API. Auto guest import, reservation sync, request logging. Priority — largest independent hotel PMS in Europe.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Cloudbeds Integration</div>
+        <div class="feature-desc">REST API. Strong in Americas and Asia-Pacific boutique segment. Full reservation and guest profile sync.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Little Hotelier</div>
+        <div class="feature-desc">REST API. Designed for small properties (B&Bs, guesthouses). Perfect fit for our target market.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Apaleo</div>
+        <div class="feature-desc">REST + Webhooks. Modern open-platform PMS with a strong developer ecosystem. Fast to integrate.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">RoomRaccoon</div>
+        <div class="feature-desc">REST API. Growing fast in boutique hotel segment across Europe and Africa.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Opera / Oracle OHIP</div>
+        <div class="feature-desc">REST (OHIP). Enterprise integration for larger independents and soft-brand groups. Unlocks higher-tier properties.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <div class="feature-name">Xnprotel</div>
+        <div class="feature-desc">SOAP/REST. Strong coverage in Middle East and Asia markets. Expands our geographic reach.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔄</span>
+        <div class="feature-name">Auto Guest Welcome</div>
+        <div class="feature-desc">When a guest checks in on the PMS, Arivo automatically sends a WhatsApp or SMS with their personalised app link.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-badge ph3"><span>3</span>Phase</div>
+      <div class="phase-meta">
+        <div class="phase-title">Built-in Mini PMS</div>
+        <div class="phase-timeline">Months 7–12 · For hotels without a PMS</div>
+      </div>
+    </div>
+    <p class="phase-desc">A surprising number of small independent hotels — guesthouses, B&Bs, owner-operated boutiques — still run on spreadsheets or paper. For these properties, we become their entire operational system. This dramatically increases switching costs and makes Arivo deeply embedded in how they run their business.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🗓</span>
+        <div class="feature-name">Reservation Management</div>
+        <div class="feature-desc">Visual booking calendar, room availability, multi-channel booking management (direct, OTA).</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👤</span>
+        <div class="feature-name">Guest Profiles</div>
+        <div class="feature-desc">Full guest history, preferences, notes, and stay records. Returning guests feel recognised immediately.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🛏</span>
+        <div class="feature-name">Room Management</div>
+        <div class="feature-desc">Room status (clean/dirty/occupied), housekeeping assignments, maintenance flags.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💳</span>
+        <div class="feature-name">Invoicing & Payments</div>
+        <div class="feature-desc">Folio management, invoice generation, Stripe payment links. Everything needed for checkout.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div class="feature-name">Reporting Dashboard</div>
+        <div class="feature-desc">Occupancy rates, revenue, average length of stay, and source breakdown at a glance.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📲</span>
+        <div class="feature-name">Staff Mobile View</div>
+        <div class="feature-desc">Lightweight staff app for housekeeping and front desk — see room status, guest requests, and tasks.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-badge ph4"><span>4</span>Phase</div>
+      <div class="phase-meta">
+        <div class="phase-title">AI Revenue & Upsell Engine</div>
+        <div class="phase-timeline">Months 12–18 · Where it gets exciting</div>
+      </div>
+    </div>
+    <p class="phase-desc">Once we have stay data, guest preferences, and usage patterns, we can deploy AI to actively drive revenue for hotels — not just serve guests reactively. This is the phase that turns Arivo into a revenue partner, not just a software tool, and justifies premium pricing.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <div class="feature-name">Smart Upsell Timing</div>
+        <div class="feature-desc">AI detects the right moment to offer a room upgrade, dinner reservation, or spa treatment — based on stay patterns and guest behaviour.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌐</span>
+        <div class="feature-name">Multi-language Concierge</div>
+        <div class="feature-desc">AI concierge auto-detects guest language and responds natively. French, Spanish, German, Mandarin, Arabic and more.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⭐</span>
+        <div class="feature-name">Review Nudge Engine</div>
+        <div class="feature-desc">AI sends a perfectly-timed, personalised review request post-checkout. Proven to lift Google and TripAdvisor scores.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📈</span>
+        <div class="feature-name">Revenue Analytics</div>
+        <div class="feature-desc">Show hotels exactly how much additional revenue Arivo has generated. Makes the ROI conversation easy.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Self Check-in Add-on -->
+  <div class="phase-block" style="margin-top:48px;">
+    <div class="phase-header">
+      <div class="phase-badge" style="background:linear-gradient(135deg,var(--gold),#8B6914);min-width:56px;height:56px;"><span>+</span>Add-on</div>
+      <div class="phase-meta">
+        <div class="phase-title">Self Check-in Module</div>
+        <div class="phase-timeline">Available from Month 6 · Premium add-on · Requires PMS integration</div>
+      </div>
+    </div>
+    <p class="phase-desc">A fully automated self check-in flow for guests — no front desk interaction needed. Built with strict validation logic to protect hotels from early arrivals, name mismatches, unpaid balances, and unready rooms. Staff are always kept in the loop via WhatsApp notification at the point of key handover.</p>
+    <div style="padding-left:76px;">
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:16px;">Check-in Validation Flow</div>
+      <div class="checkin-flow">
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num block">1</div>
+            <div class="checkin-connector"></div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">Name Match Verification</div>
+            <div class="checkin-step-desc">The guest enters their name. The system checks it against the booker name on the PMS reservation. Partial matches (e.g. middle names) are flagged for staff review rather than hard-blocked.</div>
+            <div class="checkin-outcome blocked">✕ Hard block if names do not match</div>
+          </div>
+        </div>
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num warn">2</div>
+            <div class="checkin-connector"></div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">Check-in Time Window</div>
+            <div class="checkin-step-desc">The system checks the hotel's configured check-in time (e.g. 3:00 PM). If the guest attempts to check in before this window, they are placed in a holding state — not rejected. They receive a message with the earliest available time and can re-attempt automatically.</div>
+            <div class="checkin-outcome hold">⏳ Held with message if too early — not hard blocked</div>
+          </div>
+        </div>
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num warn">3</div>
+            <div class="checkin-connector"></div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">Outstanding Payment Check</div>
+            <div class="checkin-step-desc">If the reservation shows an outstanding balance, the guest is prompted to settle via Stripe payment link before proceeding. Check-in is gated until payment is confirmed in real time.</div>
+            <div class="checkin-outcome hold">💳 Gated — payment required before proceeding</div>
+          </div>
+        </div>
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num go">4</div>
+            <div class="checkin-connector"></div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">Guest ID Verification</div>
+            <div class="checkin-step-desc">The guest uploads a photo of their passport or driving licence. Stored securely and flagged to hotel staff for review. Check-in continues in parallel — staff can action any concern post-capture.</div>
+            <div class="checkin-outcome pass">📋 ID captured — staff notified to review</div>
+          </div>
+        </div>
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num go">5</div>
+            <div class="checkin-connector"></div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">Room Ready Status</div>
+            <div class="checkin-step-desc">The system checks the housekeeping status of the assigned room via the PMS. If not yet marked clean, the guest receives a friendly message with an estimated ready time and is notified automatically once the room is cleared.</div>
+            <div class="checkin-outcome hold">🧹 Held with ETA if room not ready — auto-notified when clear</div>
+          </div>
+        </div>
+        <div class="checkin-step">
+          <div class="checkin-step-left">
+            <div class="checkin-step-num clear">✓</div>
+          </div>
+          <div class="checkin-step-body">
+            <div class="checkin-step-title">All Clear — Check-in Complete</div>
+            <div class="checkin-step-desc">All checks passed. Guest receives their room number and a personalised welcome message. Staff receive a WhatsApp notification to prepare and hand over the physical key. Reservation is marked checked-in on the PMS automatically.</div>
+            <div class="checkin-outcome complete">🗝 Staff notified via WhatsApp to hand over key</div>
+          </div>
+        </div>
+      </div>
+      <div class="addon-card">
+        <div class="addon-price-block">
+          <div class="addon-plus">+</div>
+          <div class="addon-price">£149</div>
+          <div class="addon-period">per property / month</div>
+        </div>
+        <div class="addon-divider"></div>
+        <div class="addon-info">
+          <div class="addon-label">Premium Add-on</div>
+          <div class="addon-title">Self Check-in Module</div>
+          <div class="addon-desc">Add to any Professional or Complete plan. Includes the full 6-step validation flow, ID capture and secure storage, Stripe payment gating, room status checking, and staff WhatsApp notifications at key handover.</div>
+          <div class="addon-req">⚠ Requires PMS integration — available from Phase 2 onwards</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PMS Integration Table -->
+  <div class="section-header">
+    <div class="section-eyebrow">03 — PMS Integration Detail</div>
+    <div class="section-title">Integration <em>plan</em></div>
+  </div>
+
+  <table class="pms-table">
+    <thead>
+      <tr>
+        <th>PMS System</th>
+        <th>Market Presence</th>
+        <th>API Type</th>
+        <th>Priority</th>
+        <th>Key Features to Sync</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="pms-name">Mews</div>
+          <div class="pms-market">Europe-first, global growth</div>
+        </td>
+        <td>Strong in UK, EU boutique</td>
+        <td><span class="badge rest">REST</span> <span class="badge webhook">Webhooks</span></td>
+        <td><span class="badge p1">Phase 2 — First</span></td>
+        <td>Guest import, reservations, billing, check-in/out events</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">Cloudbeds</div>
+          <div class="pms-market">Americas, APAC, global</div>
+        </td>
+        <td>Large independent segment</td>
+        <td><span class="badge rest">REST</span></td>
+        <td><span class="badge p1">Phase 2 — First</span></td>
+        <td>Guest profiles, reservations, room status, channel manager</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">Little Hotelier</div>
+          <div class="pms-market">Small properties globally</div>
+        </td>
+        <td>B&Bs, guesthouses, small inns</td>
+        <td><span class="badge rest">REST</span></td>
+        <td><span class="badge p1">Phase 2 — First</span></td>
+        <td>Reservations, guest data, availability</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">Apaleo</div>
+          <div class="pms-market">Europe, modern stack hotels</div>
+        </td>
+        <td>Growing fast, API-first PMS</td>
+        <td><span class="badge rest">REST</span> <span class="badge webhook">Webhooks</span></td>
+        <td><span class="badge p2">Phase 2 — Second</span></td>
+        <td>Full PMS sync via open platform, real-time events</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">RoomRaccoon</div>
+          <div class="pms-market">Europe, Africa, growing</div>
+        </td>
+        <td>Boutique and lifestyle hotels</td>
+        <td><span class="badge rest">REST</span></td>
+        <td><span class="badge p2">Phase 2 — Second</span></td>
+        <td>Reservations, guest profiles, revenue reporting</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">Opera / Oracle OHIP</div>
+          <div class="pms-market">Global, enterprise</div>
+        </td>
+        <td>Larger independents, groups</td>
+        <td><span class="badge rest">REST (OHIP)</span></td>
+        <td><span class="badge p3">Phase 2 — Third</span></td>
+        <td>Guest profiles, reservations, folio, events</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pms-name">Xnprotel</div>
+          <div class="pms-market">Middle East, Asia</div>
+        </td>
+        <td>Regional boutique and independent</td>
+        <td><span class="badge soap">SOAP / REST</span></td>
+        <td><span class="badge p3">Phase 2 — Third</span></td>
+        <td>Guest data, reservations, room status</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- Revenue Model -->
+  <div class="section-header">
+    <div class="section-eyebrow">04 — Revenue Model</div>
+    <div class="section-title">How we <em>charge</em></div>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-tier">Starter</div>
+      <div class="pricing-price">£99</div>
+      <div class="pricing-period">per property / month</div>
+      <div class="pricing-features">
+        <div class="pricing-feature">Guest web app (QR code)</div>
+        <div class="pricing-feature">Digital welcome book</div>
+        <div class="pricing-feature">Local recommendations</div>
+        <div class="pricing-feature">Guest request hub</div>
+        <div class="pricing-feature">WhatsApp routing</div>
+        <div class="pricing-feature">Basic admin panel</div>
+      </div>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-tier">Professional</div>
+      <div class="pricing-price">£299</div>
+      <div class="pricing-period">per property / month</div>
+      <div class="pricing-features">
+        <div class="pricing-feature">Everything in Starter</div>
+        <div class="pricing-feature">AI concierge (Claude)</div>
+        <div class="pricing-feature">PMS integration</div>
+        <div class="pricing-feature">Auto guest welcome</div>
+        <div class="pricing-feature">Full white-label branding</div>
+        <div class="pricing-feature">Analytics dashboard</div>
+      </div>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-tier">Complete</div>
+      <div class="pricing-price">£499</div>
+      <div class="pricing-period">per property / month</div>
+      <div class="pricing-features">
+        <div class="pricing-feature">Everything in Professional</div>
+        <div class="pricing-feature">Built-in mini PMS</div>
+        <div class="pricing-feature">Multi-language AI</div>
+        <div class="pricing-feature">Upsell engine</div>
+        <div class="pricing-feature">Review nudge engine</div>
+        <div class="pricing-feature">Revenue analytics</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--white);border:2px dashed var(--gold);border-radius:16px;padding:24px 28px;display:flex;align-items:center;gap:24px;margin-top:16px;">
+    <div style="text-align:center;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:600;letter-spacing:2px;margin-bottom:4px;">ADD-ON</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:400;color:var(--forest);line-height:1;">+£149</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:300;margin-top:4px;">per property / month</div>
+    </div>
+    <div style="width:1px;background:var(--cream-dark);align-self:stretch;flex-shrink:0;"></div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:6px;">Premium Add-on</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--forest);margin-bottom:6px;">Self Check-in Module</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:300;line-height:1.6;">Available on Professional and Complete plans only. Includes all 6 validation steps: name matching, time-window enforcement, payment gating, ID verification, room-ready check, and WhatsApp key handover notification to staff.</div>
+      <div style="font-size:11px;color:var(--gold);margin-top:8px;font-weight:500;">Requires PMS integration — available from Phase 2 onwards</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Tech Stack -->
+  <div class="section-header">
+    <div class="section-eyebrow">05 — Technology</div>
+    <div class="section-title">How it's <em>built</em></div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-layer">Frontend</div>
+      <div class="tech-name">React + Tailwind</div>
+      <div class="tech-why">Fast, mobile-optimised guest app and admin panel. PWA for app-like feel without the App Store.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-layer">Backend</div>
+      <div class="tech-name">Node.js + Supabase</div>
+      <div class="tech-why">Scalable API, real-time database for live request updates, built-in auth for hotel admin access.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-layer">AI Layer</div>
+      <div class="tech-name">Anthropic Claude API</div>
+      <div class="tech-why">Powers the AI concierge. Hotel-specific context injected per property. Handles escalation to WhatsApp gracefully.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-layer">Messaging</div>
+      <div class="tech-name">WhatsApp Business API</div>
+      <div class="tech-why">Routes guest requests to hotel staff. Sends automated welcome messages on check-in. Zero friction for guests.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-layer">Payments</div>
+      <div class="tech-name">Stripe</div>
+      <div class="tech-why">SaaS subscription billing, invoicing for the mini-PMS, and payment link generation for hotel use.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-layer">PMS Layer</div>
+      <div class="tech-name">Unified Integration Hub</div>
+      <div class="tech-why">Single internal API that normalises data from Mews, Cloudbeds, Opera et al. Add new PMS without rebuilding.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 18-month Timeline -->
+  <div class="section-header">
+    <div class="section-eyebrow">06 — Timeline</div>
+    <div class="section-title">18-month <em>view</em></div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-months">
+      <div class="timeline-month">M1</div>
+      <div class="timeline-month">M2</div>
+      <div class="timeline-month">M3</div>
+      <div class="timeline-month">M4</div>
+      <div class="timeline-month">M5</div>
+      <div class="timeline-month">M6</div>
+      <div class="timeline-month">M7</div>
+      <div class="timeline-month">M8</div>
+      <div class="timeline-month">M9</div>
+      <div class="timeline-month">M10</div>
+      <div class="timeline-month">M11</div>
+      <div class="timeline-month">M12</div>
+      <div class="timeline-month">M13</div>
+      <div class="timeline-month">M14</div>
+      <div class="timeline-month">M15</div>
+      <div class="timeline-month">M16</div>
+      <div class="timeline-month">M17</div>
+      <div class="timeline-month">M18</div>
+    </div>
+
+    <div class="timeline-row">
+      <div class="timeline-label">Phase 1: MVP</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:0%;width:16.6%;background:var(--phase1)">
+          <span class="timeline-bar-label">Guest App + Admin</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">First customers</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:11%;width:5.5%;background:var(--gold)">
+          <span class="timeline-bar-label">Launch</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">Phase 2: PMS (1st)</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:16.6%;width:22.2%;background:var(--phase2)">
+          <span class="timeline-bar-label">Mews · Cloudbeds · Little Hotelier</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">Phase 2: PMS (2nd)</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:33.3%;width:22.2%;background:#C4A050">
+          <span class="timeline-bar-label">Apaleo · RoomRaccoon · Opera · Xnprotel</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">Phase 3: Mini PMS</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:38.8%;width:27.7%;background:var(--phase3)">
+          <span class="timeline-bar-label">Built-in PMS for non-PMS hotels</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">Phase 4: AI Revenue</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:66.6%;width:33.3%;background:var(--phase4)">
+          <span class="timeline-bar-label">Upsell · Multi-language · Review Engine</span>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">Self Check-in Add-on</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="left:33.3%;width:66.6%;background:linear-gradient(90deg,var(--gold),var(--gold-light))">
+          <span class="timeline-bar-label">Available from Month 6 — ongoing add-on</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Go to Market -->
+  <div class="section-header">
+    <div class="section-eyebrow">07 — Go To Market</div>
+    <div class="section-title">How we <em>sell</em> it</div>
+  </div>
+
+  <div class="features-grid" style="padding-left:0">
+    <div class="feature-card">
+      <span class="feature-icon">🤝</span>
+      <div class="feature-name">Direct Sales</div>
+      <div class="feature-desc">Target boutique hotel associations, LinkedIn outreach to independent hotel owners, and regional hospitality trade shows.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔌</span>
+      <div class="feature-name">PMS Partner Channels</div>
+      <div class="feature-desc">List on Mews Marketplace, Cloudbeds App Store, and Apaleo Store. Hotels discover us where they already shop for tools.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🏆</span>
+      <div class="feature-name">Pilot Programme</div>
+      <div class="feature-desc">Offer 3 months free to 10 flagship boutique hotels in exchange for case studies and testimonials. Use these to sell the next 100.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🌍</span>
+      <div class="feature-name">Agency Resellers</div>
+      <div class="feature-desc">Partner with hospitality consultants and hotel marketing agencies who can resell Arivo to their clients on a commission basis.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:60px;text-align:center;padding:40px;background:var(--forest);border-radius:20px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--white);margin-bottom:8px;">Ready to <em style="color:var(--gold-light)">build</em>?</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);font-weight:300;">Phase 1 MVP is already built. Next step: first paying hotel.</div>
+  </div>
+
+</div>
+</body>
+</html>

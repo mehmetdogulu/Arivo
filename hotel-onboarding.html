@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Arivo — Get Started</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0F1117; --surface:#181B23; --surface2:#1E2130;
+  --border:#2A2D3A; --border2:#353848;
+  --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.12); --gold-border:rgba(201,168,76,0.28);
+  --green:#3DD68C; --green-dim:rgba(61,214,140,0.1);
+  --text:#F0F0F5; --text2:#9094A8; --text3:#5C6080; --white:#FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:'Geist',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* ── SCREENS ── */
+.scr { display:none; min-height:100vh; animation:fadeUp 0.3s ease; }
+.scr.active { display:flex; flex-direction:column; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap { padding:20px 24px 0; }
+.progress-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width 0.4s ease; }
+.progress-label { font-size:11px; color:var(--text3); margin-top:8px; }
+
+/* ── HEADER ── */
+.ob-header {
+  padding:32px 24px 24px;
+  background:radial-gradient(ellipse at 70% 0%, rgba(201,168,76,0.08) 0%, transparent 60%), var(--bg);
+}
+.ob-logo { font-family:'Instrument Serif',serif; font-size:20px; color:var(--white); margin-bottom:24px; }
+.ob-logo span { color:var(--gold); }
+.ob-step-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); font-weight:500; margin-bottom:8px; }
+.ob-title { font-family:'Instrument Serif',serif; font-size:30px; color:var(--white); line-height:1.1; margin-bottom:6px; }
+.ob-title em { font-style:italic; color:var(--gold); }
+.ob-sub { font-size:13px; color:var(--text3); font-weight:300; line-height:1.5; }
+
+/* ── FORM AREA ── */
+.ob-body { flex:1; padding:24px; overflow-y:auto; }
+.fg { margin-bottom:18px; }
+.fl { display:block; font-size:10px; font-weight:500; color:var(--text2); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; }
+.fi {
+  width:100%; background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:10px; padding:13px 16px;
+  font-family:'Geist',sans-serif; font-size:15px; color:var(--text);
+  outline:none; transition:border-color 0.15s; -webkit-appearance:none;
+}
+.fi:focus { border-color:var(--gold); }
+.fi::placeholder { color:var(--text3); }
+select.fi { cursor:pointer; }
+.fi-error { border-color:#F87171; }
+.err-msg { font-size:11px; color:#F87171; margin-top:5px; display:none; }
+.err-msg.show { display:block; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:480px) { .form-row { grid-template-columns:1fr; } }
+
+/* ── OPTION CARDS ── */
+.option-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px; }
+@media(max-width:400px) { .option-grid { grid-template-columns:1fr; } }
+.option-card {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:16px; cursor:pointer;
+  transition:all 0.15s; text-align:center;
+  user-select:none;
+}
+.option-card:hover { border-color:var(--border2); }
+.option-card.selected { background:var(--gold-dim); border-color:var(--gold-border); }
+.option-card.selected .oc-label { color:var(--gold); }
+.oc-icon { font-size:26px; margin-bottom:6px; }
+.oc-label { font-size:12px; font-weight:500; color:var(--text2); }
+.oc-sub { font-size:10px; color:var(--text3); margin-top:3px; font-weight:300; }
+
+/* ── PLAN CARDS ── */
+.plan-grid { display:flex; flex-direction:column; gap:10px; }
+.plan-card {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:14px; padding:18px; cursor:pointer;
+  transition:all 0.15s; display:flex; align-items:center; gap:14px;
+  user-select:none;
+}
+.plan-card:hover { border-color:var(--border2); }
+.plan-card.selected { background:var(--gold-dim); border-color:var(--gold-border); }
+.plan-radio {
+  width:20px; height:20px; border-radius:50%;
+  border:2px solid var(--border2); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+}
+.plan-card.selected .plan-radio { border-color:var(--gold); background:var(--gold); }
+.plan-card.selected .plan-radio::after { content:''; width:8px; height:8px; background:var(--bg); border-radius:50%; }
+.plan-info { flex:1; }
+.plan-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.plan-card.selected .plan-name { color:var(--gold); }
+.plan-desc { font-size:11px; color:var(--text3); font-weight:300; line-height:1.4; }
+.plan-price { font-family:'Instrument Serif',serif; font-size:22px; color:var(--white); flex-shrink:0; }
+.plan-price span { font-size:11px; color:var(--text3); font-family:'Geist',sans-serif; font-weight:300; }
+.plan-popular { font-size:9px; font-weight:600; background:var(--gold); color:var(--bg); padding:2px 8px; border-radius:10px; margin-left:8px; letter-spacing:0.5px; }
+
+/* ── FEATURE LIST ── */
+.feature-list { margin-top:16px; }
+.feature-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:13px; color:var(--text2);
+}
+.feature-item:last-child { border-bottom:none; }
+.feature-item .check { color:var(--green); font-size:14px; flex-shrink:0; }
+
+/* ── FOOTER ── */
+.ob-footer {
+  padding:16px 24px;
+  border-top:1px solid var(--border);
+  background:var(--surface);
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+}
+.btn-primary {
+  width:100%; background:var(--gold); color:var(--bg);
+  border:none; border-radius:12px; padding:15px;
+  font-family:'Geist',sans-serif; font-size:15px; font-weight:600;
+  cursor:pointer; transition:background 0.15s; touch-action:manipulation;
+}
+.btn-primary:hover { background:#D4B060; }
+.btn-primary:active { background:#B8933F; }
+.btn-primary:disabled { background:var(--surface2); color:var(--text3); cursor:not-allowed; }
+.btn-back {
+  width:100%; background:transparent; border:none;
+  font-family:'Geist',sans-serif; font-size:12px;
+  color:var(--text3); text-decoration:underline;
+  cursor:pointer; padding:10px; margin-top:6px;
+}
+
+/* ── SUCCESS ── */
+.success-screen {
+  background:radial-gradient(ellipse at 50% 20%, rgba(201,168,76,0.1) 0%, transparent 60%), var(--bg);
+  align-items:center; justify-content:center; text-align:center; padding:40px 28px;
+}
+.success-icon { font-size:60px; margin-bottom:20px; animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both; }
+@keyframes popIn { from{opacity:0;transform:scale(0.4)} to{opacity:1;transform:scale(1)} }
+.success-title { font-family:'Instrument Serif',serif; font-size:38px; color:var(--white); margin-bottom:8px; }
+.success-title em { font-style:italic; color:var(--gold); }
+.success-sub { font-size:14px; color:var(--text3); font-weight:300; line-height:1.65; max-width:300px; margin:0 auto 32px; }
+.success-checklist { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:24px; text-align:left; }
+.sc-item { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text2); }
+.sc-item:last-child { border-bottom:none; }
+.sc-item .sc-check { color:var(--green); font-size:15px; flex-shrink:0; }
+.success-btn { width:100%; background:var(--gold); color:var(--bg); border:none; border-radius:12px; padding:15px; font-family:'Geist',sans-serif; font-size:15px; font-weight:600; cursor:pointer; margin-bottom:10px; }
+.success-btn-s { width:100%; background:var(--surface2); color:var(--text2); border:1px solid var(--border); border-radius:12px; padding:13px; font-family:'Geist',sans-serif; font-size:13px; cursor:pointer; }
+
+/* ── HINT BOX ── */
+.hint-box {
+  background:var(--gold-dim); border:1px solid var(--gold-border);
+  border-radius:10px; padding:12px 14px;
+  font-size:11px; color:var(--text2); line-height:1.6; margin-bottom:16px;
+}
+.hint-box strong { color:var(--gold); }
+
+/* ── TOAST ── */
+#toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(10px); background:#22C55E; color:white; padding:10px 20px; border-radius:30px; font-size:13px; font-weight:500; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════
+     STEP 1: Hotel Details
+══════════════ -->
+<div class="scr active" id="s1">
+  <div class="ob-header">
+    <div class="ob-logo">Ari<span>vo</span></div>
+    <div class="ob-step-label">Step 1 of 4</div>
+    <div class="ob-title">Tell us about<br>your <em>hotel</em></div>
+    <div class="ob-sub">We'll set up your guest app and dashboard in minutes.</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+    <div class="progress-label">Hotel Details</div>
+  </div>
+  <div class="ob-body">
+    <div class="fg">
+      <label class="fl">Hotel Name</label>
+      <input class="fi" id="s1-name" placeholder="e.g. The Anchor Hotel" autocomplete="organization">
+      <div class="err-msg" id="err-s1-name">Please enter your hotel name</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Town / City</label>
+      <input class="fi" id="s1-city" placeholder="e.g. Bath" autocomplete="address-level2">
+      <div class="err-msg" id="err-s1-city">Please enter your location</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Country</label>
+      <select class="fi" id="s1-country">
+        <option value="UK">United Kingdom</option>
+        <option value="IE">Ireland</option>
+        <option value="FR">France</option>
+        <option value="DE">Germany</option>
+        <option value="ES">Spain</option>
+        <option value="IT">Italy</option>
+        <option value="NL">Netherlands</option>
+        <option value="PT">Portugal</option>
+        <option value="AE">UAE</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Number of Rooms</label>
+        <input class="fi" id="s1-rooms" type="number" min="1" max="500" placeholder="e.g. 22">
+        <div class="err-msg" id="err-s1-rooms">Please enter room count</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Property Type</label>
+        <select class="fi" id="s1-type">
+          <option>Boutique Hotel</option>
+          <option>B&amp;B / Guesthouse</option>
+          <option>Independent Hotel</option>
+          <option>Aparthotel</option>
+          <option>Inn / Pub with rooms</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="ob-footer">
+    <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════
+     STEP 2: Manager Account
+══════════════ -->
+<div class="scr" id="s2">
+  <div class="ob-header">
+    <div class="ob-logo">Ari<span>vo</span></div>
+    <div class="ob-step-label">Step 2 of 4</div>
+    <div class="ob-title">Create your<br><em>manager account</em></div>
+    <div class="ob-sub">This is how you and your team sign in to the dashboard.</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+    <div class="progress-label">Manager Account</div>
+  </div>
+  <div class="ob-body">
+    <div class="fg">
+      <label class="fl">Your Name</label>
+      <input class="fi" id="s2-name" placeholder="e.g. James Mitchell" autocomplete="name">
+      <div class="err-msg" id="err-s2-name">Please enter your name</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Email Address</label>
+      <input class="fi" id="s2-email" type="email" placeholder="james@yourhotel.com" autocomplete="email">
+      <div class="err-msg" id="err-s2-email">Please enter a valid email</div>
+    </div>
+    <div class="fg">
+      <label class="fl">WhatsApp Number</label>
+      <input class="fi" id="s2-whatsapp" type="tel" placeholder="+44 7900 000000" autocomplete="tel">
+      <div class="err-msg" id="err-s2-wa">Please enter your WhatsApp number</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:5px;">Guest requests will be sent to this number via WhatsApp</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fi" id="s2-pass" type="password" placeholder="Minimum 8 characters" autocomplete="new-password">
+      <div class="err-msg" id="err-s2-pass">Password must be at least 8 characters</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Confirm Password</label>
+      <input class="fi" id="s2-pass2" type="password" placeholder="Repeat password" autocomplete="new-password">
+      <div class="err-msg" id="err-s2-pass2">Passwords do not match</div>
+    </div>
+    <div class="hint-box">
+      <strong>🔒 GDPR note:</strong> Your account data is stored securely in the EU and used solely to provide the Arivo service. Full details in our Privacy Policy.
+    </div>
+  </div>
+  <div class="ob-footer">
+    <button class="btn-primary" onclick="goStep(3)">Continue →</button>
+    <button class="btn-back" onclick="goStep(1)">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════
+     STEP 3: Features
+══════════════ -->
+<div class="scr" id="s3">
+  <div class="ob-header">
+    <div class="ob-logo">Ari<span>vo</span></div>
+    <div class="ob-step-label">Step 3 of 4</div>
+    <div class="ob-title">Choose your<br><em>features</em></div>
+    <div class="ob-sub">You can change these at any time from your dashboard settings.</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+    <div class="progress-label">Features</div>
+  </div>
+  <div class="ob-body">
+    <div class="fg">
+      <label class="fl" style="margin-bottom:10px;">Which features do you want active from day one?</label>
+      <div class="option-grid">
+        <div class="option-card selected" onclick="toggleOption(this)">
+          <div class="oc-icon">🏨</div>
+          <div class="oc-label">Digital Welcome Book</div>
+          <div class="oc-sub">Hotel info, WiFi, rules</div>
+        </div>
+        <div class="option-card selected" onclick="toggleOption(this)">
+          <div class="oc-icon">📍</div>
+          <div class="oc-label">Local Guide</div>
+          <div class="oc-sub">Your restaurant picks</div>
+        </div>
+        <div class="option-card selected" onclick="toggleOption(this)">
+          <div class="oc-icon">🛎</div>
+          <div class="oc-label">Guest Requests</div>
+          <div class="oc-sub">Towels, taxis, checkout</div>
+        </div>
+        <div class="option-card selected" onclick="toggleOption(this)">
+          <div class="oc-icon">✨</div>
+          <div class="oc-label">AI Concierge</div>
+          <div class="oc-sub">Claude-powered chat</div>
+        </div>
+        <div class="option-card selected" onclick="toggleOption(this)">
+          <div class="oc-icon">💬</div>
+          <div class="oc-label">WhatsApp Routing</div>
+          <div class="oc-sub">Requests to your phone</div>
+        </div>
+        <div class="option-card" onclick="toggleOption(this)">
+          <div class="oc-icon">✅</div>
+          <div class="oc-label">Self Check-in</div>
+          <div class="oc-sub">+£149/mo add-on</div>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl" style="margin-bottom:10px;">Choose your plan</label>
+      <div class="plan-grid">
+        <div class="plan-card" onclick="selectPlan(this)" data-plan="starter">
+          <div class="plan-radio"></div>
+          <div class="plan-info">
+            <div class="plan-name">Starter</div>
+            <div class="plan-desc">Guest app, welcome book, local guide, requests</div>
+          </div>
+          <div class="plan-price">£99<span>/mo</span></div>
+        </div>
+        <div class="plan-card selected" onclick="selectPlan(this)" data-plan="professional">
+          <div class="plan-radio"></div>
+          <div class="plan-info">
+            <div class="plan-name">Professional <span class="plan-popular">Most popular</span></div>
+            <div class="plan-desc">Everything + AI concierge, WhatsApp routing, analytics</div>
+          </div>
+          <div class="plan-price">£299<span>/mo</span></div>
+        </div>
+        <div class="plan-card" onclick="selectPlan(this)" data-plan="complete">
+          <div class="plan-radio"></div>
+          <div class="plan-info">
+            <div class="plan-name">Complete</div>
+            <div class="plan-desc">Everything + mini PMS, upsell engine, multi-language AI</div>
+          </div>
+          <div class="plan-price">£499<span>/mo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ob-footer">
+    <button class="btn-primary" onclick="goStep(4)">Continue →</button>
+    <button class="btn-back" onclick="goStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════
+     STEP 4: Quick Setup
+══════════════ -->
+<div class="scr" id="s4">
+  <div class="ob-header">
+    <div class="ob-logo">Ari<span>vo</span></div>
+    <div class="ob-step-label">Step 4 of 4 — Almost there</div>
+    <div class="ob-title">Quick hotel<br><em>setup</em></div>
+    <div class="ob-sub">This goes straight into your guest app. You can update everything later.</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div>
+    <div class="progress-label">Quick Setup</div>
+  </div>
+  <div class="ob-body">
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">WiFi Network</label>
+        <input class="fi" id="s4-wifi" placeholder="e.g. Hotel_Guest">
+      </div>
+      <div class="fg">
+        <label class="fl">WiFi Password</label>
+        <input class="fi" id="s4-wifipass" placeholder="e.g. welcome123">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Check-in Time</label>
+        <input class="fi" id="s4-checkin" type="time" value="15:00">
+      </div>
+      <div class="fg">
+        <label class="fl">Check-out Time</label>
+        <input class="fi" id="s4-checkout" type="time" value="11:00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Breakfast From</label>
+        <input class="fi" type="time" value="08:00">
+      </div>
+      <div class="fg">
+        <label class="fl">Breakfast Until</label>
+        <input class="fi" type="time" value="10:00">
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Reception Phone (guests dial this)</label>
+      <input class="fi" id="s4-phone" placeholder="e.g. Dial 0 or +44 20 1234 5678">
+    </div>
+    <div class="hint-box">
+      <strong>💡 Tip:</strong> Don't worry about getting this perfect now. Everything can be edited from your dashboard in seconds — including adding sections, local recommendations, and house rules.
+    </div>
+    <div class="fg">
+      <label class="fl">How did you hear about Arivo?</label>
+      <select class="fi">
+        <option>A colleague or friend in hospitality</option>
+        <option>LinkedIn</option>
+        <option>Google Search</option>
+        <option>Hospitality trade show</option>
+        <option>Mews / Cloudbeds marketplace</option>
+        <option>Email or cold outreach</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="ob-footer">
+    <button class="btn-primary" onclick="completeOnboarding()">Launch my Arivo ✦</button>
+    <button class="btn-back" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════
+     SUCCESS
+══════════════ -->
+<div class="scr" id="s-success" style="background:radial-gradient(ellipse at 50% 20%,rgba(201,168,76,0.1) 0%,transparent 60%),var(--bg);">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;">
+    <div class="success-icon">🏨</div>
+    <div class="success-title">You're <em>live</em></div>
+    <div style="font-size:14px;color:var(--text3);font-weight:300;line-height:1.65;max-width:300px;margin:0 auto 28px;">
+      Your Arivo account has been created. Here's what to do next.
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px;width:100%;max-width:360px;text-align:left;">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:14px;">Your next 3 steps</div>
+      <div class="sc-item"><span class="sc-check">1</span>Open your dashboard and add your local recommendations</div>
+      <div class="sc-item"><span class="sc-check">2</span>Download your QR code and print it for your rooms</div>
+      <div class="sc-item"><span class="sc-check">3</span>Hand the QR card to your next arriving guest and watch it work</div>
+    </div>
+
+    <div style="background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:12px;padding:14px 16px;margin-bottom:24px;width:100%;max-width:360px;text-align:left;">
+      <div style="font-size:11px;color:var(--text2);line-height:1.6;">
+        <strong style="color:var(--gold);">Your guest app URL:</strong><br>
+        <span style="font-family:monospace;color:var(--gold);font-size:12px;" id="success-url">guest.arivo.app/your-hotel</span>
+      </div>
+    </div>
+
+    <button class="success-btn" onclick="openDashboard()">Go to my dashboard →</button>
+    <button class="success-btn-s" onclick="toast('QR code downloading...')">⬇ Download QR code</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var currentStep = 1;
+
+function goStep(n) {
+  // Validate before going forward
+  if (n > currentStep) {
+    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 2 && !validateStep2()) return;
+  }
+
+  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
+  var target = document.getElementById('s' + n);
+  if (target) { target.classList.add('active'); window.scrollTo(0,0); }
+  currentStep = n;
+}
+
+function validateStep1() {
+  var ok = true;
+  var name = document.getElementById('s1-name').value.trim();
+  var city = document.getElementById('s1-city').value.trim();
+  var rooms = document.getElementById('s1-rooms').value;
+  if (!name) { showErr('err-s1-name'); ok = false; } else hideErr('err-s1-name');
+  if (!city) { showErr('err-s1-city'); ok = false; } else hideErr('err-s1-city');
+  if (!rooms || parseInt(rooms) < 1) { showErr('err-s1-rooms'); ok = false; } else hideErr('err-s1-rooms');
+  return ok;
+}
+
+function validateStep2() {
+  var ok = true;
+  var name = document.getElementById('s2-name').value.trim();
+  var email = document.getElementById('s2-email').value.trim();
+  var wa = document.getElementById('s2-whatsapp').value.trim();
+  var pass = document.getElementById('s2-pass').value;
+  var pass2 = document.getElementById('s2-pass2').value;
+  if (!name) { showErr('err-s2-name'); ok = false; } else hideErr('err-s2-name');
+  if (!email || !email.includes('@')) { showErr('err-s2-email'); ok = false; } else hideErr('err-s2-email');
+  if (!wa) { showErr('err-s2-wa'); ok = false; } else hideErr('err-s2-wa');
+  if (!pass || pass.length < 8) { showErr('err-s2-pass'); ok = false; } else hideErr('err-s2-pass');
+  if (pass !== pass2) { showErr('err-s2-pass2'); ok = false; } else hideErr('err-s2-pass2');
+  return ok;
+}
+
+function showErr(id) {
+  var el = document.getElementById(id);
+  if (el) { el.classList.add('show'); }
+}
+function hideErr(id) {
+  var el = document.getElementById(id);
+  if (el) { el.classList.remove('show'); }
+}
+
+function toggleOption(card) {
+  card.classList.toggle('selected');
+}
+
+function selectPlan(card) {
+  document.querySelectorAll('.plan-card').forEach(function(c){ c.classList.remove('selected'); });
+  card.classList.add('selected');
+}
+
+function completeOnboarding() {
+  var hotelName = document.getElementById('s1-name').value.trim() || 'yourhotel';
+  var slug = hotelName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  var url = 'guest.arivo.app/' + slug;
+  document.getElementById('success-url').textContent = url;
+
+  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('s-success').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function openDashboard() {
+  toast('Opening your dashboard...');
+  setTimeout(function(){ window.location.href = 'hotel-dashboard.html'; }, 1000);
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+</script>
+</body>
+</html>

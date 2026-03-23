@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Legal Documents</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #1E3A2F;
+    --gold: #B8933F;
+    --gold-light: #D4AF6A;
+    --cream: #F8F4ED;
+    --cream-dark: #EDE6D4;
+    --charcoal: #1A1A1A;
+    --muted: #6B6355;
+    --white: #FEFCF8;
+    --red: #DC2626;
+    --green: #16A34A;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); }
+
+  /* Nav */
+  .doc-nav {
+    background: var(--forest);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .doc-nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: white;
+    padding: 16px 0;
+    margin-right: 32px;
+    flex-shrink: 0;
+  }
+  .doc-nav-logo span { color: var(--gold-light); }
+  .doc-tab {
+    padding: 18px 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .doc-tab:hover { color: rgba(255,255,255,0.8); }
+  .doc-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+
+  /* Content */
+  .doc-content { max-width: 800px; margin: 0 auto; padding: 60px 40px 100px; }
+  .doc-section { display: none; }
+  .doc-section.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .doc-header {
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .doc-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .doc-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--forest);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .doc-meta { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .doc-warning {
+    background: rgba(220,38,38,0.06);
+    border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--red);
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--forest);
+    margin: 36px 0 12px;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin: 20px 0 8px;
+  }
+  p { font-size: 13px; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 12px; }
+  ul { margin: 8px 0 12px 20px; }
+  li { font-size: 13px; color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 4px; }
+  strong { color: var(--charcoal); font-weight: 600; }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .clause-block {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .clause-num {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 12px;
+  }
+  .data-table th {
+    background: var(--forest);
+    color: var(--gold-light);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .data-table th:first-child { border-radius: 8px 0 0 0; }
+  .data-table th:last-child { border-radius: 0 8px 0 0; }
+  .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--cream-dark); color: var(--muted); font-weight: 300; vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--white); }
+
+  /* Rights cards */
+  .rights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 24px; }
+  .right-card {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .right-icon { font-size: 20px; margin-bottom: 6px; }
+  .right-name { font-size: 12px; font-weight: 600; color: var(--forest); margin-bottom: 4px; }
+  .right-desc { font-size: 11px; color: var(--muted); font-weight: 300; line-height: 1.5; }
+
+  /* Cookie categories */
+  .cookie-card {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .cookie-toggle-wrap { flex-shrink: 0; margin-top: 2px; }
+  .cookie-toggle {
+    width: 40px; height: 22px;
+    border-radius: 11px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    border: none;
+  }
+  .cookie-toggle.required { background: var(--forest); cursor: not-allowed; }
+  .cookie-toggle.optional { background: #D1D5DB; }
+  .cookie-toggle.optional.on { background: var(--forest); }
+  .cookie-toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: left 0.2s;
+  }
+  .cookie-toggle.on::after, .cookie-toggle.required::after { left: 21px; }
+  .cookie-info { flex: 1; }
+  .cookie-name { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 4px; }
+  .cookie-desc { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.5; }
+  .cookie-required-label { font-size: 10px; color: var(--forest); font-weight: 500; margin-top: 4px; }
+
+  /* Consent Flow */
+  .consent-phone {
+    max-width: 360px;
+    margin: 0 auto 40px;
+    background: var(--white);
+    border-radius: 28px;
+    border: 2px solid var(--cream-dark);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  }
+  .consent-step { display: none; }
+  .consent-step.active { display: block; animation: fadeIn 0.3s ease; }
+  .consent-header {
+    background: var(--forest);
+    padding: 28px 24px 20px;
+    text-align: center;
+  }
+  .consent-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: white; margin-bottom: 4px; }
+  .consent-hotel { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .consent-body { padding: 24px; }
+  .consent-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--forest); margin-bottom: 8px; }
+  .consent-text { font-size: 12px; color: var(--muted); line-height: 1.6; font-weight: 300; margin-bottom: 16px; }
+  .consent-checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: var(--cream);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .consent-checkbox {
+    width: 18px; height: 18px;
+    border: 2px solid var(--cream-dark);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+    background: white;
+  }
+  .consent-checkbox.checked { background: var(--forest); border-color: var(--forest); color: white; }
+  .consent-checkbox-label { font-size: 11px; color: var(--charcoal); line-height: 1.5; }
+  .consent-checkbox-label a { color: var(--gold); }
+  .consent-btn {
+    width: 100%;
+    background: var(--forest);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.15s;
+  }
+  .consent-btn:disabled { background: #9CA3AF; cursor: not-allowed; }
+  .consent-btn.secondary { background: transparent; color: var(--muted); font-size: 11px; margin-top: 6px; text-decoration: underline; }
+  .consent-success { text-align: center; padding: 32px 24px; }
+  .consent-success-icon { font-size: 48px; margin-bottom: 12px; }
+  .consent-success-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--forest); margin-bottom: 8px; }
+  .consent-success-text { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .step-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border-top: 1px solid var(--cream-dark);
+  }
+  .step-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cream-dark);
+    transition: background 0.2s;
+  }
+  .step-dot.active { background: var(--forest); width: 18px; border-radius: 3px; }
+
+  .section-note {
+    background: rgba(184,147,63,0.08);
+    border: 1px solid rgba(184,147,63,0.25);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 24px 0;
+    font-weight: 400;
+  }
+
+  hr.doc-divider { border: none; height: 1px; background: var(--cream-dark); margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<div class="doc-nav">
+  <div class="doc-nav-logo">Ari<span>vo</span></div>
+  <div class="doc-tab active" onclick="showDoc('tc', this)">Terms & Conditions</div>
+  <div class="doc-tab" onclick="showDoc('privacy', this)">Privacy Policy</div>
+  <div class="doc-tab" onclick="showDoc('cookies', this)">Cookie Policy</div>
+  <div class="doc-tab" onclick="showDoc('consent', this)">Guest Consent Flow</div>
+</div>
+
+<div class="doc-content">
+
+  <!-- TERMS & CONDITIONS -->
+  <div class="doc-section active" id="doc-tc">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Legal Document</div>
+      <div class="doc-title">Terms &<br>Conditions</div>
+      <div class="doc-meta">Effective date: 1 April 2026 · Version 1.0 · Applies to hotels and hotel guests</div>
+    </div>
+    <div class="doc-warning">⚠ This is a working draft for review purposes. Before publishing, this document must be reviewed and approved by a qualified solicitor registered in England & Wales. Do not publish this document as legally binding without professional legal review.</div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 1</div>
+      <h3>About Arivo and These Terms</h3>
+      <p>Arivo is a software-as-a-service (SaaS) platform operated by Arivo Ltd, a company registered in England and Wales. These Terms and Conditions govern the use of the Arivo platform by both hotel operators ("Hotels") and hotel guests ("Guests").</p>
+      <p>By accessing or using Arivo — whether as a hotel signing up to our platform or as a guest using the in-room app — you agree to be bound by these Terms. If you do not agree, you must not use our services.</p>
+      <p>Arivo Ltd may be contacted at: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2aea7a5a3ae82b1b6a3bbadb1eca3b2b2">[email&#160;protected]</a></strong></p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 2</div>
+      <h3>Hotel Operator Terms</h3>
+      <p>These terms apply specifically to hotels and accommodation providers who subscribe to Arivo.</p>
+      <h3>2.1 Account Registration</h3>
+      <p>Hotels must register for an account and provide accurate, complete information including legal business name, address, VAT number (where applicable), and an authorised contact. You are responsible for maintaining the security of your login credentials.</p>
+      <h3>2.2 Subscription and Billing</h3>
+      <p>Arivo is provided on a monthly subscription basis. Fees are as published on our pricing page and invoiced monthly in advance. Payment is due within 14 days of invoice. Late payment may result in suspension of the service. All prices are exclusive of VAT where applicable.</p>
+      <h3>2.3 Hotel Responsibilities</h3>
+      <p>As a hotel operator using Arivo, you agree to:</p>
+      <ul>
+        <li>Provide accurate hotel information to guests through the platform</li>
+        <li>Ensure guests are informed that their data is processed by Arivo on the hotel's behalf</li>
+        <li>Respond to guest requests within a reasonable timeframe</li>
+        <li>Not use Arivo to mislead guests or for any unlawful purpose</li>
+        <li>Comply with all applicable laws including GDPR, UK data protection law, and consumer protection regulations</li>
+        <li>Maintain appropriate insurance for your hospitality operations</li>
+      </ul>
+      <h3>2.4 Data Processing Agreement</h3>
+      <p>When hotels use Arivo, they act as the <strong>Data Controller</strong> for guest personal data, and Arivo acts as the <strong>Data Processor</strong>. A Data Processing Agreement (DPA) is incorporated into these Terms by reference and is available upon request. Hotels must have a lawful basis for processing guest data.</p>
+      <h3>2.5 Cancellation</h3>
+      <p>Hotels may cancel their subscription at any time with 30 days' written notice. No refunds are issued for partial months. Upon cancellation, hotel data is retained for 90 days before permanent deletion.</p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 3</div>
+      <h3>Guest Terms</h3>
+      <p>These terms apply to hotel guests who access the Arivo guest app during their stay.</p>
+      <h3>3.1 Access</h3>
+      <p>Guests access Arivo via a QR code provided by their hotel. No account registration is required. Access is limited to the duration of your stay at the hotel.</p>
+      <h3>3.2 Acceptable Use</h3>
+      <p>You agree to use the guest app only for legitimate purposes related to your hotel stay. You must not attempt to access other guests' information, tamper with the system, or use the app in any way that could cause harm to the hotel, other guests, or Arivo.</p>
+      <h3>3.3 Guest Requests</h3>
+      <p>Requests submitted through the app are routed to hotel staff. Arivo does not guarantee response times — these are the responsibility of the hotel. Arivo is not a party to the service relationship between you and the hotel.</p>
+      <h3>3.4 AI Concierge</h3>
+      <p>The AI concierge is powered by a third-party AI service (Anthropic). Responses are generated automatically and may occasionally be inaccurate. Always verify important information (such as local transport times or restaurant bookings) directly with the hotel or the relevant business. Do not input sensitive personal information into the AI chat.</p>
+      <h3>3.5 Self Check-in (where enabled)</h3>
+      <p>Where the hotel has enabled self check-in, you will be required to provide your name, a form of photographic ID, and confirm your booking details. This information is used solely to verify your identity and reservation. ID images are stored securely and deleted within 90 days of your checkout. By using self check-in, you consent to this processing.</p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 4</div>
+      <h3>Intellectual Property</h3>
+      <p>All software, design, code, and content within the Arivo platform is the intellectual property of Arivo Ltd. Hotels are granted a limited, non-exclusive, non-transferable licence to use the platform during their active subscription. Guests are granted a temporary licence to use the guest app during their stay.</p>
+      <p>Neither hotels nor guests may copy, modify, reverse-engineer, or redistribute any part of the Arivo platform.</p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 5</div>
+      <h3>Limitation of Liability</h3>
+      <p>Arivo Ltd provides the platform on an "as is" basis. To the fullest extent permitted by law:</p>
+      <ul>
+        <li>Arivo is not liable for any indirect, consequential, or incidental loss arising from use of the platform</li>
+        <li>Arivo is not responsible for the actions or inactions of hotel staff in response to guest requests</li>
+        <li>Arivo is not liable for inaccuracies in AI-generated responses</li>
+        <li>Our total liability to hotels shall not exceed the total fees paid in the three months prior to any claim</li>
+      </ul>
+      <p>Nothing in these Terms limits liability for death or personal injury caused by negligence, or for fraud or fraudulent misrepresentation.</p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 6</div>
+      <h3>Governing Law</h3>
+      <p>These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+    </div>
+
+    <div class="clause-block">
+      <div class="clause-num">Clause 7</div>
+      <h3>Changes to These Terms</h3>
+      <p>Arivo reserves the right to update these Terms at any time. Hotels will be notified of material changes by email with 30 days' notice. Continued use of the platform after the effective date constitutes acceptance of the revised Terms.</p>
+    </div>
+  </div>
+
+  <!-- PRIVACY POLICY -->
+  <div class="doc-section" id="doc-privacy">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Legal Document</div>
+      <div class="doc-title">Privacy<br>Policy</div>
+      <div class="doc-meta">Effective date: 1 April 2026 · Version 1.0 · GDPR & UK GDPR Compliant</div>
+    </div>
+    <div class="doc-warning">⚠ Working draft — requires review by a qualified data protection solicitor before publication. A Data Protection Impact Assessment (DPIA) should also be completed before launch, particularly for the ID verification and self check-in features.</div>
+
+    <div class="section-note">Arivo operates as a Data Processor on behalf of hotels (the Data Controllers) when processing guest data. This policy covers both our relationship with hotels and the data we handle about guests.</div>
+
+    <h2>Who We Are</h2>
+    <p>Arivo Ltd is the data controller for hotel operator account data, and a data processor for hotel guest data. Our Data Protection Officer can be reached at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="84e0f4ebc4f7f0e5fdebf7aae5f4f4">[email&#160;protected]</a></strong>.</p>
+    <p>We are registered with the Information Commissioner's Office (ICO) under registration number [TO BE CONFIRMED].</p>
+
+    <h2>What Data We Collect</h2>
+
+    <h3>From Hotel Operators</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Purpose</th>
+          <th>Legal Basis</th>
+          <th>Retention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name, email, phone</td>
+          <td>Account management, support</td>
+          <td>Contract performance</td>
+          <td>Duration of contract + 6 years</td>
+        </tr>
+        <tr>
+          <td>Business name, address, VAT number</td>
+          <td>Invoicing, legal compliance</td>
+          <td>Legal obligation</td>
+          <td>7 years (HMRC requirement)</td>
+        </tr>
+        <tr>
+          <td>Payment information</td>
+          <td>Billing (processed by Stripe)</td>
+          <td>Contract performance</td>
+          <td>Per Stripe's retention policy</td>
+        </tr>
+        <tr>
+          <td>Platform usage data</td>
+          <td>Product improvement, support</td>
+          <td>Legitimate interests</td>
+          <td>24 months</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>From Hotel Guests (processed on behalf of hotels)</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Purpose</th>
+          <th>Legal Basis</th>
+          <th>Retention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name (from booking)</td>
+          <td>Personalised welcome, check-in</td>
+          <td>Legitimate interests / Contract</td>
+          <td>90 days post checkout</td>
+        </tr>
+        <tr>
+          <td>Room number, stay dates</td>
+          <td>Service delivery</td>
+          <td>Contract performance</td>
+          <td>90 days post checkout</td>
+        </tr>
+        <tr>
+          <td>Guest requests</td>
+          <td>Service fulfilment</td>
+          <td>Contract performance</td>
+          <td>90 days post checkout</td>
+        </tr>
+        <tr>
+          <td>AI chat content</td>
+          <td>Generating responses</td>
+          <td>Consent</td>
+          <td>Session only — not stored</td>
+        </tr>
+        <tr>
+          <td>Photographic ID (self check-in)</td>
+          <td>Identity verification</td>
+          <td>Consent (explicit)</td>
+          <td>90 days post checkout</td>
+        </tr>
+        <tr>
+          <td>Payment data (if outstanding balance)</td>
+          <td>Payment processing via Stripe</td>
+          <td>Contract performance</td>
+          <td>Per Stripe's retention policy</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Your Rights Under GDPR</h2>
+    <p>Under UK GDPR and EU GDPR, you have the following rights regarding your personal data:</p>
+    <div class="rights-grid">
+      <div class="right-card">
+        <div class="right-icon">👁</div>
+        <div class="right-name">Right of Access</div>
+        <div class="right-desc">Request a copy of all personal data we hold about you.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">✏️</div>
+        <div class="right-name">Right to Rectification</div>
+        <div class="right-desc">Request correction of inaccurate or incomplete data.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">🗑</div>
+        <div class="right-name">Right to Erasure</div>
+        <div class="right-desc">Request deletion of your data (the "right to be forgotten").</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">⏸</div>
+        <div class="right-name">Right to Restriction</div>
+        <div class="right-desc">Request that we limit how we process your data.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">📦</div>
+        <div class="right-name">Right to Portability</div>
+        <div class="right-desc">Receive your data in a structured, machine-readable format.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">🚫</div>
+        <div class="right-name">Right to Object</div>
+        <div class="right-desc">Object to processing based on legitimate interests.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">🤖</div>
+        <div class="right-name">Automated Decisions</div>
+        <div class="right-desc">Not be subject to solely automated decisions that significantly affect you.</div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon">↩️</div>
+        <div class="right-name">Right to Withdraw Consent</div>
+        <div class="right-desc">Withdraw consent at any time where processing is consent-based.</div>
+      </div>
+    </div>
+    <p>To exercise any of these rights, contact <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7216021d320106130b1d015c130202">[email&#160;protected]</a></strong>. We will respond within 30 days. You also have the right to lodge a complaint with the ICO at <strong>ico.org.uk</strong>.</p>
+
+    <h2>Third Parties We Share Data With</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Third Party</th>
+          <th>Purpose</th>
+          <th>Location</th>
+          <th>Safeguards</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Anthropic</strong></td>
+          <td>AI concierge responses</td>
+          <td>USA</td>
+          <td>Standard Contractual Clauses (SCCs)</td>
+        </tr>
+        <tr>
+          <td><strong>Stripe</strong></td>
+          <td>Payment processing</td>
+          <td>USA / EU</td>
+          <td>SCCs + EU-US Data Privacy Framework</td>
+        </tr>
+        <tr>
+          <td><strong>Supabase</strong></td>
+          <td>Database hosting</td>
+          <td>EU (Frankfurt)</td>
+          <td>EU-based processing, GDPR compliant</td>
+        </tr>
+        <tr>
+          <td><strong>Meta (WhatsApp API)</strong></td>
+          <td>Messaging for requests</td>
+          <td>USA / EU</td>
+          <td>SCCs + Meta DPA</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>International Data Transfers</h2>
+    <p>Where data is transferred outside the UK or EEA (particularly to the USA for Anthropic and Stripe), we rely on Standard Contractual Clauses (SCCs) approved by the European Commission and the ICO's International Data Transfer Agreement (IDTA) to ensure adequate protection.</p>
+
+    <h2>Data Security</h2>
+    <p>We implement appropriate technical and organisational measures including encryption at rest and in transit (TLS 1.3), access controls, regular security assessments, and secure deletion practices. ID photographs uploaded for self check-in are stored in an encrypted, access-controlled storage environment and are never shared with third parties beyond the hotel.</p>
+
+    <h2>Children's Data</h2>
+    <p>Arivo does not knowingly collect personal data from children under the age of 16. If you believe a child has provided personal data through our platform, please contact us immediately at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1a7e6a755a696e7b637569347b6a6a">[email&#160;protected]</a>.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this Privacy Policy periodically. Material changes will be notified to hotel operators by email. The current version is always available at arivo.app/privacy.</p>
+
+  </div>
+
+  <!-- COOKIE POLICY -->
+  <div class="doc-section" id="doc-cookies">
+    <div class="doc-header">
+      <div class="doc-eyebrow">Legal Document</div>
+      <div class="doc-title">Cookie<br>Policy</div>
+      <div class="doc-meta">Effective date: 1 April 2026 · Version 1.0 · UK PECR & ePrivacy Directive Compliant</div>
+    </div>
+    <div class="doc-warning">⚠ Working draft — requires legal review. A cookie audit (scanning all cookies actually set by the platform) must be conducted before publication to ensure this policy accurately reflects what the live product does.</div>
+
+    <p>Arivo uses cookies and similar technologies in both our hotel admin dashboard and our guest-facing app. This policy explains what we use, why, and how you can control them.</p>
+
+    <h2>What Are Cookies?</h2>
+    <p>Cookies are small text files placed on your device by a website or app. They help us remember your preferences, keep you logged in, and understand how our platform is being used. Some cookies are essential for the platform to function; others are optional.</p>
+
+    <h2>Cookies We Use</h2>
+
+    <div class="cookie-card">
+      <div class="cookie-toggle-wrap">
+        <button class="cookie-toggle required" disabled></button>
+      </div>
+      <div class="cookie-info">
+        <div class="cookie-name">Strictly Necessary Cookies</div>
+        <div class="cookie-desc">These cookies are essential for the platform to work. They enable hotel login sessions, security tokens, and basic functionality. They cannot be disabled.</div>
+        <div class="cookie-required-label">Always Active</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
+          <strong style="color:var(--charcoal);">Examples:</strong> arivo_session (authentication), csrf_token (security), arivo_hotel_id (identify your property)
+        </div>
+      </div>
+    </div>
+
+    <div class="cookie-card">
+      <div class="cookie-toggle-wrap">
+        <button class="cookie-toggle optional on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="cookie-info">
+        <div class="cookie-name">Functional Cookies</div>
+        <div class="cookie-desc">These remember your preferences — such as your chosen language, dashboard layout, and notification settings — so you don't have to reset them every visit.</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
+          <strong style="color:var(--charcoal);">Examples:</strong> arivo_prefs (dashboard settings), arivo_lang (language preference)
+        </div>
+      </div>
+    </div>
+
+    <div class="cookie-card">
+      <div class="cookie-toggle-wrap">
+        <button class="cookie-toggle optional on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="cookie-info">
+        <div class="cookie-name">Analytics Cookies</div>
+        <div class="cookie-desc">These help us understand how hotels and guests use the platform — which features are most used, where people drop off, and how to improve. Data is anonymised and aggregated. We use Plausible Analytics (privacy-friendly, no cross-site tracking).</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);">
+          <strong style="color:var(--charcoal);">Examples:</strong> plausible_session (anonymous usage tracking)
+        </div>
+      </div>
+    </div>
+
+    <div class="cookie-card">
+      <div class="cookie-toggle-wrap">
+        <button class="cookie-toggle optional" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="cookie-info">
+        <div class="cookie-name">Marketing Cookies</div>
+        <div class="cookie-desc">We currently do not use marketing or advertising cookies on our platform. If this changes in the future, we will update this policy and seek your consent before placing any marketing cookies.</div>
+        <div class="cookie-required-label" style="color:var(--muted);">Not used</div>
+      </div>
+    </div>
+
+    <h2>Cookies in the Guest App</h2>
+    <p>The guest-facing app uses minimal cookies. Because the app is accessed via a QR code without a login, we use only a session token to maintain continuity during a guest's visit to the app. No persistent tracking cookies are placed on guest devices. The session cookie expires when the browser is closed.</p>
+
+    <h2>Third-Party Cookies</h2>
+    <p>Where we embed third-party functionality — such as WhatsApp links — those third parties may set their own cookies subject to their own privacy policies. We do not control third-party cookies. No advertising networks have access to your data through Arivo.</p>
+
+    <h2>How to Control Cookies</h2>
+    <p>You can control and delete cookies through your browser settings. Note that disabling strictly necessary cookies will prevent the hotel dashboard from functioning. Guidance for major browsers:</p>
+    <ul>
+      <li><a href="#">Google Chrome</a> — Settings → Privacy and Security → Cookies</li>
+      <li><a href="#">Safari</a> — Preferences → Privacy → Manage Website Data</li>
+      <li><a href="#">Firefox</a> — Options → Privacy & Security → Cookies and Site Data</li>
+    </ul>
+
+    <h2>Updates to This Policy</h2>
+    <p>We will update this Cookie Policy whenever we add or remove cookies from our platform. The latest version is always available at arivo.app/cookies.</p>
+  </div>
+
+  <!-- GUEST CONSENT FLOW -->
+  <div class="doc-section" id="doc-consent">
+    <div class="doc-header">
+      <div class="doc-eyebrow">UX & Legal</div>
+      <div class="doc-title">Guest Consent<br><em>Flow</em></div>
+      <div class="doc-meta">What guests see when they first open the app · GDPR-compliant consent capture</div>
+    </div>
+
+    <div class="section-note">This is the consent flow guests see when they first scan the QR code. Consent must be freely given, specific, informed, and unambiguous. All consent records are logged with timestamp and IP for compliance purposes.</div>
+
+    <p style="margin-bottom:28px;">The flow below is interactive — click through to see each screen a guest would experience on their phone.</p>
+
+    <!-- Interactive consent phone -->
+    <div class="consent-phone">
+
+      <!-- Step 1: Welcome + Basic Consent -->
+      <div class="consent-step active" id="cstep-1">
+        <div class="consent-header">
+          <div class="consent-logo">The Maison</div>
+          <div class="consent-hotel">Bath · Your stay companion</div>
+        </div>
+        <div class="consent-body">
+          <div class="consent-title">Welcome to your stay</div>
+          <div class="consent-text">Before we show you everything we've prepared, we need a moment to explain how we handle your information. Please read and confirm the following.</div>
+
+          <div class="consent-checkbox-row" onclick="toggleCheck('c1')">
+            <div class="consent-checkbox checked" id="check-c1">✓</div>
+            <div class="consent-checkbox-label">I have read and agree to Arivo's <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>.</div>
+          </div>
+          <div class="consent-checkbox-row" onclick="toggleCheck('c2')">
+            <div class="consent-checkbox" id="check-c2"></div>
+            <div class="consent-checkbox-label">I agree that my name and room details may be used to personalise my experience during this stay. <strong>Optional.</strong></div>
+          </div>
+          <div class="consent-checkbox-row" onclick="toggleCheck('c3')">
+            <div class="consent-checkbox" id="check-c3"></div>
+            <div class="consent-checkbox-label">I agree to the use of a session cookie to keep the app working during my visit.</div>
+          </div>
+
+          <button class="consent-btn" id="step1-btn" onclick="goToStep(2)">Continue</button>
+          <button class="consent-btn secondary" onclick="goToStep(2)">Continue without optional consents</button>
+        </div>
+        <div class="step-indicators">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: AI Concierge Consent -->
+      <div class="consent-step" id="cstep-2">
+        <div class="consent-header">
+          <div class="consent-logo">The Maison</div>
+          <div class="consent-hotel">Bath · Your stay companion</div>
+        </div>
+        <div class="consent-body">
+          <div class="consent-title">AI Concierge</div>
+          <div class="consent-text">Our AI concierge is powered by Anthropic's Claude. When you use it, your messages are sent to Anthropic's servers to generate a response. Conversations are <strong>not stored</strong> after your session ends and are <strong>not used to train AI models</strong>.</div>
+          <div class="consent-text">Please do not share sensitive personal information (passport numbers, bank details, etc.) in the AI chat.</div>
+
+          <div class="consent-checkbox-row" onclick="toggleCheck('c4')">
+            <div class="consent-checkbox" id="check-c4"></div>
+            <div class="consent-checkbox-label">I understand how the AI concierge works and consent to using it. <strong>Optional — you can still use the app without it.</strong></div>
+          </div>
+
+          <button class="consent-btn" onclick="goToStep(3)">Continue</button>
+          <button class="consent-btn secondary" onclick="goToStep(3)">Skip — I don't want to use the AI concierge</button>
+        </div>
+        <div class="step-indicators">
+          <div class="step-dot"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: All set -->
+      <div class="consent-step" id="cstep-3">
+        <div class="consent-header">
+          <div class="consent-logo">The Maison</div>
+          <div class="consent-hotel">Bath · Your stay companion</div>
+        </div>
+        <div class="consent-success">
+          <div class="consent-success-icon">✅</div>
+          <div class="consent-success-title">You're all set</div>
+          <div class="consent-success-text" style="margin-bottom:20px;">Your preferences have been saved. You can change them at any time from the app menu. Enjoy your stay!</div>
+          <button class="consent-btn" onclick="goToStep(1)">Enter the app →</button>
+          <div style="margin-top:16px;font-size:10px;color:var(--muted);">Your consent was recorded at 15:42 on 21 Mar 2026</div>
+        </div>
+        <div class="step-indicators">
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot active"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <h2>Self Check-in Consent (Additional)</h2>
+    <p>When a guest initiates self check-in, an additional explicit consent screen is shown before any ID is uploaded. This is a separate, specific consent as required by GDPR Article 9 for the processing of identity documents.</p>
+
+    <div class="consent-phone" style="margin-bottom:40px;">
+      <div class="consent-step active">
+        <div class="consent-header" style="background:#1A2535;">
+          <div class="consent-logo">Self Check-in</div>
+          <div class="consent-hotel">Identity Verification</div>
+        </div>
+        <div class="consent-body">
+          <div class="consent-title">ID Verification</div>
+          <div class="consent-text">To complete self check-in, we need to verify your identity. You will be asked to upload a photo of a valid passport or driving licence.</div>
+          <div class="consent-text"><strong>How your ID is used:</strong> Your ID photo is stored securely, accessible only to hotel staff for verification, and deleted automatically 90 days after checkout. It is never shared with third parties.</div>
+
+          <div class="consent-checkbox-row" onclick="toggleCheck('cid1')">
+            <div class="consent-checkbox" id="check-cid1"></div>
+            <div class="consent-checkbox-label">I explicitly consent to uploading my photographic ID for the purpose of identity verification for this stay only.</div>
+          </div>
+
+          <button class="consent-btn" onclick="toggleCheck('cid1')">Upload ID & Continue</button>
+          <button class="consent-btn secondary">Cancel — I'll check in at reception</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>What We Log</h2>
+    <p>For compliance purposes, every consent decision is logged with the following data:</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Value (example)</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Consent timestamp</td>
+          <td>2026-03-21T15:42:00Z</td>
+          <td>Proof of when consent was given</td>
+        </tr>
+        <tr>
+          <td>IP address (hashed)</td>
+          <td>[hashed, not stored in plain text]</td>
+          <td>Verify request origin without storing PII</td>
+        </tr>
+        <tr>
+          <td>Hotel ID</td>
+          <td>hotel_maison_bath</td>
+          <td>Link consent to the correct property</td>
+        </tr>
+        <tr>
+          <td>Consent version</td>
+          <td>v1.0</td>
+          <td>Track which version of T&Cs was agreed to</td>
+        </tr>
+        <tr>
+          <td>Consents given</td>
+          <td>{terms: true, personalisation: true, ai: false}</td>
+          <td>Granular record of each individual consent</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function showDoc(name, tab) {
+  document.querySelectorAll('.doc-section').forEach(s => s.classList.remove('active'));
+  document.querySel

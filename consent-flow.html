@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Guest Consent Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F8F4ED; --cream-dark: #EDE6D4; --forest: #1E3A2F;
+    --forest-light: #2C5040; --gold: #B8933F; --gold-light: #D4AF6A;
+    --charcoal: #1A1A1A; --muted: #6B6355; --white: #FEFCF8;
+    --error: #B91C1C; --success: #166534;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; max-width: 420px; animation: fadeUp 0.35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── WELCOME SCREEN ── */
+  .welcome-card {
+    background: var(--forest);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .welcome-card::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(184,147,63,0.12);
+  }
+  .hotel-logo {
+    width: 64px; height: 64px; background: rgba(255,255,255,0.1);
+    border-radius: 18px; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  .welcome-label {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 8px; font-weight: 500;
+  }
+  .welcome-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 36px;
+    font-weight: 300; color: white; line-height: 1.2; margin-bottom: 8px;
+  }
+  .welcome-title em { font-style: italic; color: var(--gold-light); }
+  .welcome-sub { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 300; margin-bottom: 28px; }
+
+  .welcome-body {
+    background: var(--white); border-radius: 16px; padding: 22px;
+    text-align: left; margin-bottom: 20px;
+  }
+  .welcome-body-title {
+    font-size: 12px; font-weight: 600; color: var(--forest); margin-bottom: 10px;
+  }
+  .data-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12px; color: var(--muted); font-weight: 300;
+    padding: 6px 0; border-bottom: 1px solid var(--cream-dark);
+    line-height: 1.45;
+  }
+  .data-item:last-child { border-bottom: none; }
+  .data-item-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .consent-check-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 14px; margin-bottom: 10px; cursor: pointer;
+  }
+  .consent-check-row input[type="checkbox"] {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+    accent-color: var(--gold); cursor: pointer;
+  }
+  .consent-check-label {
+    font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 300; line-height: 1.5;
+  }
+  .consent-check-label a { color: var(--gold-light); text-decoration: underline; }
+  .consent-check-label strong { color: white; font-weight: 600; }
+
+  .btn-primary {
+    width: 100%; background: var(--gold); color: white; border: none;
+    border-radius: 14px; padding: 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary:not(:disabled):active { transform: scale(0.98); }
+  .btn-secondary {
+    width: 100%; background: transparent; color: rgba(255,255,255,0.5);
+    border: none; padding: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 12px; cursor: pointer; margin-top: 8px;
+    text-decoration: underline;
+  }
+
+  /* ── COOKIE BANNER ── */
+  .cookie-card {
+    background: var(--white); border-radius: 24px; padding: 28px;
+    border: 1px solid var(--cream-dark); box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  }
+  .cookie-icon { font-size: 32px; margin-bottom: 12px; }
+  .cookie-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 28px;
+    font-weight: 400; color: var(--forest); margin-bottom: 8px;
+  }
+  .cookie-desc { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.65; margin-bottom: 20px; }
+  .cookie-desc a { color: var(--gold); text-decoration: underline; }
+
+  .cookie-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--cream-dark);
+  }
+  .cookie-toggle-row:last-of-type { border-bottom: none; }
+  .cookie-toggle-info { flex: 1; padding-right: 16px; }
+  .cookie-toggle-name { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 2px; }
+  .cookie-toggle-desc { font-size: 11px; color: var(--muted); font-weight: 300; }
+  .toggle-switch {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: var(--cream-dark);
+    border-radius: 24px; cursor: pointer; transition: 0.25s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; height: 18px; width: 18px;
+    left: 3px; bottom: 3px; background: white; border-radius: 50%;
+    transition: 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--forest); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+  .toggle-switch input:disabled + .toggle-slider { opacity: 0.6; cursor: not-allowed; }
+
+  .cookie-btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-accept-all {
+    flex: 1; background: var(--forest); color: white; border: none;
+    border-radius: 12px; padding: 13px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-accept-all:active { background: var(--forest-light); }
+  .btn-save-prefs {
+    flex: 1; background: transparent; color: var(--forest);
+    border: 1.5px solid var(--forest); border-radius: 12px; padding: 13px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-save-prefs:active { background: var(--cream); }
+
+  /* ── ID CONSENT SCREEN ── */
+  .id-card {
+    background: var(--white); border-radius: 24px; padding: 28px;
+    border: 1px solid var(--cream-dark); box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  }
+  .id-header {
+    background: #FEF3C7; border-radius: 14px; padding: 16px;
+    margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .id-header-icon { font-size: 24px; flex-shrink: 0; }
+  .id-header-text { font-size: 12px; color: #78350F; font-weight: 300; line-height: 1.55; }
+  .id-header-text strong { font-weight: 600; }
+  .id-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 28px;
+    font-weight: 400; color: var(--forest); margin-bottom: 8px;
+  }
+  .id-desc { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.65; margin-bottom: 20px; }
+  .id-points { margin-bottom: 20px; }
+  .id-point {
+    display: flex; gap: 10px; font-size: 12px; color: var(--charcoal);
+    font-weight: 300; padding: 8px 0; border-bottom: 1px solid var(--cream-dark);
+    line-height: 1.5; align-items: flex-start;
+  }
+  .id-point:last-child { border-bottom: none; }
+  .id-point-icon { font-size: 16px; flex-shrink: 0; }
+  .id-consent-check {
+    background: rgba(30,58,47,0.05); border-radius: 12px; padding: 14px;
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .id-consent-check input[type="checkbox"] {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;
+    accent-color: var(--forest); cursor: pointer;
+  }
+  .id-consent-label {
+    font-size: 12px; color: var(--charcoal); font-weight: 300; line-height: 1.55;
+  }
+  .id-consent-label a { color: var(--gold); text-decoration: underline; }
+  .btn-forest {
+    width: 100%; background: var(--forest); color: white; border: none;
+    border-radius: 14px; padding: 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-forest:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-forest:not(:disabled):active { transform: scale(0.98); }
+  .btn-link {
+    width: 100%; background: transparent; color: var(--muted); border: none;
+    padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 12px;
+    cursor: pointer; text-decoration: underline; margin-top: 6px;
+  }
+
+  /* ── SUCCESS SCREEN ── */
+  .success-card {
+    background: var(--forest); border-radius: 24px; padding: 40px 32px;
+    text-align: center;
+  }
+  .success-icon {
+    width: 72px; height: 72px; background: rgba(255,255,255,0.1);
+    border-radius: 50%; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .success-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 36px;
+    font-weight: 300; color: white; margin-bottom: 8px;
+  }
+  .success-sub { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 300; margin-bottom: 28px; line-height: 1.55; }
+  .consent-summary {
+    background: rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; margin-bottom: 24px; text-align: left;
+  }
+  .consent-summary-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 10px; font-weight: 500; }
+  .consent-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; color: rgba(255,255,255,0.6); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .consent-row:last-child { border-bottom: none; }
+  .consent-row-val { color: rgba(255,255,255,0.9); font-weight: 500; }
+  .consent-row-val.yes { color: #86EFAC; }
+  .consent-row-val.no { color: rgba(255,255,255,0.4); }
+  .btn-enter {
+    width: 100%; background: var(--gold); color: white; border: none;
+    border-radius: 14px; padding: 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-enter:active { opacity: 0.9; }
+
+  /* ── STEP INDICATOR ── */
+  .step-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px;
+  }
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);
+    transition: all 0.25s;
+  }
+  .step-dot.active { background: var(--gold-light); width: 20px; border-radius: 4px; }
+  .step-dot.done { background: rgba(255,255,255,0.5); }
+
+  /* Legal policy modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 1000; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: 24px 24px 0 0; padding: 28px;
+    width: 100%; max-width: 420px; max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--forest); margin-bottom: 12px; }
+  .modal p { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.7; margin-bottom: 10px; }
+  .modal-close {
+    width: 100%; background: var(--forest); color: white; border: none;
+    border-radius: 12px; padding: 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: Welcome & Terms Consent -->
+<div class="screen active" id="screen-welcome">
+  <div class="step-indicator">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+    <div class="step-dot" id="dot4"></div>
+  </div>
+  <div class="welcome-card">
+    <div class="hotel-logo">🏨</div>
+    <div class="welcome-label">The Maison Collective</div>
+    <div class="welcome-title">Welcome,<br><em>James & Sophie</em></div>
+    <div class="welcome-sub">Room 14 · Garden Suite · 3 nights</div>
+
+    <div class="welcome-body">
+      <div class="welcome-body-title">Before you continue, we collect:</div>
+      <div class="data-item">
+        <div class="data-item-icon">👤</div>
+        <div>Your <strong>name and reservation details</strong> to personalise your experience</div>
+      </div>
+      <div class="data-item">
+        <div class="data-item-icon">🛎</div>
+        <div>The <strong>content of service requests</strong> you make via this app</div>
+      </div>
+      <div class="data-item">
+        <div class="data-item-icon">💬</div>
+        <div><strong>AI chat messages</strong> to generate concierge responses (anonymised after 30 days)</div>
+      </div>
+      <div class="data-item">
+        <div class="data-item-icon">📊</div>
+        <div><strong>Anonymous usage data</strong> to improve the platform (with your consent)</div>
+      </div>
+    </div>
+
+    <label class="consent-check-row" for="chk-terms">
+      <input type="checkbox" id="chk-terms" onchange="updateWelcomeBtn()">
+      <span class="consent-check-label">
+        <strong>Required.</strong> I have read and agree to the
+        <a href="#" onclick="openModal('terms'); return false;">Terms &amp; Conditions</a> and
+        <a href="#" onclick="openModal('privacy'); return false;">Privacy Policy</a>.
+      </span>
+    </label>
+
+    <label class="consent-check-row" for="chk-analytics">
+      <input type="checkbox" id="chk-analytics" onchange="updateWelcomeBtn()">
+      <span class="consent-check-label">
+        <strong>Optional.</strong> I consent to anonymous analytics to help improve the app.
+      </span>
+    </label>
+
+    <button class="btn-primary" id="btn-welcome" disabled onclick="goTo('screen-cookies')">
+      Continue
+    </button>
+    <button class="btn-secondary" onclick="openModal('privacy')">
+      What data do we use and why?
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 2: Cookie Consent -->
+<div class="screen" id="screen-cookies">
+  <div class="step-indicator">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="cookie-card">
+    <div class="cookie-icon">🍪</div>
+    <div class="cookie-title">Cookie Preferences</div>
+    <div class="cookie-desc">
+      We use cookies to keep your session secure and to understand how the app is used. You can choose which optional cookies to allow. <a href="#" onclick="openModal('cookies'); return false;">Read our full Cookie Policy.</a>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-name">🔒 Essential Cookies</div>
+        <div class="cookie-toggle-desc">Required for login, security, and session management. Cannot be disabled.</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" checked disabled>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-name">⚙️ Functional Cookies</div>
+        <div class="cookie-toggle-desc">Remember your preferences such as language and welcome screen.</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="ck-functional" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-name">📊 Analytics Cookies</div>
+        <div class="cookie-toggle-desc">Anonymous data about app usage to help us improve the experience.</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="ck-analytics">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-btn-row">
+      <button class="btn-accept-all" onclick="acceptAllCookies()">Accept All</button>
+      <button class="btn-save-prefs" onclick="savePrefs()">Save My Choices</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: ID Verification Consent (Self Check-in) -->
+<div class="screen" id="screen-id">
+  <div class="step-indicator">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="id-card">
+    <div class="id-header">
+      <div class="id-header-icon">⚠️</div>
+      <div class="id-header-text">
+        <strong>This step is only required for self check-in.</strong> If you prefer to check in at the front desk, you can skip this.
+      </div>
+    </div>
+    <div class="id-title">ID Verification Consent</div>
+    <div class="id-desc">To complete self check-in, we need to verify your identity. This requires you to upload a photo of a valid government-issued ID document.</div>
+
+    <div class="id-points">
+      <div class="id-point">
+        <div class="id-point-icon">🔒</div>
+        <div>Your ID is stored <strong>encrypted</strong> and accessible only to authorised hotel staff.</div>
+      </div>
+      <div class="id-point">
+        <div class="id-point-icon">🗑</div>
+        <div>Your ID will be <strong>permanently deleted within 90 days</strong> of your check-out.</div>
+      </div>
+      <div class="id-point">
+        <div class="id-point-icon">↩️</div>
+        <div>You can <strong>withdraw this consent at any time</strong> by contacting the hotel or emailing <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1c6c6e756a7d7f655c6f687d65736f327f7371">[email&#160;protected]</a>.</div>
+      </div>
+      <div class="id-point">
+        <div class="id-point-icon">🚫</div>
+        <div>Your ID will <strong>never be shared with third parties</strong> except as required by law.</div>
+      </div>
+    </div>
+
+    <label class="id-consent-check" for="chk-id">
+      <input type="checkbox" id="chk-id" onchange="updateIdBtn()">
+      <span class="id-consent-label">
+        I <strong>explicitly consent</strong> to Arivo and The Maison Collective processing a copy of my identity document for the sole purpose of verifying my identity for self check-in, as described in the <a href="#" onclick="openModal('privacy'); return false;">Privacy Policy</a>.
+      </span>
+    </label>
+
+    <button class="btn-forest" id="btn-id" disabled onclick="goTo('screen-success')">
+      Consent &amp; Proceed to Check-in
+    </button>
+    <button class="btn-link" onclick="goTo('screen-success', true)">
+      Skip — I'll check in at the front desk
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 4: All Done -->
+<div class="screen" id="screen-success">
+  <div class="step-indicator">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+  </div>
+  <div class="success-card">
+    <div class="success-icon">✨</div>
+    <div class="success-title">You're all set</div>
+    <div class="success-sub">Your preferences have been saved. Here's a summary of what you've agreed to.</div>
+
+    <div class="consent-summary">
+      <div class="consent-summary-title">Your Consent Record</div>
+      <div class="consent-row">
+        <span>Terms &amp; Conditions</span>
+        <span class="consent-row-val yes" id="sum-terms">✓ Accepted</span>
+      </div>
+      <div class="consent-row">
+        <span>Privacy Policy</span>
+        <span class="consent-row-val yes" id="sum-privacy">✓ Accepted</span>
+      </div>
+      <div class="consent-row">
+        <span>Analytics Cookies</span>
+        <span class="consent-row-val" id="sum-analytics">Not selected</span>
+      </div>
+      <div class="consent-row">
+        <span>Functional Cookies</span>
+        <span class="consent-row-val" id="sum-functional">Not selected</span>
+      </div>
+      <div class="consent-row">
+        <span>ID Verification (Self Check-in)</span>
+        <span class="consent-row-val" id="sum-id">Not selected</span>
+      </div>
+      <div class="consent-row">
+        <span>Timestamp</span>
+        <span class="consent-row-val" id="sum-time" style="font-size:10px;"></span>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:300;margin-bottom:20px;line-height:1.6;">
+      You can update your preferences at any time via the app settings. To exercise your GDPR rights, contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="aededcc7d8cfcdd7eedddacfd7c1dd80cdc1c3">[email&#160;protected]</a>.
+    </div>
+
+    <button class="btn-enter" onclick="enterApp()">Enter Your Stay →</button>
+  </div>
+</div>
+
+<!-- MODAL: Policy Viewer -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <h3 id="modal-title">Policy</h3>
+    <div id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  let consentState = {
+    terms: false,
+    analyticsOptional: false,
+    functionalCookies: true,
+    analyticsCookies: false,
+    idVerification: false,
+    skippedId: false
+  };
+
+  function updateWelcomeBtn() {
+    const terms = document.getElementById('chk-terms').checked;
+    const btn = document.getElementById('btn-welcome');
+    btn.disabled = !terms;
+    consentState.terms = terms;
+    consentState.analyticsOptional = document.getElementById('chk-analytics').checked;
+  }
+
+  function updateIdBtn() {
+    const checked = document.getElementById('chk-id').checked;
+    document.getElementById('btn-id').disabled = !checked;
+    consentState.idVerification = checked;
+  }
+
+  function goTo(screenId, skipped) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    if (skipped) consentState.skippedId = true;
+    if (screenId === 'screen-success') buildSummary();
+    window.scrollTo(0, 0);
+  }
+
+  function acceptAllCookies() {
+    document.getElementById('ck-functional').checked = true;
+    document.getElementById('ck-analytics').checked = true;
+    consentState.functionalCookies = true;
+    consentState.analyticsCookies = true;
+    goTo('screen-id');
+  }
+
+  function savePrefs() {
+    consentState.functionalCookies = document.getElementById('ck-functional').checked;
+    consentState.analyticsCookies = document.getElementById('ck-analytics').checked;
+    goTo('screen-id');
+  }
+
+  function buildSummary() {
+    const yes = '<span class="consent-row-val yes">✓ Accepted</span>';
+    const no = '<span class="consent-row-val no">✗ Declined</span>';
+    const na = '<span class="consent-row-val no">Skipped</span>';
+
+    document.getElementById('sum-analytics').outerHTML = `<span class="consent-row-val ${consentState.analyticsCookies ? 'yes">✓ Accepted' : 'no">✗ Declined'}</span>`;
+    document.getElementById('sum-functional').outerHTML = `<span class="consent-row-val ${consentState.functionalCookies ? 'yes">✓ Accepted' : 'no">✗ Declined'}</span>`;
+    document.getElementById('sum-id').outerHTML = consentState.skippedId
+      ? `<span class="consent-row-val no">Skipped</span>`
+      : `<span class="consent-row-val ${consentState.idVerification ? 'yes">✓ Consented' : 'no">Not given'}</span>`;
+    document.getElementById('sum-time').textContent = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  function enterApp() {
+    // In production: save consent record to backend with timestamp, IP, version
+    alert('Consent recorded. Redirecting to your guest app…\n\n(In production this would navigate to the main Arivo guest experience)');
+  }
+
+  const policies = {
+    terms: {
+      title: 'Terms & Conditions — Summary',
+      body: `
+        <p><strong>Part A (Hotel Terms)</strong> governs the hotel's use of the Arivo platform. The hotel is the Data Controller of your personal data.</p>
+        <p><strong>Part B (Guest Terms)</strong> — by using this app you agree to:</p>
+        <p>• Use the app only for your stay at this hotel<br>• Provide accurate information<br>• Not misuse the self check-in feature<br>• The limitation of Arivo's liability for hotel service quality</p>
+        <p>Full terms available at arivo.app/terms</p>
+      `
+    },
+    privacy: {
+      title: 'Privacy Policy — Summary',
+      body: `
+        <p><strong>What we collect:</strong> Your name, reservation details, service requests, and (if you consent) a copy of your ID for self check-in.</p>
+        <p><strong>Why:</strong> To deliver the guest app services on behalf of your hotel.</p>
+        <p><strong>How long:</strong> Guest data is deleted 90 days after check-out. ID documents within 90 days. AI chat messages anonymised after 30 days.</p>
+        <p><strong>Your rights:</strong> Access, rectification, erasure, portability, objection. Contact privacy@arivo.app.</p>
+        <p><strong>Supervisory authority:</strong> ICO (UK) — ico.org.uk</p>
+        <p>Full policy available at arivo.app/privacy</p>
+      `
+    },
+    cookies: {
+      title: 'Cookie Policy — Summary',
+      body: `
+        <p><strong>Essential cookies:</strong> Always active. Required for security and session management.</p>
+        <p><strong>Functional cookies:</strong> Remember your preferences. You can decline these.</p>
+        <p><strong>Analytics cookies:</strong> Anonymous usage data. You can decline these.</p>
+        <p>We do not use advertising or tracking cookies.</p>
+        <p>Full policy available at arivo.app/cookies</p>
+      `
+    }
+  };
+
+  function openModal(type) {
+    const p = policies[type];
+    document.getElementById('modal-title').textContent = p.title;
+    document.getElementById('modal-body').innerHTML = p.content;
+    document.getElementById('policy-modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('policy-modal').style.display = 'none';
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('policy-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>

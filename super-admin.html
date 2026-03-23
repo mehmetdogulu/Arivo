@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Arivo — Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080B10;
+  --surface:#0E1219;
+  --surface2:#141820;
+  --surface3:#1A2030;
+  --border:#1E2535;
+  --border2:#252D40;
+  --gold:#C9A84C;
+  --gold-dim:rgba(201,168,76,0.12);
+  --gold-border:rgba(201,168,76,0.25);
+  --green:#3DD68C;
+  --green-dim:rgba(61,214,140,0.08);
+  --red:#F87171;
+  --red-dim:rgba(248,113,113,0.08);
+  --amber:#FBB040;
+  --amber-dim:rgba(251,176,64,0.08);
+  --blue:#60A5FA;
+  --blue-dim:rgba(96,165,250,0.08);
+  --purple:#A78BFA;
+  --purple-dim:rgba(167,139,250,0.08);
+  --text:#E8EAF0;
+  --text2:#7A8099;
+  --text3:#3D4560;
+  --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── LOGIN ── */
+.login-screen{display:none;min-height:100vh;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 30% 20%,rgba(201,168,76,0.06) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 80%,rgba(96,165,250,0.04) 0%,transparent 50%),var(--bg);}
+.login-screen.active{display:flex;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.login-wrap{width:100%;max-width:380px;padding:20px;}
+.login-brand{margin-bottom:40px;}
+.login-logo{font-family:'Instrument Serif',serif;font-size:32px;color:var(--white);letter-spacing:-1px;}
+.login-logo em{font-style:italic;color:var(--gold);}
+.login-badge{display:inline-block;background:var(--red-dim);border:1px solid rgba(248,113,113,0.2);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-top:8px;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;}
+.login-title{font-family:'Instrument Serif',serif;font-size:22px;color:var(--white);margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:24px;}
+.lf{margin-bottom:14px;}
+.lf label{display:block;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.lf input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;font-family:'Geist',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
+.lf input:focus{border-color:var(--gold);}
+.lf input::placeholder{color:var(--text3);}
+.login-btn{width:100%;background:var(--gold);color:#080B10;border:none;border-radius:9px;padding:13px;font-family:'Geist',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:0.3px;}
+.login-btn:hover{background:#D4B060;}
+.login-err{font-size:12px;color:var(--red);margin-top:10px;text-align:center;display:none;}
+.login-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:14px;}
+.login-hint span{color:var(--gold);}
+
+/* ── DASHBOARD SHELL ── */
+.dash{display:none;min-height:100vh;}
+.dash.active{display:flex;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:300;transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+.sb-brand{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo{font-family:'Instrument Serif',serif;font-size:22px;color:var(--white);letter-spacing:-0.5px;}
+.sb-logo em{font-style:italic;color:var(--gold);}
+.sb-badge{display:inline-block;background:var(--red-dim);border:1px solid rgba(248,113,113,0.2);border-radius:5px;padding:2px 8px;font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.sb-admin-chip{margin:14px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.sb-av{width:32px;height:32px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.sb-av-name{font-size:12px;font-weight:600;color:var(--text);}
+.sb-av-role{font-size:10px;color:var(--red);font-weight:600;letter-spacing:0.5px;}
+.nav-lbl{padding:10px 14px 4px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);font-weight:600;}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:1px 8px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;border:1px solid transparent;user-select:none;}
+.ni:hover{background:var(--surface2);color:var(--text);}
+.ni.active{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border);}
+.ni-ico{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.ni-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.ni-badge.amber{background:var(--amber);color:#080B10;}
+.ni-badge.green{background:var(--green);color:#080B10;}
+.sb-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);}
+.logout-btn{width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:'Geist',sans-serif;font-size:12px;color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── MAIN ── */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:12px;}
+.menu-btn{display:none;width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;align-items:center;justify-content:center;font-size:16px;cursor:pointer;flex-shrink:0;}
+.tb-title{font-family:'Instrument Serif',serif;font-size:18px;color:var(--white);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:9px;padding:8px 14px;font-family:'Geist',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-g{background:var(--gold);color:#080B10;}
+.btn-g:hover{background:#D4B060;}
+.btn-s{background:var(--surface2);color:var(--text2);border:1px solid var(--border);font-weight:500;}
+.btn-s:hover{border-color:var(--border2);color:var(--text);}
+.btn-r{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,113,113,0.2);font-weight:500;}
+.btn-r:hover{background:var(--red);color:white;}
+.btn-blu{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(96,165,250,0.2);font-weight:500;}
+
+.content{padding:24px;flex:1;}
+.sec{display:none;}
+.sec.active{display:block;animation:fadeUp 0.22s ease;}
+.sec-hdr{margin-bottom:20px;}
+.sec-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.sec-title{font-family:'Instrument Serif',serif;font-size:26px;color:var(--white);line-height:1;}
+.sec-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* ── STAT CARDS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:0.5;}
+.stat.green::before{background:radial-gradient(circle,rgba(61,214,140,0.08),transparent);}
+.stat.gold::before{background:radial-gradient(circle,rgba(201,168,76,0.08),transparent);}
+.stat.red::before{background:radial-gradient(circle,rgba(248,113,113,0.08),transparent);}
+.stat.blue::before{background:radial-gradient(circle,rgba(96,165,250,0.08),transparent);}
+.stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-weight:600;}
+.stat-val{font-family:'Instrument Serif',serif;font-size:38px;color:var(--white);line-height:1;margin-bottom:6px;}
+.stat-note{font-size:11px;color:var(--text3);}
+.stat-note.up{color:var(--green);}
+.stat-note.warn{color:var(--amber);}
+.stat-note.bad{color:var(--red);}
+
+/* ── MRR CARD ── */
+.mrr-card{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border:1px solid var(--gold-border);border-radius:14px;padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:24px;}
+.mrr-main{flex:1;}
+.mrr-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.mrr-val{font-family:'Instrument Serif',serif;font-size:52px;color:var(--white);line-height:1;margin-bottom:4px;}
+.mrr-sub{font-size:13px;color:var(--text2);}
+.mrr-breakdown{display:flex;gap:20px;flex-wrap:wrap;}
+.mrr-item{text-align:center;}
+.mrr-item-val{font-family:'Instrument Serif',serif;font-size:22px;color:var(--white);}
+.mrr-item-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.card-hdr{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:13px;font-weight:600;color:var(--text);}
+.card-action{font-size:11px;color:var(--gold);cursor:pointer;font-weight:500;}
+.card-body{padding:16px 18px;}
+
+/* ── HOTEL TABLE ── */
+.hotel-table{width:100%;border-collapse:collapse;}
+.hotel-table th{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text3);font-weight:600;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.hotel-table td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+.hotel-table tr:last-child td{border-bottom:none;}
+.hotel-table tr:hover td{background:var(--surface2);}
+.h-name{font-size:13px;font-weight:500;color:var(--text);}
+.h-loc{font-size:11px;color:var(--text3);margin-top:2px;}
+.plan-tag{display:inline-block;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;}
+.plan-tag.starter{background:var(--blue-dim);color:var(--blue);}
+.plan-tag.pro{background:var(--gold-dim);color:var(--gold);}
+.plan-tag.complete{background:var(--purple-dim);color:var(--purple);}
+.status-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;}
+.status-dot::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.status-dot.active::before{background:var(--green);box-shadow:0 0 5px var(--green);}
+.status-dot.trial::before{background:var(--amber);}
+.status-dot.overdue::before{background:var(--red);box-shadow:0 0 5px var(--red);}
+.status-dot.suspended::before{background:var(--text3);}
+.status-dot.active{color:var(--green);}
+.status-dot.trial{color:var(--amber);}
+.status-dot.overdue{color:var(--red);}
+.status-dot.suspended{color:var(--text3);}
+.h-actions{display:flex;gap:5px;}
+.ic-btn{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:all 0.15s;}
+.ic-btn:hover{border-color:var(--border2);}
+.ic-btn.warn:hover{border-color:var(--amber);background:var(--amber-dim);}
+.ic-btn.danger:hover{border-color:var(--red);background:var(--red-dim);}
+.ic-btn.ok:hover{border-color:var(--green);background:var(--green-dim);}
+
+/* ── ACTIVITY FEED ── */
+.activity-row{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);}
+.activity-row:last-child{border-bottom:none;}
+.act-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.act-ico.signup{background:var(--green-dim);}
+.act-ico.payment{background:var(--gold-dim);}
+.act-ico.cancel{background:var(--red-dim);}
+.act-ico.trial{background:var(--amber-dim);}
+.act-ico.login{background:var(--blue-dim);}
+.act-info{flex:1;min-width:0;}
+.act-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.act-sub{font-size:11px;color:var(--text3);}
+.act-time{font-size:10px;color:var(--text3);flex-shrink:0;margin-top:2px;}
+
+/* ── TRIAL EXPIRY ── */
+.trial-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);}
+.trial-row:last-child{border-bottom:none;}
+.trial-info{flex:1;}
+.trial-name{font-size:13px;font-weight:500;color:var(--text);}
+.trial-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.days-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;}
+.days-badge.urgent{background:var(--red-dim);color:var(--red);}
+.days-badge.soon{background:var(--amber-dim);color:var(--amber);}
+.days-badge.ok{background:var(--green-dim);color:var(--green);}
+
+/* ── FORM ── */
+.fg{margin-bottom:14px;}
+.fg:last-child{margin-bottom:0;}
+.fl{display:block;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Geist',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
+.fi:focus{border-color:var(--gold);}
+.fi::placeholder{color:var(--text3);}
+select.fi{cursor:pointer;}
+textarea.fi{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ── TOGGLE ── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);min-height:54px;}
+.tog-row:last-child{border-bottom:none;}
+.tog-lbl{font-size:13px;font-weight:500;color:var(--text);}
+.tog-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.toggle{width:44px;height:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:var(--gold);border-color:var(--gold);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:2px;left:2px;transition:left 0.2s;}
+.toggle.on::after{left:22px;}
+
+/* ── MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
+.modal-ov.open{display:flex;animation:fadeUp 0.2s ease;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-title{font-family:'Instrument Serif',serif;font-size:20px;color:var(--white);}
+.modal-close{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);}
+.modal-body{padding:20px;}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;}
+
+/* ── REVENUE CHART ── */
+.rev-bars{display:flex;align-items:flex-end;gap:8px;height:80px;padding:0 4px;}
+.rev-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.rev-bar{width:100%;border-radius:4px 4px 0 0;background:var(--gold-dim);border:1px solid var(--gold-border);transition:background 0.2s;cursor:pointer;min-height:4px;}
+.rev-bar:hover{background:rgba(201,168,76,0.3);}
+.rev-bar.current{background:var(--gold);border-color:var(--gold);}
+.rev-bar-lbl{font-size:8px;color:var(--text3);text-align:center;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);width:260px;}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 30px rgba(0,0,0,0.6);}
+  .main{margin-left:0;}
+  .menu-btn{display:flex;}
+  .content{padding:14px 12px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .hotel-table th:nth-child(4),.hotel-table td:nth-child(4),
+  .hotel-table th:nth-child(5),.hotel-table td:nth-child(5){display:none;}
+  .mrr-card{flex-direction:column;gap:16px;}
+}
+
+function loadHotelLogs(){
+  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
+  var container = document.getElementById('admin-log-entries');
+  if(!container) return;
+  if(!logs.length){
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#5C6080;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  logs.forEach(function(log){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #2A2D3A;font-size:12px;';
+    var d = new Date(log.ts);
+    var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var srcColors = {'guest_app':'#C9A84C','staff_app':'#60A5FA','dashboard':'#3DD68C'};
+    var srcColor = srcColors[log.source] || '#9094A8';
+    row.innerHTML =
+      '<div style="flex-shrink:0;width:90px;color:#5C6080;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="color:#F0F0F5;font-weight:500;">'+log.detail+'</div>'+
+        '<div style="color:#5C6080;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
+      '</div>';
+    container.appendChild(row);
+  });
+}
+
+function exportAdminLogs(){
+  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
+  if(!logs.length){alert('No logs to export.');return;}
+  var csv = 'Timestamp,Action,Detail,User,Room,Source
+';
+  logs.forEach(function(l){
+    csv += [l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'
+';
+  });
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'arivo-admin-log-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
+@media(min-width:901px) and (max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:1201px){.stats{grid-template-columns:repeat(4,1fr);}}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:290;backdrop-filter:blur(2px);}
+.overlay.open{display:block;}
+#toast{position:fixed;bottom:24px;right:24px;background:#22C55E;color:white;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+#toast.show{opacity:1;}
+#toast.warn{background:var(--amber);color:#080B10;}
+#toast.err{background:var(--red);}
+.notif{display:inline-block;width:6px;height:6px;background:var(--red);border-radius:50%;margin-left:5px;vertical-align:middle;box-shadow:0 0 4px var(--red);}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div class="login-screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-logo">Ari<em>vo</em></div>
+      <div class="login-badge">Super Admin</div>
+    </div>
+    <div class="login-card">
+      <div class="login-title">Platform Control</div>
+      <div class="login-sub">Restricted access — authorised personnel only</div>
+      <div class="lf"><label>Admin Email</label><input type="email" id="l-email" placeholder="admin@arivo.app" autocomplete="email"></div>
+      <div class="lf"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
+      <div class="login-err" id="l-err">Incorrect credentials. Try: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3253565f5b5c7253405b445d1c534242">[email&#160;protected]</a> / admin2026</div>
+      <div class="login-hint">Demo: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f190959c989fb1908398879edf908181">[email&#160;protected]</a></span> / <span>admin2026</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div class="dash" id="screen-dash">
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">Ari<em>vo</em></div>
+      <div class="sb-badge">Super Admin</div>
+    </div>
+    <div class="sb-admin-chip">
+      <div class="sb-av">YO</div>
+      <div><div class="sb-av-name">You (Owner)</div><div class="sb-av-role">&#128274; Root Access</div></div>
+    </div>
+    <div class="nav-lbl">Platform</div>
+    <div class="ni active" onclick="go('overview',this)"><span class="ni-ico">&#9646;&#9646;</span>Overview</div>
+    <div class="ni" onclick="go('hotels',this)"><span class="ni-ico">&#127968;</span>All Hotels<span class="ni-badge green" id="sb-hotel-count">5</span></div>
+    <div class="ni" onclick="go('revenue',this)"><span class="ni-ico">&#128178;</span>Revenue</div>
+    <div class="ni" onclick="go('trials',this)"><span class="ni-ico">&#9203;</span>Trials<span class="ni-badge amber">3</span></div>
+    <div class="nav-lbl">Operations</div>
+    <div class="ni" onclick="go('activity',this)"><span class="ni-ico">&#9881;</span>Activity Log</div>
+    <div class="ni" onclick="go('messages',this)"><span class="ni-ico">&#128172;</span>Broadcast</div>
+    <div class="nav-lbl">System</div>
+    <div class="ni" onclick="go('settings',this)"><span class="ni-ico">&#9881;&#65039;</span>Platform Settings</div>
+    <div class="sb-footer">
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="menu-btn" onclick="openSidebar()">&#9776;</div>
+        <div class="tb-title" id="ttitle">Overview</div>
+      </div>
+      <div class="tb-right">
+        <div class="btn btn-s" style="display:none;" id="tb-hide" onclick="go('hotels',null)">&#127968; Hotels</div>
+        <div class="btn btn-g" onclick="openModal('modal-add-hotel')">+ Add Hotel</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="sec active" id="s-overview">
+        <div class="sec-hdr">
+          <div class="sec-title">Platform Overview</div>
+          <div class="sec-sub" id="overview-date">Loading...</div>
+        </div>
+
+        <!-- MRR Banner -->
+        <div class="mrr-card">
+          <div class="mrr-main">
+            <div class="mrr-lbl">Monthly Recurring Revenue</div>
+            <div class="mrr-val">£1,296</div>
+            <div class="mrr-sub" style="color:var(--green);">&#8593; Growing · 5 active subscribers</div>
+          </div>
+          <div class="mrr-breakdown">
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--blue);">2</div><div class="mrr-item-lbl">Starter<br>£198/mo</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--gold);">2</div><div class="mrr-item-lbl">Professional<br>£598/mo</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--purple);">1</div><div class="mrr-item-lbl">Complete<br>£499/mo</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">3</div><div class="mrr-item-lbl">On Trial<br>£0/mo</div></div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat green"><div class="stat-lbl">Active Hotels</div><div class="stat-val">5</div><div class="stat-note up">&#8593; 2 this month</div></div>
+          <div class="stat amber"><div class="stat-lbl">On Free Trial</div><div class="stat-val">3</div><div class="stat-note warn">1 expires in 3 days</div></div>
+          <div class="stat gold"><div class="stat-lbl">Total Guests</div><div class="stat-val">312</div><div class="stat-note up">&#8593; Across all hotels</div></div>
+          <div class="stat blue"><div class="stat-lbl">Requests Today</div><div class="stat-val">47</div><div class="stat-note up">&#8593; Platform-wide</div></div>
+        </div>
+
+        <div class="two-col">
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-title">Recent Activity <span class="notif"></span></div>
+              <div class="card-action" onclick="go('activity',null)">View all →</div>
+            </div>
+            <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">The Larkspur House signed up</div><div class="act-sub">Starter plan · Cornwall, UK</div></div><div class="act-time">2 min ago</div></div>
+            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £299</div><div class="act-sub">The Anchor Hotel · Professional</div></div><div class="act-time">1 hr ago</div></div>
+            <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expires in 3 days</div><div class="act-sub">Briarwood Inn · Not yet converted</div></div><div class="act-time">Auto alert</div></div>
+            <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel logged in</div><div class="act-sub">The Maison Collective · Bath</div></div><div class="act-time">3 hrs ago</div></div>
+            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £499</div><div class="act-sub">Clifton Manor Hotel · Complete</div></div><div class="act-time">Yesterday</div></div>
+          </div>
+
+          <!-- Trial Expirations -->
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-title">Trial Expirations</div>
+              <div class="card-action" onclick="go('trials',null)">Manage →</div>
+            </div>
+            <div class="trial-row">
+              <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds · Signed up 27 Feb · No payment method</div></div>
+              <span class="days-badge urgent">3 days</span>
+              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Chase</button>
+            </div>
+            <div class="trial-row">
+              <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow · Signed up 5 Mar</div></div>
+              <span class="days-badge soon">10 days</span>
+              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
+            </div>
+            <div class="trial-row">
+              <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Signed up 10 Mar</div></div>
+              <span class="days-badge ok">15 days</span>
+              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ALL HOTELS ═══ -->
+      <div class="sec" id="s-hotels">
+        <div class="sec-hdr">
+          <div class="sec-row">
+            <div><div class="sec-title">All Hotels</div><div class="sec-sub">8 properties · 5 paying · 3 on trial</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-s" onclick="toast('Export CSV downloading...')">&#8659; Export CSV</button>
+              <button class="btn btn-g" onclick="openModal('modal-add-hotel')">+ Add Hotel</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="padding:0 4px;overflow-x:auto;">
+            <table class="hotel-table" id="hotels-table">
+              <thead>
+                <tr>
+                  <th>Hotel</th>
+                  <th>Plan</th>
+                  <th>Status</th>
+                  <th>MRR</th>
+                  <th>Since</th>
+                  <th>Last Active</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="hotels-tbody">
+                <!-- populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ REVENUE ═══ -->
+      <div class="sec" id="s-revenue">
+        <div class="sec-hdr">
+          <div class="sec-title">Revenue</div>
+          <div class="sec-sub">Monthly overview · All figures in GBP</div>
+        </div>
+        <div class="mrr-card" style="margin-bottom:16px;">
+          <div class="mrr-main">
+            <div class="mrr-lbl">Current MRR</div>
+            <div class="mrr-val">£1,296</div>
+            <div class="mrr-sub">ARR equivalent: <strong style="color:var(--white);">£15,552</strong></div>
+          </div>
+          <div class="mrr-breakdown">
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--green);">£1,296</div><div class="mrr-item-lbl">Collected<br>this month</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--amber);">£897</div><div class="mrr-item-lbl">Potential<br>(trials convert)</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">0%</div><div class="mrr-item-lbl">Churn<br>this month</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Revenue History (6 months)</div></div>
+          <div class="card-body">
+            <div class="rev-bars" id="rev-bars"></div>
+            <div style="margin-top:16px;font-size:11px;color:var(--text3);">Stripe integration will populate live data. Below is a projection based on current subscribers.</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Revenue by Plan</div></div>
+            <div class="card-body" style="padding:12px 18px;">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter (2 hotels)</span><span style="color:var(--white);font-weight:600;">£198/mo</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional (2 hotels)</span><span style="color:var(--white);font-weight:600;">£598/mo</span></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete (1 hotel)</span><span style="color:var(--white);font-weight:600;">£499/mo</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£1,295/mo</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Stripe Payouts</div></div>
+            <div class="card-body">
+              <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:14px;">Connect your Stripe account to see real payout data, failed payments, and upcoming invoices.</p>
+              <button class="btn btn-g" style="width:100%;" onclick="toast('Opens Stripe dashboard in production')">&#128279; Connect Stripe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TRIALS ═══ -->
+      <div class="sec" id="s-trials">
+        <div class="sec-hdr">
+          <div class="sec-title">Trial Management</div>
+          <div class="sec-sub">3 hotels currently on free trial</div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Active Trials</div>
+            <div class="card-action" onclick="toast('Sending chase emails to all expiring trials...')">&#9993; Chase all expiring</div>
+          </div>
+          <div class="trial-row" style="min-height:70px;">
+            <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds, UK · Starter plan interest · Signed up 27 Feb 2026 · No card added yet</div></div>
+            <span class="days-badge urgent">3 days left</span>
+            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
+              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Email</button>
+              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Briarwood Inn')">+ Extend</button>
+              <button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast('Trial ended for Briarwood Inn')">End trial</button>
+            </div>
+          </div>
+          <div class="trial-row" style="min-height:70px;">
+            <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow, Cornwall · Professional plan interest · Signed up 5 Mar 2026</div></div>
+            <span class="days-badge soon">10 days left</span>
+            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
+              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
+              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('The Harbour Arms')">+ Extend</button>
+            </div>
+          </div>
+          <div class="trial-row" style="min-height:70px;">
+            <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Starter plan · Signed up 10 Mar 2026 · Very active (34 scans)</div></div>
+            <span class="days-badge ok">15 days left</span>
+            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
+              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
+              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Oakwood Guesthouse')">+ Extend</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ACTIVITY LOG ═══ -->
+      <div class="sec" id="s-activity">
+        <div class="sec-hdr">
+          <div class="sec-title">Activity Log</div>
+          <div class="sec-sub">Platform-wide events in real time</div>
+        </div>
+        <div class="card" id="activity-log">
+          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — The Larkspur House</div><div class="act-sub">Starter plan · Mousehole, Cornwall · via landing page</div></div><div class="act-time">2 min ago</div></div>
+          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £299</div><div class="act-sub">The Anchor Hotel · Monthly renewal · Stripe</div></div><div class="act-time">1 hr ago</div></div>
+          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Maison Collective</div><div class="act-sub">Bath · James Mitchell · Chrome on iPhone</div></div><div class="act-time">3 hrs ago</div></div>
+          <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expiry alert sent — Briarwood Inn</div><div class="act-sub">Auto email: 3 days remaining</div></div><div class="act-time">6 hrs ago</div></div>
+          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £499</div><div class="act-sub">Clifton Manor Hotel · Monthly renewal</div></div><div class="act-time">Yesterday</div></div>
+          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — Oakwood Guesthouse</div><div class="act-sub">Starter trial · Ambleside, Lake District</div></div><div class="act-time">11 Mar</div></div>
+          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Harbour Arms</div><div class="act-sub">Padstow · First login since signup</div></div><div class="act-time">10 Mar</div></div>
+        </div>
+        <!-- Hotel-level log viewer -->
+        <div class="card" style="margin-top:14px;">
+          <div class="card-hdr" style="padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:13px;font-weight:600;color:var(--white);">&#128196; Hotel Activity Log Viewer</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="loadHotelLogs()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;">&#8635; Load Logs</button>
+              <button onclick="exportAdminLogs()" style="background:var(--gold);color:var(--bg);border:none;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;">&#8659; Export CSV</button>
+            </div>
+          </div>
+          <div id="admin-log-entries" style="max-height:500px;overflow-y:auto;">
+            <div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;">Click "Load Logs" to view activity from the hotel apps on this device.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ BROADCAST ═══ -->
+      <div class="sec" id="s-messages">
+        <div class="sec-hdr">
+          <div class="sec-title">Broadcast Message</div>
+          <div class="sec-sub">Send announcements to all hotels or specific plans</div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">New Message</div></div>
+          <div class="card-body">
+            <div class="fg">
+              <label class="fl">Send to</label>
+              <select class="fi" id="msg-audience">
+                <option>All hotels (8)</option>
+                <option>Paying hotels only (5)</option>
+                <option>Trial hotels only (3)</option>
+                <option>Starter plan (2)</option>
+                <option>Professional plan (2)</option>
+                <option>Complete plan (1)</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Subject</label>
+              <input class="fi" id="msg-subject" placeholder="e.g. New feature: Self Check-in is now live">
+            </div>
+            <div class="fg">
+              <label class="fl">Message</label>
+              <textarea class="fi" id="msg-body" placeholder="Write your message to hotel managers..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="btn btn-g" onclick="sendBroadcast()">&#128172; Send Message</button>
+              <button class="btn btn-s" onclick="toast('Draft saved')">Save draft</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Previous Messages</div></div>
+          <div class="activity-row"><div class="act-ico login">&#128172;</div><div class="act-info"><div class="act-title">Welcome to Arivo — Getting started guide</div><div class="act-sub">Sent to all hotels · 8 recipients · 100% opened</div></div><div class="act-time">15 Mar</div></div>
+          <div class="activity-row"><div class="act-ico payment">&#128172;</div><div class="act-info"><div class="act-title">New feature: Pre-arrival guest links</div><div class="act-sub">Sent to Professional + Complete · 3 recipients</div></div><div class="act-time">10 Mar</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ PLATFORM SETTINGS ═══ -->
+      <div class="sec" id="s-settings">
+        <div class="sec-hdr">
+          <div class="sec-title">Platform Settings</div>
+          <div class="sec-sub">Global Arivo configuration</div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Pricing Configuration</div></div>
+            <div class="card-body">
+              <div class="fg"><label class="fl">Starter Plan (£/month)</label><input class="fi" type="number" value="99"></div>
+              <div class="fg"><label class="fl">Professional Plan (£/month)</label><input class="fi" type="number" value="299"></div>
+              <div class="fg"><label class="fl">Complete Plan (£/month)</label><input class="fi" type="number" value="499"></div>
+              <div class="fg"><label class="fl">Self Check-in Add-on (£/month)</label><input class="fi" type="number" value="149"></div>
+              <div class="fg"><label class="fl">Free Trial Period (days)</label><input class="fi" type="number" value="30"></div>
+              <button class="btn btn-g" onclick="toast('Pricing updated — takes effect for new signups')">Save Pricing</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Platform Toggles</div></div>
+            <div class="tog-row"><div><div class="tog-lbl">New signups open</div><div class="tog-sub">Allow new hotels to register</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div><div class="tog-lbl">Free trials enabled</div><div class="tog-sub">New hotels get 30-day trial</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div><div class="tog-lbl">AI concierge active</div><div class="tog-sub">Claude API enabled platform-wide</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div><div class="tog-lbl">Self check-in available</div><div class="tog-sub">Add-on visible in hotel settings</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div><div class="tog-lbl">Maintenance mode</div><div class="tog-sub">Show maintenance page to all guests</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Admin Account</div></div>
+            <div class="card-body">
+              <div class="fg"><label class="fl">Admin Name</label><input class="fi" value="Platform Owner"></div>
+              <div class="fg"><label class="fl">Admin Email</label><input class="fi" type="email" value="admin@arivo.app"></div>
+              <div class="fg"><label class="fl">New Password</label><input class="fi" type="password" placeholder="Change password..."></div>
+              <button class="btn btn-g" onclick="toast('Admin account updated')">Save Changes</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Legal & Compliance</div></div>
+            <div class="card-body">
+              <div class="fg"><label class="fl">Company Name</label><input class="fi" value="Arivo Ltd"></div>
+              <div class="fg"><label class="fl">Company Number</label><input class="fi" placeholder="UK Companies House number"></div>
+              <div class="fg"><label class="fl">ICO Registration Number</label><input class="fi" placeholder="ZB000000 — register at ico.org.uk"></div>
+              <div class="fg"><label class="fl">VAT Number (if registered)</label><input class="fi" placeholder="GB000000000"></div>
+              <button class="btn btn-g" onclick="toast('Legal details saved')">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /screen-dash -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Add Hotel -->
+<div class="modal-ov" id="modal-add-hotel">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Add Hotel Manually</div>
+      <div class="modal-close" onclick="closeModal('modal-add-hotel')">&#10005;</div>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Hotel Name</label><input class="fi" id="ah-name" placeholder="e.g. The Anchor Hotel"></div>
+      <div class="form-row">
+        <div class="fg"><label class="fl">City</label><input class="fi" id="ah-city" placeholder="e.g. Bath"></div>
+        <div class="fg"><label class="fl">Country</label><input class="fi" id="ah-country" value="United Kingdom"></div>
+      </div>
+      <div class="fg"><label class="fl">Manager Email</label><input class="fi" id="ah-email" type="email" placeholder="manager@hotel.com"></div>
+      <div class="fg"><label class="fl">Plan</label>
+        <select class="fi" id="ah-plan">
+          <option value="trial">Free Trial (30 days)</option>
+          <option value="starter">Starter — £99/mo</option>
+          <option value="pro">Professional — £299/mo</option>
+          <option value="complete">Complete — £499/mo</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Notes (internal only)</label><textarea class="fi" id="ah-notes" placeholder="e.g. Referred by James, met at hospitality fair"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" style="flex:1;" onclick="addHotel()">Add Hotel &amp; Send Welcome Email</button>
+      <button class="btn btn-s" onclick="closeModal('modal-add-hotel')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hotel Detail -->
+<div class="modal-ov" id="modal-hotel-detail">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="detail-title">Hotel Details</div>
+      <div class="modal-close" onclick="closeModal('modal-hotel-detail')">&#10005;</div>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Plan</div><div style="font-size:14px;font-weight:600;color:var(--white);" id="detail-plan">-</div></div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Status</div><div style="font-size:14px;font-weight:600;" id="detail-status">-</div></div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">MRR</div><div style="font-size:14px;font-weight:600;color:var(--gold);" id="detail-mrr">-</div></div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Since</div><div style="font-size:14px;font-weight:600;color:var(--white);" id="detail-since">-</div></div>
+      </div>
+      <div class="fg"><label class="fl">Change Plan</label>
+        <select class="fi" id="detail-plan-select">
+          <option value="trial">Free Trial</option>
+          <option value="starter">Starter — £99/mo</option>
+          <option value="pro">Professional — £299/mo</option>
+          <option value="complete">Complete — £499/mo</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Internal Notes</label><textarea class="fi" placeholder="Add notes about this hotel..."></textarea></div>
+      <div style="background:var(--red-dim);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:8px;">Danger Zone</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-r" onclick="toast('Hotel suspended — access blocked')">Suspend Account</button>
+          <button class="btn btn-r" onclick="toast('Login email sent to hotel manager')">&#128274; Force Logout</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" style="flex:1;" onclick="toast('Changes saved');closeModal('modal-hotel-detail')">Save Changes</button>
+      <button class="btn btn-blu" onclick="toast('Logging in as this hotel manager...')">&#128100; Login as Hotel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Extend Trial -->
+<div class="modal-ov" id="modal-extend">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Extend Trial</div>
+      <div class="modal-close" onclick="closeModal('modal-extend')">&#10005;</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Extending trial for: <strong style="color:var(--white);" id="extend-hotel-name">-</strong></p>
+      <div class="fg"><label class="fl">Extend by (days)</label>
+        <select class="fi" id="extend-days">
+          <option>7 days</option>
+          <option>14 days</option>
+          <option selected>30 days</option>
+          <option>60 days</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Reason (internal)</label><input class="fi" placeholder="e.g. Promising lead, needs more time to set up"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" style="flex:1;" onclick="toast('Trial extended successfully');closeModal('modal-extend')">Extend Trial</button>
+      <button class="btn btn-s" onclick="closeModal('modal-extend')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── DATA ──
+var hotels = [
+  {id:1,name:'The Maison Collective',loc:'Bath, UK',plan:'pro',status:'active',mrr:299,since:'1 Feb 2026',lastActive:'3 hrs ago',scans:312,guests:47},
+  {id:2,name:'The Anchor Hotel',loc:'Lyme Regis, UK',plan:'pro',status:'active',mrr:299,since:'8 Feb 2026',lastActive:'Yesterday',scans:188,guests:31},
+  {id:3,name:'Clifton Manor Hotel',loc:'Bristol, UK',plan:'complete',status:'active',mrr:499,since:'15 Feb 2026',lastActive:'2 days ago',scans:421,guests:68},
+  {id:4,name:'The Larkspur House',loc:'Mousehole, UK',plan:'starter',status:'active',mrr:99,since:'19 Feb 2026',lastActive:'2 min ago',scans:94,guests:14},
+  {id:5,name:'The Salcombe',loc:'Devon, UK',plan:'starter',status:'active',mrr:99,since:'24 Feb 2026',lastActive:'Today',scans:76,guests:12},
+  {id:6,name:'Briarwood Inn',loc:'Cotswolds, UK',plan:'trial',status:'trial',mrr:0,since:'27 Feb 2026',lastActive:'4 days ago',scans:22,guests:3},
+  {id:7,name:'The Harbour Arms',loc:'Padstow, UK',plan:'trial',status:'trial',mrr:0,since:'5 Mar 2026',lastActive:'Yesterday',scans:45,guests:7},
+  {id:8,name:'Oakwood Guesthouse',loc:'Lake District, UK',plan:'trial',status:'trial',mrr:0,since:'10 Mar 2026',lastActive:'Today',scans:34,guests:5}
+];
+
+var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',settings:'Platform Settings'};
+var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
+var PLAN_MRR = {starter:'£99/mo',pro:'£299/mo',complete:'£499/mo',trial:'Free trial'};
+
+// ── LOGIN ──
+function doLogin(){
+  var email=document.getElementById('l-email').value.trim();
+  var pass=document.getElementById('l-pass').value;
+  var err=document.getElementById('l-err');
+  if(email==='admin@arivo.app' && pass==='admin2026'){
+    err.style.display='none';
+    document.getElementById('screen-login').classList.remove('active');
+    var dash=document.getElementById('screen-dash');
+    dash.classList.add('active');
+    dash.style.animation='fadeUp 0.35s ease';
+    var now=new Date();
+    var el=document.getElementById('overview-date');
+    if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    renderHotels();
+    renderRevChart();
+  } else {
+    err.style.display='block';
+  }
+}
+document.getElementById('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+function doLogout(){
+  document.getElementById('screen-dash').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('l-email').value='';
+  document.getElementById('l-pass').value='';
+}
+
+// ── NAV ──
+function go(name,el){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('s-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('ttitle').textContent=TITLES[name]||name;
+  closeSidebar();
+  window.scrollTo(0,0);
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
+
+// ── MODALS ──
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+document.querySelectorAll('.modal-ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeModal(o.id);});});
+
+// ── RENDER HOTELS TABLE ──
+function renderHotels(){
+  var tbody=document.getElementById('hotels-tbody');
+  if(!tbody)return;
+  tbody.innerHTML='';
+  hotels.forEach(function(h){
+    var tr=document.createElement('tr');
+    var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':h.plan==='trial'?'':'starter';
+    var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
+    var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
+    var mrrStr=h.mrr>0?'&pound;'+h.mrr:'-';
+    tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+h.loc+'</div></td>'+
+      '<td><span class="plan-tag '+planCls+'">'+PLAN_LABELS[h.plan]+'</span></td>'+
+      '<td><span class="status-dot '+statusCls+'">'+statusLbl+'</span></td>'+
+      '<td style="color:var(--gold);font-weight:600;">'+mrrStr+'</td>'+
+      '<td style="color:var(--text3);">'+h.since+'</td>'+
+      '<td style="color:var(--text3);">'+h.lastActive+'</td>'+
+      '<td><div class="h-actions">'+
+        '<div class="ic-btn ok" title="View details" onclick="openHotelDetail('+h.id+')">&#128065;</div>'+
+        '<div class="ic-btn warn" title="Suspend" onclick="toast(\''+h.name+' suspended\')">&#9940;</div>'+
+        '<div class="ic-btn danger" title="Delete" onclick="toast(\'Are you sure? This cannot be undone.\')">&#128465;</div>'+
+      '</div></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function openHotelDetail(id){
+  var h=hotels.find(function(x){return x.id===id;});
+  if(!h)return;
+  document.getElementById('detail-title').textContent=h.name;
+  document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan];
+  document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':'Overdue';
+  document.getElementById('detail-status').style.color=h.status==='active'?'var(--green)':h.status==='trial'?'var(--amber)':'var(--red)';
+  document.getElementById('detail-mrr').textContent=h.mrr>0?'£'+h.mrr+'/mo':'Free trial';
+  document.getElementById('detail-since').textContent=h.since;
+  var sel=document.getElementById('detail-plan-select');
+  sel.value=h.plan;
+  openModal('modal-hotel-detail');
+}
+
+// ── ADD HOTEL ──
+function addHotel(){
+  var name=document.getElementById('ah-name').value.trim();
+  var city=document.getElementById('ah-city').value.trim();
+  var country=document.getElementById('ah-country').value.trim();
+  var plan=document.getElementById('ah-plan').value;
+  if(!name){toast('Please enter a hotel name','err');return;}
+  var newHotel={id:hotels.length+1,name:name,loc:(city?city+', ':'')+country,plan:plan,status:plan==='trial'?'trial':'active',mrr:plan==='starter'?99:plan==='pro'?299:plan==='complete'?499:0,since:'Today',lastActive:'Just now',scans:0,guests:0};
+  hotels.push(newHotel);
+  renderHotels();
+  document.getElementById('sb-hotel-count').textContent=hotels.length;
+  closeModal('modal-add-hotel');
+  document.getElementById('ah-name').value='';document.getElementById('ah-city').value='';
+  toast('Hotel added — welcome email sent to manager');
+}
+
+// ── EXTEND TRIAL ──
+function openExtendModal(hotelName){
+  document.getElementById('extend-hotel-name').textContent=hotelName;
+  openModal('modal-extend');
+}
+
+// ── REVENUE CHART ──
+function renderRevChart(){
+  var container=document.getElementById('rev-bars');
+  if(!container)return;
+  var months=['Oct','Nov','Dec','Jan','Feb','Mar'];
+  var values=[0,0,299,598,897,1296];
+  var max=Math.max.apply(null,values)||1;
+  container.innerHTML='';
+  months.forEach(function(m,i){
+    var wrap=document.createElement('div');
+    wrap.className='rev-bar-wrap';
+    var bar=document.createElement('div');
+    bar.className='rev-bar'+(i===months.length-1?' current':'');
+    bar.style.height=Math.max(4,Math.round((values[i]/max)*75))+'px';
+    bar.title=m+': £'+values[i];
+    bar.onclick=function(){toast(m+' 2026: £'+values[i]+' MRR');};
+    var lbl=document.createElement('div');
+    lbl.className='rev-bar-lbl';
+    lbl.textContent=m;
+    wrap.appendChild(bar);
+    wrap.appendChild(lbl);
+    container.appendChild(wrap);
+  });
+}
+
+// ── BROADCAST ──
+function sendBroadcast(){
+  var audience=document.getElementById('msg-audience').value;
+  var subject=document.getElementById('msg-subject').value.trim();
+  var body=document.getElementById('msg-body').value.trim();
+  if(!subject||!body){toast('Please fill in subject and message','err');return;}
+  toast('Message sent to: '+audience);
+  document.getElement('modal-broadcast').style.display='none';
+  document.getElementById('bc-subject').value='';
+  document.getElementById('bc-body').value='';
+}
+</script>
+</body>
+</html>

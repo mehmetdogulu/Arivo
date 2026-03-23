@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Terms & Conditions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #1E3A2F; --gold: #B8933F; --gold-light: #D4AF6A;
+    --cream: #F8F4ED; --cream-dark: #EDE6D4; --charcoal: #1A1A1A;
+    --muted: #6B6355; --white: #FEFCF8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); line-height: 1.7; }
+
+  .header {
+    background: var(--forest); padding: 56px 80px 48px; position: relative; overflow: hidden;
+  }
+  .header::after {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 300px; height: 300px; border-radius: 50%; background: rgba(184,147,63,0.1);
+  }
+  .doc-type {
+    font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 12px; font-weight: 500;
+  }
+  .doc-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 56px;
+    font-weight: 300; color: #FEFCF8; line-height: 1.1; margin-bottom: 20px;
+  }
+  .doc-title em { font-style: italic; color: var(--gold-light); }
+  .doc-meta { display: flex; gap: 40px; }
+  .doc-meta-item { }
+  .doc-meta-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+  .doc-meta-value { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 300; }
+
+  .content { max-width: 860px; margin: 0 auto; padding: 64px 60px 100px; }
+
+  .intro-box {
+    background: rgba(184,147,63,0.08); border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0; padding: 20px 24px; margin-bottom: 48px;
+    font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.7;
+  }
+  .intro-box strong { color: var(--charcoal); font-weight: 600; }
+
+  .toc {
+    background: var(--white); border-radius: 16px; padding: 28px 32px;
+    border: 1px solid var(--cream-dark); margin-bottom: 56px;
+  }
+  .toc-title {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); font-weight: 500; margin-bottom: 16px;
+  }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 32px; }
+  .toc-item {
+    font-size: 12px; color: var(--muted); padding: 5px 0;
+    border-bottom: 1px solid var(--cream-dark); font-weight: 300;
+    display: flex; gap: 10px;
+  }
+  .toc-num { color: var(--gold); font-weight: 600; flex-shrink: 0; width: 20px; }
+
+  .part-divider {
+    background: var(--forest); color: var(--white); border-radius: 14px;
+    padding: 20px 28px; margin: 48px 0 36px;
+  }
+  .part-label {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 4px; font-weight: 500;
+  }
+  .part-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 26px;
+    font-weight: 300; color: var(--white);
+  }
+  .part-subtitle { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; font-weight: 300; }
+
+  .clause { margin-bottom: 40px; }
+  .clause-header {
+    display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--cream-dark);
+  }
+  .clause-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 28px;
+    font-weight: 600; color: var(--gold); flex-shrink: 0; line-height: 1;
+  }
+  .clause-title {
+    font-size: 16px; font-weight: 600; color: var(--forest);
+  }
+  .clause p {
+    font-size: 13px; color: var(--charcoal); font-weight: 300;
+    line-height: 1.75; margin-bottom: 12px;
+  }
+  .clause p:last-child { margin-bottom: 0; }
+  .clause ul, .clause ol {
+    margin: 10px 0 14px 24px; font-size: 13px;
+    color: var(--charcoal); font-weight: 300; line-height: 1.75;
+  }
+  .clause li { margin-bottom: 6px; }
+  .clause strong { font-weight: 600; color: var(--charcoal); }
+
+  .highlight-box {
+    background: var(--white); border-radius: 12px; padding: 18px 22px;
+    border: 1px solid var(--cream-dark); margin: 16px 0; font-size: 13px;
+    color: var(--charcoal); font-weight: 300; line-height: 1.7;
+  }
+  .highlight-box.warning {
+    background: #FEF3C7; border-color: #FDE68A; color: #78350F;
+  }
+  .highlight-box.important {
+    background: rgba(30,58,47,0.06); border-color: rgba(30,58,47,0.2);
+  }
+
+  .dpa-table {
+    width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px;
+  }
+  .dpa-table th {
+    background: var(--forest); color: var(--gold-light); padding: 10px 14px;
+    text-align: left; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;
+  }
+  .dpa-table td {
+    padding: 10px 14px; border-bottom: 1px solid var(--cream-dark);
+    vertical-align: top; color: var(--charcoal); font-weight: 300;
+  }
+  .dpa-table tr:nth-child(even) td { background: var(--white); }
+
+  .signature-block {
+    background: var(--white); border-radius: 16px; padding: 32px;
+    border: 1px solid var(--cream-dark); margin-top: 56px; text-align: center;
+  }
+  .sig-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--forest); margin-bottom: 8px; }
+  .sig-sub { font-size: 12px; color: var(--muted); font-weight: 300; margin-bottom: 20px; }
+  .sig-company { font-size: 12px; color: var(--muted); margin-top: 24px; }
+
+  hr.divider { border: none; height: 1px; background: var(--cream-dark); margin: 48px 0; }
+
+  @media print { body { background: white; } .header { padding: 40px; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="doc-type">Legal Document</div>
+  <div class="doc-title">Terms &amp; <em>Conditions</em></div>
+  <div class="doc-meta">
+    <div class="doc-meta-item">
+      <div class="doc-meta-label">Version</div>
+      <div class="doc-meta-value">1.0</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="doc-meta-label">Effective Date</div>
+      <div class="doc-meta-value">March 2026</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="doc-meta-label">Governing Law</div>
+      <div class="doc-meta-value">England &amp; Wales / UK GDPR / EU GDPR</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="doc-meta-label">Issued By</div>
+      <div class="doc-meta-value">Arivo Ltd</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="intro-box">
+    <strong>Important — Please Read Carefully.</strong> These Terms &amp; Conditions consist of two parts: <strong>Part A</strong> governs the relationship between Arivo Ltd and hotels or property operators who subscribe to the Arivo platform (<em>Hotel Terms</em>). <strong>Part B</strong> governs the relationship between Arivo and individual guests who use the Arivo guest experience application (<em>Guest Terms</em>). By using the Arivo platform or guest application, you confirm that you have read, understood, and agreed to the applicable terms.
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <div class="toc-grid">
+      <div class="toc-item"><span class="toc-num">A1</span>Definitions &amp; Interpretation</div>
+      <div class="toc-item"><span class="toc-num">A2</span>Subscription &amp; Access</div>
+      <div class="toc-item"><span class="toc-num">A3</span>Hotel Obligations</div>
+      <div class="toc-item"><span class="toc-num">A4</span>Payment &amp; Billing</div>
+      <div class="toc-item"><span class="toc-num">A5</span>Data Processing Agreement</div>
+      <div class="toc-item"><span class="toc-num">A6</span>Intellectual Property</div>
+      <div class="toc-item"><span class="toc-num">A7</span>Limitation of Liability</div>
+      <div class="toc-item"><span class="toc-num">A8</span>Confidentiality</div>
+      <div class="toc-item"><span class="toc-num">A9</span>Termination</div>
+      <div class="toc-item"><span class="toc-num">A10</span>Governing Law</div>
+      <div class="toc-item"><span class="toc-num">B1</span>Guest Use of the App</div>
+      <div class="toc-item"><span class="toc-num">B2</span>Self Check-in Terms</div>
+      <div class="toc-item"><span class="toc-num">B3</span>Guest Data &amp; GDPR Rights</div>
+      <div class="toc-item"><span class="toc-num">B4</span>ID Verification</div>
+      <div class="toc-item"><span class="toc-num">B5</span>Payments via the App</div>
+      <div class="toc-item"><span class="toc-num">B6</span>Minors</div>
+      <div class="toc-item"><span class="toc-num">B7</span>Disclaimers &amp; Liability</div>
+      <div class="toc-item"><span class="toc-num">B8</span>Guest Governing Law</div>
+    </div>
+  </div>
+
+  <!-- PART A: HOTEL TERMS -->
+  <div class="part-divider">
+    <div class="part-label">Part A</div>
+    <div class="part-title">Hotel &amp; Operator Terms</div>
+    <div class="part-subtitle">Governs the subscription agreement between Arivo Ltd and the subscribing hotel or property operator</div>
+  </div>
+
+  <div class="clause" id="A1">
+    <div class="clause-header">
+      <div class="clause-num">A1</div>
+      <div class="clause-title">Definitions &amp; Interpretation</div>
+    </div>
+    <p>In these Hotel Terms, the following definitions apply:</p>
+    <ul>
+      <li><strong>"Arivo"</strong> means Arivo Ltd, a company registered in England and Wales.</li>
+      <li><strong>"Hotel"</strong> or <strong>"Operator"</strong> means the business entity that has subscribed to the Arivo platform and accepted these Terms.</li>
+      <li><strong>"Platform"</strong> means the Arivo software-as-a-service product, including the guest-facing application, the hotel admin panel, and any integrations.</li>
+      <li><strong>"Guest Data"</strong> means any personal data relating to guests that is processed via the Platform on behalf of the Hotel.</li>
+      <li><strong>"PMS"</strong> means the Hotel's property management system, where applicable.</li>
+      <li><strong>"Subscription"</strong> means the monthly or annual service plan selected by the Hotel at sign-up.</li>
+      <li><strong>"Data Controller"</strong> has the meaning given in UK GDPR Article 4(7). The Hotel is the Data Controller of Guest Data.</li>
+      <li><strong>"Data Processor"</strong> has the meaning given in UK GDPR Article 4(8). Arivo is the Data Processor acting on the Hotel's instructions.</li>
+    </ul>
+  </div>
+
+  <div class="clause" id="A2">
+    <div class="clause-header">
+      <div class="clause-num">A2</div>
+      <div class="clause-title">Subscription &amp; Access</div>
+    </div>
+    <p>2.1 Arivo grants the Hotel a non-exclusive, non-transferable, revocable licence to access and use the Platform during the Subscription term, subject to these Terms and timely payment of all fees.</p>
+    <p>2.2 The Hotel may configure the Platform for use at the property or properties covered by the Subscription. Each property requires a separate Subscription unless otherwise agreed in writing.</p>
+    <p>2.3 The Hotel is responsible for ensuring that all staff members who access the admin panel do so in accordance with these Terms and applicable data protection law.</p>
+    <p>2.4 Arivo reserves the right to update, modify, or improve the Platform at any time. Material changes that adversely affect the Hotel's use will be communicated with at least 30 days' notice.</p>
+    <p>2.5 The Hotel must not resell, sublicense, or otherwise make the Platform available to third parties without Arivo's prior written consent.</p>
+  </div>
+
+  <div class="clause" id="A3">
+    <div class="clause-header">
+      <div class="clause-num">A3</div>
+      <div class="clause-title">Hotel Obligations</div>
+    </div>
+    <p>3.1 The Hotel agrees to:</p>
+    <ul>
+      <li>Provide accurate, current, and complete information when setting up the Platform, including check-in times, house rules, and guest-facing content.</li>
+      <li>Ensure that all content uploaded to the Platform (including local recommendations, images, and property information) does not infringe any third-party intellectual property rights.</li>
+      <li>Act as Data Controller and ensure that guests are notified of data processing activities in accordance with UK GDPR and EU GDPR Article 13 obligations.</li>
+      <li>Not use the Platform in any way that is unlawful, fraudulent, or harmful.</li>
+      <li>Promptly notify Arivo of any suspected data breach or security incident affecting the Platform.</li>
+      <li>Where the Self Check-in Module is enabled, ensure that all applicable legal requirements for identity verification in the relevant jurisdiction are met.</li>
+    </ul>
+    <p>3.2 The Hotel acknowledges that Arivo operates as a technology platform and is not responsible for the hospitality services, room readiness, or guest experience outcomes at the property.</p>
+  </div>
+
+  <div class="clause" id="A4">
+    <div class="clause-header">
+      <div class="clause-num">A4</div>
+      <div class="clause-title">Payment &amp; Billing</div>
+    </div>
+    <p>4.1 Subscription fees are charged monthly or annually in advance, depending on the plan selected. All fees are exclusive of VAT, which will be applied at the prevailing rate.</p>
+    <p>4.2 Payments are processed by Stripe. The Hotel authorises Arivo to charge the payment method on file on each renewal date.</p>
+    <p>4.3 In the event of a failed payment, Arivo will notify the Hotel and allow a 7-day grace period. If payment is not received within this period, access to the Platform may be suspended until the outstanding balance is settled.</p>
+    <p>4.4 All fees are non-refundable except where required by applicable law or where Arivo has materially failed to deliver the Platform as described.</p>
+    <p>4.5 Arivo reserves the right to amend pricing with 60 days' written notice. The Hotel may terminate the Subscription without penalty if it does not accept the new pricing.</p>
+    <p>4.6 Add-on modules (including the Self Check-in Module) are billed separately and may be cancelled independently of the base Subscription.</p>
+  </div>
+
+  <div class="clause" id="A5">
+    <div class="clause-header">
+      <div class="clause-num">A5</div>
+      <div class="clause-title">Data Processing Agreement (DPA)</div>
+    </div>
+    <div class="highlight-box important">
+      This clause constitutes a binding Data Processing Agreement between the Hotel (as Data Controller) and Arivo Ltd (as Data Processor) as required by UK GDPR Article 28 and EU GDPR Article 28.
+    </div>
+    <p>5.1 <strong>Scope of Processing.</strong> Arivo will process Guest Data only for the purposes of delivering the Platform services as instructed by the Hotel, including: operating the guest-facing application, processing guest requests, facilitating self check-in where enabled, and providing analytics to the Hotel.</p>
+    <p>5.2 <strong>Arivo Processor Obligations.</strong> Arivo agrees to:</p>
+    <ul>
+      <li>Process Guest Data only on documented instructions from the Hotel.</li>
+      <li>Ensure that all personnel with access to Guest Data are bound by confidentiality obligations.</li>
+      <li>Implement appropriate technical and organisational security measures in accordance with UK GDPR Article 32.</li>
+      <li>Not engage any sub-processor without the Hotel's prior written authorisation (general authorisation is granted for the sub-processors listed in Schedule 1).</li>
+      <li>Assist the Hotel in responding to data subject rights requests within the timeframes required by applicable law.</li>
+      <li>Notify the Hotel without undue delay and in any event within 48 hours upon becoming aware of a personal data breach.</li>
+      <li>Delete or return all Guest Data upon termination of the Subscription, at the Hotel's election, within 30 days.</li>
+      <li>Make available all information necessary to demonstrate compliance with this DPA and permit audits by the Hotel or its appointed auditor.</li>
+    </ul>
+
+    <p>5.3 <strong>Sub-processors.</strong> The Hotel grants general authorisation for Arivo to engage the following sub-processors:</p>
+    <table class="dpa-table">
+      <thead>
+        <tr><th>Sub-processor</th><th>Purpose</th><th>Location</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Stripe Inc.</td><td>Payment processing</td><td>USA (SCCs / UK Addendum in place)</td></tr>
+        <tr><td>Supabase Inc.</td><td>Database &amp; authentication</td><td>EU (AWS Frankfurt)</td></tr>
+        <tr><td>Anthropic PBC</td><td>AI concierge (Claude API)</td><td>USA (SCCs / UK Addendum in place)</td></tr>
+        <tr><td>Meta Platforms (WhatsApp Business API)</td><td>Guest &amp; staff messaging</td><td>USA (SCCs / UK Addendum in place)</td></tr>
+        <tr><td>Amazon Web Services</td><td>Cloud hosting &amp; storage</td><td>EU (Frankfurt region)</td></tr>
+      </tbody>
+    </table>
+    <p>Arivo will notify the Hotel of any intended changes to this list with at least 14 days' notice, giving the Hotel the opportunity to object.</p>
+
+    <p>5.4 <strong>International Transfers.</strong> Where Guest Data is transferred outside the UK or EEA, Arivo will ensure that adequate safeguards are in place, including Standard Contractual Clauses (SCCs) and the UK International Data Transfer Addendum where required.</p>
+
+    <p>5.5 <strong>Data Retention.</strong> Guest Data will be retained for the period necessary to deliver the service and as required by applicable law. ID verification images will be retained for no longer than 90 days from the date of the relevant stay, unless a longer period is required by law. The Hotel may configure shorter retention periods via the admin panel.</p>
+
+    <p>5.6 <strong>Security Measures.</strong> Arivo maintains the following minimum technical and organisational security measures:</p>
+    <ul>
+      <li>Encryption of data at rest (AES-256) and in transit (TLS 1.3).</li>
+      <li>Role-based access controls limiting staff access to data on a need-to-know basis.</li>
+      <li>Regular penetration testing and vulnerability assessments.</li>
+      <li>Multi-factor authentication required for all admin panel access.</li>
+      <li>Incident response procedures with defined escalation paths.</li>
+    </ul>
+  </div>
+
+  <div class="clause" id="A6">
+    <div class="clause-header">
+      <div class="clause-num">A6</div>
+      <div class="clause-title">Intellectual Property</div>
+    </div>
+    <p>6.1 The Platform, including all software, design, algorithms, and documentation, is and remains the sole intellectual property of Arivo Ltd. Nothing in these Terms transfers any IP rights to the Hotel.</p>
+    <p>6.2 The Hotel grants Arivo a limited licence to use the Hotel's branding, logo, and content solely for the purpose of configuring and displaying the Platform to the Hotel's guests.</p>
+    <p>6.3 The Hotel retains ownership of all content it uploads to the Platform (recommendations, descriptions, images). The Hotel warrants that it has the right to use and share such content.</p>
+    <p>6.4 Arivo may use anonymised, aggregated data derived from Platform usage to improve its products and services, provided that such data cannot be used to identify any individual guest or Hotel.</p>
+  </div>
+
+  <div class="clause" id="A7">
+    <div class="clause-header">
+      <div class="clause-num">A7</div>
+      <div class="clause-title">Limitation of Liability</div>
+    </div>
+    <div class="highlight-box warning">
+      ⚠ This clause limits Arivo's liability. Please read carefully.
+    </div>
+    <p>7.1 Arivo's total aggregate liability to the Hotel for any claims arising out of or in connection with these Terms shall not exceed the total fees paid by the Hotel to Arivo in the 12 months preceding the event giving rise to the claim.</p>
+    <p>7.2 Arivo shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to: loss of revenue, loss of profit, loss of goodwill, loss of business opportunity, or data loss.</p>
+    <p>7.3 Arivo shall not be liable for any failure or delay in performance resulting from causes beyond its reasonable control, including but not limited to: third-party PMS downtime, WhatsApp Business API outages, or failures of sub-processors.</p>
+    <p>7.4 Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be excluded by law.</p>
+    <p>7.5 The Hotel acknowledges that the Self Check-in Module provides a technology-facilitated process and that Arivo is not liable for any consequences arising from the Hotel's failure to enforce its own check-in policies, verify guest identities adequately, or ensure room readiness.</p>
+  </div>
+
+  <div class="clause" id="A8">
+    <div class="clause-header">
+      <div class="clause-num">A8</div>
+      <div class="clause-title">Confidentiality</div>
+    </div>
+    <p>8.1 Each party agrees to keep confidential all non-public information received from the other party in connection with these Terms, and to use such information solely for the purposes of performing obligations under these Terms.</p>
+    <p>8.2 Confidentiality obligations do not apply to information that: is or becomes publicly known through no fault of the receiving party; was already known to the receiving party prior to disclosure; or is required to be disclosed by law or court order.</p>
+    <p>8.3 Confidentiality obligations survive termination of these Terms for a period of five years.</p>
+  </div>
+
+  <div class="clause" id="A9">
+    <div class="clause-header">
+      <div class="clause-num">A9</div>
+      <div class="clause-title">Termination</div>
+    </div>
+    <p>9.1 Either party may terminate the Subscription on 30 days' written notice at the end of the current billing period.</p>
+    <p>9.2 Arivo may suspend or terminate access immediately if the Hotel: materially breaches these Terms and fails to remedy the breach within 14 days of notice; fails to pay fees after the grace period; or uses the Platform in a manner that is unlawful or harmful to Arivo or third parties.</p>
+    <p>9.3 Upon termination, the Hotel's access to the Platform will cease. Arivo will make Guest Data available for export for 30 days following termination, after which it will be securely deleted.</p>
+    <p>9.4 Clauses A5 (DPA), A6 (IP), A7 (Liability), A8 (Confidentiality), and A10 (Governing Law) survive termination.</p>
+  </div>
+
+  <div class="clause" id="A10">
+    <div class="clause-header">
+      <div class="clause-num">A10</div>
+      <div class="clause-title">Governing Law &amp; Dispute Resolution</div>
+    </div>
+    <p>10.1 These Hotel Terms are governed by the laws of England and Wales. Any dispute shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+    <p>10.2 Before commencing legal proceedings, the parties agree to attempt to resolve any dispute through good-faith negotiation for a period of 30 days.</p>
+    <p>10.3 For Hotels based in EU member states, nothing in these Terms affects the Hotel's right to bring proceedings in its local courts where required by mandatory local law.</p>
+  </div>
+
+  <!-- PART B: GUEST TERMS -->
+  <div class="part-divider">
+    <div class="part-label">Part B</div>
+    <div class="part-title">Guest Terms of Use</div>
+    <div class="part-subtitle">Governs your use of the Arivo guest experience application during your hotel stay</div>
+  </div>
+
+  <div class="clause" id="B1">
+    <div class="clause-header">
+      <div class="clause-num">B1</div>
+      <div class="clause-title">Guest Use of the Application</div>
+    </div>
+    <p>1.1 The Arivo guest application ("App") is provided to you by your hotel as a courtesy service during your stay. Arivo Ltd operates the technology platform that powers the App on behalf of your hotel.</p>
+    <p>1.2 By using the App, you agree to these Guest Terms. If you do not agree, please do not use the App and contact the hotel's front desk directly for assistance.</p>
+    <p>1.3 The App is for personal, non-commercial use only in connection with your hotel stay. You must not misuse the App, submit false information, or use it to make fraudulent requests.</p>
+    <p>1.4 The App provides access to information about your stay, local recommendations, the ability to make service requests, and (where enabled by your hotel) a self check-in service. All requests submitted via the App are directed to your hotel's staff.</p>
+    <p>1.5 Arivo is not responsible for the fulfilment of any service requests. All obligations regarding your stay (room readiness, service delivery, hospitality) remain with your hotel.</p>
+  </div>
+
+  <div class="clause" id="B2">
+    <div class="clause-header">
+      <div class="clause-num">B2</div>
+      <div class="clause-title">Self Check-in Terms</div>
+    </div>
+    <div class="highlight-box important">
+      These terms apply only where your hotel has enabled the Self Check-in Module.
+    </div>
+    <p>2.1 <strong>Eligibility.</strong> Self check-in is only available to the named booker on the reservation. The name you enter must match the name on the booking. If the names do not match, access to self check-in will be denied and you must check in at the front desk.</p>
+    <p>2.2 <strong>Check-in Time.</strong> You may not complete self check-in before the hotel's designated check-in time. If you attempt to check in early, the App will advise you of the earliest available time and you will be notified when you may proceed.</p>
+    <p>2.3 <strong>Payment.</strong> If your reservation shows an outstanding balance, you will be required to settle this payment in full before self check-in can be completed. Payment is processed securely via Stripe.</p>
+    <p>2.4 <strong>Identity Verification.</strong> You will be required to upload a photograph of a valid government-issued identity document (passport or driving licence). By submitting your ID, you consent to Arivo processing this data as described in the Privacy Policy. Your ID will be retained for no longer than 90 days from your check-out date.</p>
+    <p>2.5 <strong>Room Readiness.</strong> If your room is not yet ready at the time of check-in, you will be informed and notified automatically once it is available. Self check-in completion does not guarantee immediate room access.</p>
+    <p>2.6 <strong>Key Collection.</strong> Self check-in does not provide an electronic room key. Upon successful completion of all check-in steps, your hotel's staff will be notified to prepare your physical room key for collection. The hotel remains responsible for key handover.</p>
+    <p>2.7 <strong>Hotel Override.</strong> Your hotel reserves the right to override, cancel, or modify any self check-in request at its discretion, including where there are concerns about identity verification or reservation validity.</p>
+  </div>
+
+  <div class="clause" id="B3">
+    <div class="clause-header">
+      <div class="clause-num">B3</div>
+      <div class="clause-title">Your Data &amp; GDPR Rights</div>
+    </div>
+    <p>3.1 Your hotel is the Data Controller of your personal data. Arivo processes your data as a Data Processor on your hotel's behalf. For full details of how your data is used, please refer to the Arivo Privacy Policy.</p>
+    <p>3.2 Under UK GDPR and EU GDPR, you have the following rights regarding your personal data:</p>
+    <ul>
+      <li><strong>Right of Access</strong> — you may request a copy of the personal data held about you.</li>
+      <li><strong>Right to Rectification</strong> — you may request correction of inaccurate data.</li>
+      <li><strong>Right to Erasure</strong> — you may request deletion of your data, subject to legal retention obligations.</li>
+      <li><strong>Right to Restriction</strong> — you may request that processing of your data is restricted in certain circumstances.</li>
+      <li><strong>Right to Data Portability</strong> — you may request your data in a structured, machine-readable format.</li>
+      <li><strong>Right to Object</strong> — you may object to processing based on legitimate interests.</li>
+      <li><strong>Rights related to automated decision-making</strong> — you have the right not to be subject to solely automated decisions that significantly affect you.</li>
+    </ul>
+    <p>3.3 To exercise any of these rights, please contact your hotel directly or email Arivo at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1464667d6275776d546760756d7b673a777b79">[email&#160;protected]</a>. We will respond within 30 days.</p>
+    <p>3.4 You have the right to lodge a complaint with the Information Commissioner's Office (ICO) in the UK at <strong>ico.org.uk</strong>, or with your local data protection authority if you are in an EU member state.</p>
+  </div>
+
+  <div class="clause" id="B4">
+    <div class="clause-header">
+      <div class="clause-num">B4</div>
+      <div class="clause-title">ID Verification &amp; Special Category Data</div>
+    </div>
+    <div class="highlight-box warning">
+      ⚠ Your identity document contains special category data. We handle it with the highest level of care.
+    </div>
+    <p>4.1 Where you submit an identity document for self check-in, you explicitly consent to Arivo and your hotel processing a copy of that document solely for the purpose of verifying your identity in connection with your reservation.</p>
+    <p>4.2 Your ID document will be stored encrypted and will only be accessible to authorised hotel staff and Arivo security personnel where strictly necessary.</p>
+    <p>4.3 Your ID document will be permanently deleted within 90 days of your check-out date, unless a longer period is required by applicable law (for example, certain jurisdictions require hotels to retain guest ID records for up to 12 months).</p>
+    <p>4.4 You may withdraw your consent to ID processing at any time by contacting your hotel. However, withdrawal of consent may mean that self check-in is no longer available to you for that stay.</p>
+  </div>
+
+  <div class="clause" id="B5">
+    <div class="clause-header">
+      <div class="clause-num">B5</div>
+      <div class="clause-title">Payments via the App</div>
+    </div>
+    <p>5.1 Where the App facilitates payment of outstanding balances, payments are processed by Stripe Inc. Arivo does not store your full card details. Payment card data is handled in accordance with PCI DSS standards.</p>
+    <p>5.2 All payment disputes should be raised directly with your hotel. Arivo is not a party to the financial transaction between you and your hotel.</p>
+    <p>5.3 Stripe's own terms of service and privacy policy apply to payment processing. A link to Stripe's policies is available at stripe.com.</p>
+  </div>
+
+  <div class="clause" id="B6">
+    <div class="clause-header">
+      <div class="clause-num">B6</div>
+      <div class="clause-title">Minors</div>
+    </div>
+    <p>6.1 The App is not intended for use by persons under the age of 18. Self check-in is only available to guests aged 18 or over, as it involves the submission of identity documents and financial data.</p>
+    <p>6.2 If a guest is under 18, the self check-in must be completed by the named adult booker. The hotel remains responsible for verifying the age of guests at the property.</p>
+    <p>6.3 If you become aware that a minor has submitted personal data via the App without appropriate parental consent, please notify Arivo at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="48383a213e292b31083b3c2931273b662b2725">[email&#160;protected]</a> and we will take steps to delete the data promptly.</p>
+  </div>
+
+  <div class="clause" id="B7">
+    <div class="clause-header">
+      <div class="clause-num">B7</div>
+      <div class="clause-title">Disclaimers &amp; Limitation of Liability</div>
+    </div>
+    <p>7.1 The App is provided on an "as is" basis. Arivo makes no warranty that the App will be uninterrupted, error-free, or fully available at all times.</p>
+    <p>7.2 Local recommendations provided in the App are curated by the hotel and do not constitute endorsements by Arivo. Arivo is not liable for any experience at third-party venues.</p>
+    <p>7.3 Arivo's liability to guests is limited to the maximum extent permitted by applicable law. Nothing in these terms excludes liability for personal injury caused by negligence or any liability that cannot be excluded by law.</p>
+    <p>7.4 Your statutory rights as a consumer under UK and EU law are not affected by these terms.</p>
+  </div>
+
+  <div class="clause" id="B8">
+    <div class="clause-header">
+      <div class="clause-num">B8</div>
+      <div class="clause-title">Governing Law — Guests</div>
+    </div>
+    <p>8.1 These Guest Terms are governed by the laws of England and Wales, without prejudice to any mandatory consumer protection rights you may have under the laws of your country of residence.</p>
+    <p>8.2 If you are an EU resident, you may also bring proceedings before the courts of your country of habitual residence.</p>
+    <p>8.3 For EU consumers, the European Commission's Online Dispute Resolution platform is available at: <strong>ec.europa.eu/consumers/odr</strong>.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="signature-block">
+    <div class="sig-title">Arivo Ltd</div>
+    <div class="sig-sub">These Terms were last updated in March 2026 and supersede all previous versions.</div>
+    <div style="font-size:12px;color:var(--muted);font-weight:300;margin-top:8px;">
+      Questions? Contact us at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="acc0c9cbcdc0ecdfd8cdd5c3df82cfc3c1">[email&#160;protected]</a

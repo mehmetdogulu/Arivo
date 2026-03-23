@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — PWA Engineer Handoff</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0F1117; --surface:#181B23; --surface2:#1E2130;
+  --border:#2A2D3A; --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.12);
+  --green:#3DD68C; --green-dim:rgba(61,214,140,0.1);
+  --red:#F87171; --amber:#FBB040;
+  --text:#F0F0F5; --text2:#9094A8; --text3:#5C6080; --white:#FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Geist',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+.wrap { max-width:860px; margin:0 auto; padding:60px 32px; }
+h1 { font-family:'Instrument Serif',serif; font-size:48px; color:var(--white); margin-bottom:8px; line-height:1; }
+h1 span { color:var(--gold); }
+.tagline { font-size:14px; color:var(--text3); margin-bottom:48px; }
+h2 { font-family:'Instrument Serif',serif; font-size:28px; color:var(--white); margin:40px 0 16px; }
+h3 { font-size:14px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; margin:24px 0 10px; }
+p { font-size:13px; color:var(--text2); margin-bottom:12px; font-weight:300; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:16px; }
+.card-title { font-size:15px; font-weight:600; color:var(--white); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.card-sub { font-size:12px; color:var(--text3); margin-bottom:16px; }
+pre {
+  background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; font-size:12px; color:#A8D8A8; overflow-x:auto;
+  font-family:'Courier New',monospace; line-height:1.6; margin:10px 0;
+  white-space:pre-wrap; word-break:break-all;
+}
+.inline-code { background:var(--surface2); border:1px solid var(--border); border-radius:5px; padding:2px 7px; font-family:monospace; font-size:12px; color:var(--gold); }
+.step { display:flex; gap:16px; margin-bottom:16px; }
+.step-num { width:28px; height:28px; background:var(--gold-dim); border:1px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--gold); flex-shrink:0; margin-top:2px; }
+.step-content { flex:1; }
+.step-title { font-size:13px; font-weight:600; color:var(--white); margin-bottom:4px; }
+.step-desc { font-size:12px; color:var(--text2); font-weight:300; line-height:1.6; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; }
+.badge.done { background:var(--green-dim); color:var(--green); }
+.badge.todo { background:var(--gold-dim); color:var(--gold); }
+.badge.ios { background:rgba(96,165,250,0.1); color:#60A5FA; }
+.badge.android { background:rgba(61,214,140,0.1); color:var(--green); }
+.divider { height:1px; background:var(--border); margin:40px 0; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.compat-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.compat-row:last-child { border-bottom:none; }
+.compat-label { color:var(--text2); }
+.compat-status { display:flex; gap:6px; }
+@media (max-width:640px) { .two-col { grid-template-columns:1fr; } h1 { font-size:32px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Ari<span>vo</span> PWA</h1>
+  <div class="tagline">Engineer handoff — iOS & Android implementation guide · March 2026</div>
+
+  <!-- STATUS -->
+  <div class="card">
+    <div class="card-title">📋 What's already done in the HTML files</div>
+    <div class="card-sub">These are already embedded in both hotel-guest-app.html and hotel-dashboard.html</div>
+    <div class="compat-row"><div class="compat-label">Viewport meta with <span class="inline-code">viewport-fit=cover</span></div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Apple mobile web app meta tags</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Theme colour meta tags (iOS status bar)</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Apple touch icon (home screen icon)</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Inline PWA manifest link</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Safe area insets (notch / Dynamic Island / home bar)</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">iOS momentum scrolling</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Service worker registration stub</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Browser Push Notification API</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Full responsive layout (mobile + tablet + desktop)</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Bottom navigation for mobile</div><span class="badge done">✓ Done</span></div>
+    <div class="compat-row"><div class="compat-label">Touch-optimised tap targets</div><span class="badge done">✓ Done</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔧 What engineers still need to add</div>
+    <div class="card-sub">These require a backend or file server — cannot be done in static HTML</div>
+    <div class="compat-row"><div class="compat-label">Real <span class="inline-code">manifest.json</span> file (replace inline data URI)</div><span class="badge todo">To Do</span></div>
+    <div class="compat-row"><div class="compat-label">App icons — 192×192 and 512×512 PNG files</div><span class="badge todo">To Do</span></div>
+    <div class="compat-row"><div class="compat-label">Service worker <span class="inline-code">sw.js</span> for offline + background push</div><span class="badge todo">To Do</span></div>
+    <div class="compat-row"><div class="compat-label">VAPID keys for Web Push (push notification server)</div><span class="badge todo">To Do</span></div>
+    <div class="compat-row"><div class="compat-label">Push subscription storage (save per-device subscriptions)</div><span class="badge todo">To Do</span></div>
+    <div class="compat-row"><div class="compat-label">Server-sent push when guest submits request</div><span class="badge todo">To Do</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STEP BY STEP -->
+  <h2>Step-by-step production setup</h2>
+
+  <h3>Step 1 — manifest.json</h3>
+  <div class="card">
+    <div class="card-title">📄 Create manifest.json</div>
+    <p>Create this file at the root of your web server. Replace the inline data URI manifest link in both HTML files with <span class="inline-code">&lt;link rel="manifest" href="/manifest.json"&gt;</span></p>
+    <pre>{
+  "name": "Arivo — Your Stay",
+  "short_name": "Arivo",
+  "description": "Your personal hotel companion",
+  "start_url": "/guest/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1E3A2F",
+  "theme_color": "#1E3A2F",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/welcome.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}</pre>
+    <p style="margin-top:12px;">For the dashboard, use a separate <span class="inline-code">manifest-dashboard.json</span> with <span class="inline-code">"background_color": "#0F1117"</span> and <span class="inline-code">"theme_color": "#0F1117"</span>.</p>
+  </div>
+
+  <h3>Step 2 — App Icons</h3>
+  <div class="card">
+    <div class="card-title">🎨 App icons needed</div>
+    <p>Create these PNG files and place them in <span class="inline-code">/public/icons/</span>. Use a tool like Figma or the free <a href="https://maskable.app" style="color:var(--gold)">maskable.app</a> to ensure the icon works as a maskable icon on Android.</p>
+    <div class="compat-row"><div class="compat-label"><span class="inline-code">icon-192.png</span> — 192×192px</div><span class="badge android">Android home screen</span></div>
+    <div class="compat-row"><div class="compat-label"><span class="inline-code">icon-512.png</span> — 512×512px</div><span class="badge android">Android splash screen</span></div>
+    <div class="compat-row"><div class="compat-label"><span class="inline-code">apple-touch-icon.png</span> — 180×180px</div><span class="badge ios">iOS home screen</span></div>
+    <div class="compat-row"><div class="compat-label"><span class="inline-code">favicon.ico</span> — 32×32px</div><div style="color:var(--text3);font-size:11px;">Browser tab</div></div>
+  </div>
+
+  <h3>Step 3 — Service Worker</h3>
+  <div class="card">
+    <div class="card-title">⚙️ sw.js — Service Worker</div>
+    <p>Create this file at <span class="inline-code">/public/sw.js</span>. It handles offline caching and background push notifications. Then uncomment the registration line in both HTML files.</p>
+    <pre>const CACHE_NAME = 'arivo-v1';
+const STATIC_ASSETS = [
+  '/',
+  '/guest/',
+  '/dashboard/',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
+];
+
+// Install — cache static assets
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
+  );
+  self.skipWaiting();
+});
+
+// Activate — clean old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+// Fetch — serve from cache, fall back to network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request))
+  );
+});
+
+// Push — show notification when server sends a push
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Arivo';
+  const options = {
+    body: data.body || 'New notification',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: data.tag || 'arivo-notif',
+    data: { url: data.url || '/dashboard/' },
+    requireInteraction: data.urgent || false
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Notification click — open the dashboard
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data.url || '/dashboard/')
+  );
+});</pre>
+  </div>
+
+  <h3>Step 4 — Server-side Push Notifications</h3>
+  <div class="card">
+    <div class="card-title">🔔 Web Push setup (Node.js / Supabase Edge Function)</div>
+    <p>Use the <span class="inline-code">web-push</span> npm package to send push notifications from your server when a guest submits a request. This is what actually reaches the staff device even when the browser is closed.</p>
+    <pre># Install
+npm install web-push
+
+# Generate VAPID keys (run once, store securely)
+npx web-push generate-vapid-keys</pre>
+    <pre>// server/push.js
+const webPush = require('web-push');
+
+webPush.setVapidDetails(
+  'mailto:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="99eaece9e9f6ebedd9eaedf8e0f6eab7f8e9e9">[email&#160;protected]</a>',
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
+
+// Call this when a guest submits a request
+async function notifyStaff(subscription, requestTitle, roomNumber) {
+  const payload = JSON.stringify({
+    title: '🛎 New Guest Request',
+    body: `${requestTitle} — Room ${roomNumber}`,
+    tag: 'req-' + Date.now(),
+    url: '/dashboard/requests'
+  });
+  try {
+    await webPush.sendNotification(subscription, payload);
+  } catch (err) {
+    console.error('Push failed:', err);
+    // If subscription expired, remove it from database
+    if (err.statusCode === 410) {
+      await db.deleteSubscription(subscription.endpoint);
+    }
+  }
+}</pre>
+    <p>The <span class="inline-code">subscription</span> object is generated in the browser when the manager clicks "Enable notifications" and must be stored in your database (Supabase) per hotel. When any guest at that hotel submits a request, look up the hotel's subscription and send the push.</p>
+  </div>
+
+  <h3>Step 5 — Saving Push Subscriptions</h3>
+  <div class="card">
+    <div class="card-title">💾 Store subscription in Supabase</div>
+    <p>In the dashboard JS, after the manager clicks Enable, save their subscription to the database so the server can push to them even when the tab is closed.</p>
+    <pre>// In dashboard HTML — update requestNotifPermission()
+async function requestNotifPermission() {
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') return;
+
+  // Register service worker first
+  const reg = await navigator.serviceWorker.ready;
+
+  // Subscribe to push
+  const subscription = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+
+  // Save to Supabase
+  await fetch('/api/push-subscription', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      hotelId: HOTEL_ID,
+      subscription: subscription.toJSON()
+    })
+  });
+
+  notifGranted = true;
+  toast('🔔 Push notifications enabled');
+}
+
+// Helper
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+}</pre>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMPATIBILITY -->
+  <h2>iOS & Android compatibility</h2>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="badge ios">iOS</span> iPhone / iPad</div>
+      <div class="compat-row"><div class="compat-label">Add to Home Screen</div><span class="badge done">✓ iOS 11.3+</span></div>
+      <div class="compat-row"><div class="compat-label">Full screen (no browser bar)</div><span class="badge done">✓ iOS 11.3+</span></div>
+      <div class="compat-row"><div class="compat-label">Custom app icon</div><span class="badge done">✓ iOS 11.3+</span></div>
+      <div class="compat-row"><div class="compat-label">Offline caching</div><span class="badge done">✓ iOS 11.3+</span></div>
+      <div class="compat-row"><div class="compat-label">Push notifications</div><span class="badge done">✓ iOS 16.4+</span></div>
+      <div class="compat-row"><div class="compat-label">Safe area / notch support</div><span class="badge done">✓ All modern</span></div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.6;">
+        ⚠️ On iOS, the user must use Safari and tap "Add to Home Screen" manually. Chrome on iOS does not support PWA install prompts. Include an "Add to Home Screen" guide in your hotel onboarding.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge android">Android</span> Android phones</div>
+      <div class="compat-row"><div class="compat-label">Install prompt (automatic)</div><span class="badge done">✓ Chrome 68+</span></div>
+      <div class="compat-row"><div class="compat-label">Full screen (no browser bar)</div><span class="badge done">✓ Chrome 68+</span></div>
+      <div class="compat-row"><div class="compat-label">Custom app icon + splash</div><span class="badge done">✓ Chrome 68+</span></div>
+      <div class="compat-row"><div class="compat-label">Offline caching</div><span class="badge done">✓ Chrome 68+</span></div>
+      <div class="compat-row"><div class="compat-label">Push notifications</div><span class="badge done">✓ Chrome 42+</span></div>
+      <div class="compat-row"><div class="compat-label">Background push (tab closed)</div><span class="badge done">✓ Chrome 68+</span></div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.6;">
+        ✅ Android Chrome shows an automatic "Add to Home Screen" install banner when the PWA criteria are met (HTTPS + manifest + service worker). This is the smoothest install experience.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- IMPORTANT NOTES -->
+  <h2>Important notes for engineers</h2>
+
+  <div class="card">
+    <div class="card-title">🔒 HTTPS required</div>
+    <p>PWA features — including service workers, push notifications, and the install prompt — only work over <strong>HTTPS</strong>. Localhost is the only exception during development. Make sure your production domain has a valid SSL certificate (Cloudflare or Let's Encrypt are both free).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 "Add to Home Screen" instructions for hotels</div>
+    <p>Hotels need to know how to tell their staff to install the dashboard as an app. Include this in your onboarding email:</p>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;margin-top:8px;">
+      <p style="color:var(--text);font-size:12px;font-weight:500;margin-bottom:8px;">For iPhone (Safari only):</p>
+      <p style="font-size:12px;margin-bottom:4px;">1. Open dashboard.arivo.app in Safari</p>
+      <p style="font-size:12px;margin-bottom:4px;">2. Tap the Share button (box with arrow)</p>
+      <p style="font-size:12px;margin-bottom:0;">3. Tap "Add to Home Screen" → "Add"</p>
+    </div>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;margin-top:8px;">
+      <p style="color:var(--text);font-size:12px;font-weight:500;margin-bottom:8px;">For Android (Chrome):</p>
+      <p style="font-size:12px;margin-bottom:4px;">1. Open dashboard.arivo.app in Chrome</p>
+      <p style="font-size:12px;margin-bottom:4px;">2. Tap the banner "Add Arivo to Home Screen" or</p>
+      <p style="font-size:12px;margin-bottom:0;">3. Tap ⋮ menu → "Add to Home Screen"</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Recommended tech stack for production</div>
+    <div class="compat-row"><div class="compat-label">Frontend framework</div><div style="font-size:12px;color:var(--text2);">React + Vite (replace HTML prototype)</div></div>
+    <div class="compat-row"><div class="compat-label">Backend / API</div><div style="font-size:12px;color:var(--text2);">Node.js + Supabase</div></div>
+    <div class="compat-row"><div class="compat-label">Database</div><div style="font-size:12px;color:var(--text2);">Supabase (Postgres + Realtime)</div></div>
+    <div class="compat-row"><div class="compat-label">Push notifications</div><div style="font-size:12px;color:var(--text2);">web-push npm package + VAPID keys</div></div>
+    <div class="compat-row"><div class="compat-label">Payments</div><div style="font-size:12px;color:var(--text2);">Stripe</div></div>
+    <div class="compat-row"><div class="compat-label">WhatsApp</div><div style="font-size:12px;color:var(--text2);">WhatsApp Business API (via 360dialog or Twilio)</div></div>
+    <div class="compat-row"><div class="compat-label">AI Concierge</div><div style="font-size:12px;color:var(--text2);">Anthropic Claude API (claude-sonnet-4-20250514)</div></div>
+    <div class="compat-row"><div class="compat-label">Hosting</div><div style="font-size:12px;color:var(--text2);">Vercel or Netlify (both support HTTPS + edge functions)</div></div>
+    <div class="compat-row"><div class="compat-label">Domain</div><div style="font-size:12p

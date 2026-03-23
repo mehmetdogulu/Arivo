@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Cookie Policy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --forest: #1E3A2F; --gold: #B8933F; --gold-light: #D4AF6A; --cream: #F8F4ED; --cream-dark: #EDE6D4; --charcoal: #1A1A1A; --muted: #6B6355; --white: #FEFCF8; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); line-height: 1.7; }
+  .header { background: var(--forest); padding: 56px 80px 48px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; border-radius: 50%; background: rgba(184,147,63,0.1); }
+  .doc-type { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 12px; font-weight: 500; }
+  .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; color: #FEFCF8; line-height: 1.1; margin-bottom: 20px; }
+  .doc-title em { font-style: italic; color: var(--gold-light); }
+  .doc-meta { display: flex; gap: 40px; flex-wrap: wrap; }
+  .doc-meta-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+  .doc-meta-value { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 300; }
+  .content { max-width: 860px; margin: 0 auto; padding: 64px 60px 100px; }
+  .intro-box { background: rgba(184,147,63,0.08); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 20px 24px; margin-bottom: 48px; font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.7; }
+  .intro-box strong { color: var(--charcoal); font-weight: 600; }
+  .clause { margin-bottom: 40px; }
+  .clause-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--cream-dark); }
+  .clause-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--gold); flex-shrink: 0; line-height: 1; }
+  .clause-title { font-size: 16px; font-weight: 600; color: var(--forest); }
+  .clause p { font-size: 13px; color: var(--charcoal); font-weight: 300; line-height: 1.75; margin-bottom: 12px; }
+  .clause ul { margin: 10px 0 14px 24px; font-size: 13px; color: var(--charcoal); font-weight: 300; line-height: 1.75; }
+  .clause li { margin-bottom: 6px; }
+  .clause strong { font-weight: 600; }
+  .cookie-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+  .cookie-table th { background: var(--forest); color: var(--gold-light); padding: 10px 14px; text-align: left; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+  .cookie-table td { padding: 10px 14px; border-bottom: 1px solid var(--cream-dark); vertical-align: top; color: var(--charcoal); font-weight: 300; line-height: 1.5; }
+  .cookie-table tr:nth-child(even) td { background: var(--white); }
+  .cookie-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .ct-essential { background: rgba(44,80,64,0.1); color: var(--forest); }
+  .ct-functional { background: rgba(74,111,165,0.15); color: #2D5A8E; }
+  .ct-analytics { background: rgba(184,147,63,0.15); color: #7A5E1A; }
+  .ct-third { background: rgba(122,74,122,0.12); color: #5A2D5A; }
+  .category-block { background: var(--white); border-radius: 14px; padding: 22px; border: 1px solid var(--cream-dark); margin-bottom: 16px; }
+  .cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .cat-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .cat-name { font-size: 14px; font-weight: 600; color: var(--forest); }
+  .cat-consent { font-size: 11px; color: var(--muted); }
+  .cat-desc { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.55; }
+  .manage-btn { display: inline-block; background: var(--forest); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 24px; }
+  .note { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--cream-dark); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="doc-type">Legal Document</div>
+  <div class="doc-title">Cookie <em>Policy</em></div>
+  <div class="doc-meta">
+    <div class="doc-meta-item"><div class="doc-meta-label">Version</div><div class="doc-meta-value">1.0</div></div>
+    <div class="doc-meta-item"><div class="doc-meta-label">Effective Date</div><div class="doc-meta-value">March 2026</div></div>
+    <div class="doc-meta-item"><div class="doc-meta-label">Frameworks</div><div class="doc-meta-value">UK PECR · EU ePrivacy Directive · UK GDPR · EU GDPR</div></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="intro-box">
+    <strong>Cookies explained simply.</strong> Cookies are small text files placed on your device when you use the Arivo app or admin panel. Some cookies are essential for the app to work. Others help us understand how it is being used so we can improve it. We will always ask for your consent before placing non-essential cookies.
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">1</div><div class="clause-title">What Are Cookies?</div></div>
+    <p>Cookies are small data files stored on your browser or device. They help websites and apps remember information about your visit — such as your session, preferences, or language setting.</p>
+    <p>We also use similar technologies including <strong>local storage</strong> and <strong>session tokens</strong>. All references to "cookies" in this policy include these similar technologies.</p>
+    <p>The Arivo guest app is a web application accessed via a browser. As such, it uses cookies governed by the UK Privacy and Electronic Communications Regulations (PECR) and the EU ePrivacy Directive, in addition to UK/EU GDPR.</p>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">2</div><div class="clause-title">Cookie Categories We Use</div></div>
+
+    <div class="category-block">
+      <div class="cat-header">
+        <div class="cat-badge" style="background:rgba(44,80,64,0.1);">🔒</div>
+        <div>
+          <div class="cat-name">Strictly Necessary Cookies</div>
+          <div class="cat-consent">No consent required — these are essential for the app to function</div>
+        </div>
+      </div>
+      <div class="cat-desc">These cookies are required for the Arivo app and admin panel to operate. Without them, core features such as logging in, maintaining your session, and processing requests would not work. You cannot opt out of these cookies while using the service.</div>
+    </div>
+
+    <div class="category-block">
+      <div class="cat-header">
+        <div class="cat-badge" style="background:rgba(74,111,165,0.12);">⚙️</div>
+        <div>
+          <div class="cat-name">Functional Cookies</div>
+          <div class="cat-consent">Consent required</div>
+        </div>
+      </div>
+      <div class="cat-desc">These cookies remember your preferences, such as language settings or whether you have already viewed the welcome message during your stay. They improve your experience but are not essential.</div>
+    </div>
+
+    <div class="category-block">
+      <div class="cat-header">
+        <div class="cat-badge" style="background:rgba(184,147,63,0.12);">📊</div>
+        <div>
+          <div class="cat-name">Analytics Cookies</div>
+          <div class="cat-consent">Consent required</div>
+        </div>
+      </div>
+      <div class="cat-desc">These cookies help us understand how guests and hotel operators use the Arivo app — for example, which features are most used, how long sessions last, and where errors occur. All analytics data is anonymised and used only to improve the platform. We do not use third-party advertising analytics.</div>
+    </div>
+
+    <div class="category-block">
+      <div class="cat-header">
+        <div class="cat-badge" style="background:rgba(122,74,122,0.1);">🔗</div>
+        <div>
+          <div class="cat-name">Third-Party Cookies</div>
+          <div class="cat-consent">Consent required — set by our sub-processors</div>
+        </div>
+      </div>
+      <div class="cat-desc">Some third-party services we use may set their own cookies. We do not use any advertising networks. The only third-party cookies we permit are from Stripe (payment session) and any analytics tools we integrate. These are listed in the full cookie table below.</div>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">3</div><div class="clause-title">Full Cookie Register</div></div>
+    <table class="cookie-table">
+      <thead>
+        <tr><th>Cookie Name</th><th>Provider</th><th>Type</th><th>Purpose</th><th>Duration</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>arivo_session</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-essential">Essential</span></td>
+          <td>Maintains your authenticated session in the admin panel or guest app</td>
+          <td>Session (deleted on close)</td>
+        </tr>
+        <tr>
+          <td><strong>arivo_csrf</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-essential">Essential</span></td>
+          <td>Security token to prevent cross-site request forgery attacks</td>
+          <td>Session</td>
+        </tr>
+        <tr>
+          <td><strong>arivo_consent</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-essential">Essential</span></td>
+          <td>Records your cookie consent choices so you are not asked on every visit</td>
+          <td>12 months</td>
+        </tr>
+        <tr>
+          <td><strong>arivo_lang</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-functional">Functional</span></td>
+          <td>Remembers your language preference</td>
+          <td>12 months</td>
+        </tr>
+        <tr>
+          <td><strong>arivo_welcome_seen</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-functional">Functional</span></td>
+          <td>Remembers whether the guest has already viewed the welcome screen during their stay</td>
+          <td>Duration of stay</td>
+        </tr>
+        <tr>
+          <td><strong>arivo_analytics</strong></td>
+          <td>Arivo</td>
+          <td><span class="cookie-type ct-analytics">Analytics</span></td>
+          <td>Anonymised session analytics — pages visited, feature usage, error tracking</td>
+          <td>30 days</td>
+        </tr>
+        <tr>
+          <td><strong>__stripe_mid</strong></td>
+          <td>Stripe Inc.</td>
+          <td><span class="cookie-type ct-third">Third-Party</span></td>
+          <td>Stripe fraud detection and payment session security</td>
+          <td>12 months</td>
+        </tr>
+        <tr>
+          <td><strong>__stripe_sid</strong></td>
+          <td>Stripe Inc.</td>
+          <td><span class="cookie-type ct-third">Third-Party</span></td>
+          <td>Stripe payment session identifier</td>
+          <td>Session</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;font-weight:300;">We review and update this register whenever we add or remove cookies from the platform. Last reviewed: March 2026.</p>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">4</div><div class="clause-title">Your Cookie Choices</div></div>
+    <p>When you first use the Arivo app or admin panel, you will be shown a cookie consent banner. You can choose to accept all cookies, accept only essential cookies, or customise your preferences.</p>
+    <p>You can change your cookie preferences at any time by clicking the <strong>"Cookie Settings"</strong> link in the footer of the app.</p>
+    <p>You can also control cookies through your browser settings. Note that disabling all cookies may affect the functionality of the app. Instructions for common browsers:</p>
+    <ul>
+      <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies</li>
+      <li><strong>Safari:</strong> Preferences → Privacy → Manage Website Data</li>
+      <li><strong>Firefox:</strong> Options → Privacy &amp; Security → Cookies and Site Data</li>
+      <li><strong>Edge:</strong> Settings → Cookies and Site Permissions</li>
+    </ul>
+    <p>For mobile browsers, cookie controls are typically found in your device's browser settings or the browser app's settings menu.</p>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">5</div><div class="clause-title">No Advertising or Tracking</div></div>
+    <p>Arivo does not use advertising cookies, tracking pixels, or any technology designed to profile you for marketing purposes. We do not participate in any advertising networks.</p>
+    <p>The Arivo platform and guest app are ad-free by design.</p>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">6</div><div class="clause-title">Changes to This Policy</div></div>
+    <p>We will update this Cookie Policy whenever we change the cookies we use. Where we add new non-essential cookies, we will seek your consent again via the cookie consent banner. The effective date at the top of this policy reflects when it was last updated.</p>
+  </div>
+
+  <div class="clause">
+    <div class="clause-header"><div class="clause-num">7</div><div class="clause-title">Contact Us</div></div>
+    <p>If you have questions about our use of cookies, please contact us at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b6c6c4dfc0d7d5cff6c5c2d7cfd9c598d5d9db">[email&#160;protected]</a></strong> or write to Arivo Ltd at our registered address.</p>
+    <p>For complaints about our use of cookies, you can contact the <strong>Information Commissioner's Office (ICO)</strong> at ico.org.uk or your local EU data protection authority.</p>
+  </div>
+
+  <p class="note">This Cookie Policy is a working draft for internal review. Cookie names and 

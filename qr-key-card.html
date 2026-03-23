@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — QR Key Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#E8E4DC; min-height:100vh; padding:40px 20px; }
+
+  .page-title {
+    text-align:center; margin-bottom:32px;
+    font-family:'Cormorant Garamond',serif;
+    font-size:28px; color:#1E3A2F; font-weight:300;
+  }
+  .page-title span { color:#B8933F; font-style:italic; }
+
+  .controls {
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    margin-bottom:32px;
+  }
+  .ctrl-btn {
+    background:#1E3A2F; color:white; border:none; border-radius:10px;
+    padding:10px 20px; font-family:'DM Sans',sans-serif; font-size:13px;
+    font-weight:500; cursor:pointer; transition:background 0.15s;
+  }
+  .ctrl-btn:hover { background:#2C5040; }
+  .ctrl-btn.secondary { background:white; color:#1E3A2F; border:1px solid #C4BDB0; }
+  .ctrl-btn.gold { background:#B8933F; }
+
+  /* Edit panel */
+  .edit-panel {
+    background:white; border-radius:16px; padding:24px;
+    max-width:520px; margin:0 auto 32px; display:none;
+    border:1px solid #DDD8CE;
+    box-shadow:0 4px 20px rgba(0,0,0,0.06);
+  }
+  .edit-panel.open { display:block; }
+  .edit-title { font-size:14px; font-weight:600; color:#1E3A2F; margin-bottom:16px; }
+  .edit-row { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  .edit-row label { font-size:11px; font-weight:500; color:#7A7060; text-transform:uppercase; letter-spacing:1.5px; width:120px; flex-shrink:0; }
+  .edit-row input { flex:1; border:1.5px solid #E8E4DC; border-radius:8px; padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:#1A1A1A; outline:none; min-width:140px; }
+  .edit-row input:focus { border-color:#1E3A2F; }
+
+  /* Cards grid */
+  .cards-grid {
+    display:flex; flex-wrap:wrap; gap:24px; justify-content:center;
+    max-width:900px; margin:0 auto;
+  }
+
+  /* THE CARD — A6 size (105mm × 148mm at 96dpi = 397×559px) */
+  .key-card {
+    width:377px; height:530px;
+    background:white; border-radius:18px;
+    overflow:hidden; position:relative;
+    box-shadow:0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    flex-shrink:0;
+  }
+
+  /* Forest top band */
+  .card-top {
+    background:#1E3A2F; height:170px;
+    position:relative; overflow:hidden;
+    padding:28px 26px 20px;
+  }
+  .card-top::before {
+    content:''; position:absolute;
+    top:-50px; right:-50px;
+    width:180px; height:180px; border-radius:50%;
+    background:rgba(184,147,63,0.12);
+  }
+  .card-top::after {
+    content:''; position:absolute;
+    bottom:-30px; left:-20px;
+    width:120px; height:120px; border-radius:50%;
+    background:rgba(255,255,255,0.04);
+  }
+  .card-hotel-label {
+    font-size:8px; letter-spacing:3px; text-transform:uppercase;
+    color:rgba(212,175,106,0.7); font-weight:500; margin-bottom:6px;
+    position:relative; z-index:1;
+  }
+  .card-hotel-name {
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px; font-weight:300; color:white;
+    line-height:1.1; position:relative; z-index:1;
+  }
+  .card-hotel-name em { font-style:italic; color:#D4AF6A; }
+  .card-tagline {
+    font-size:10px; color:rgba(255,255,255,0.45);
+    margin-top:6px; font-weight:300; position:relative; z-index:1;
+  }
+
+  /* Middle content */
+  .card-middle {
+    padding:20px 24px 16px;
+    display:flex; gap:18px; align-items:flex-start;
+  }
+  .card-qr-wrap {
+    width:100px; height:100px; background:#F5F0E8;
+    border-radius:12px; padding:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card-qr-wrap svg { width:84px; height:84px; }
+  .card-info { flex:1; padding-top:4px; }
+  .card-welcome {
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px; font-weight:400; color:#1E3A2F;
+    line-height:1.2; margin-bottom:6px;
+  }
+  .card-welcome em { font-style:italic; color:#B8933F; }
+  .card-desc {
+    font-size:11px; color:#7A7060; font-weight:300;
+    line-height:1.55;
+  }
+  .card-desc strong { color:#1E3A2F; font-weight:500; }
+
+  /* Steps */
+  .card-steps {
+    padding:0 24px 16px;
+  }
+  .card-steps-title {
+    font-size:8px; letter-spacing:2.5px; text-transform:uppercase;
+    color:#B8933F; font-weight:500; margin-bottom:10px;
+  }
+  .card-step {
+    display:flex; gap:10px; align-items:flex-start; margin-bottom:8px;
+  }
+  .step-num {
+    width:18px; height:18px; background:#1E3A2F; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:8px; font-weight:700; color:white; flex-shrink:0; margin-top:1px;
+  }
+  .step-text { font-size:10px; color:#5A5248; font-weight:300; line-height:1.5; flex:1; }
+  .step-text strong { font-weight:500; color:#1A1A1A; }
+
+  /* Divider */
+  .card-divider { height:1px; background:#EDE6D6; margin:0 24px 14px; }
+
+  /* Footer */
+  .card-footer {
+    padding:0 24px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card-url {
+    font-family:monospace; font-size:9px; color:#B8933F;
+    background:#FDF8F0; padding:4px 8px; border-radius:6px;
+    border:1px solid rgba(184,147,63,0.2);
+  }
+  .card-powered {
+    font-size:8px; color:#C4BDB0; letter-spacing:1px; text-transform:uppercase;
+  }
+  .card-powered span { color:#B8933F; }
+
+  /* Gold line at bottom */
+  .card-line {
+    position:absolute; bottom:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg, #B8933F, #D4AF6A, transparent);
+  }
+
+  /* Room variant */
+  .key-card.room-variant .card-top { background:#2C4A3E; }
+  .key-card.room-variant .card-top::before { background:rgba(212,175,106,0.15); }
+
+  /* Print styles */
+  @media print {
+    body { background:white; padding:0; }
+    .controls, .edit-panel, .page-title { display:none !important; }
+    .cards-grid { gap:10mm; justify-content:flex-start; }
+    .key-card { box-shadow:none; border:0.5pt solid #DDD; page-break-inside:avoid; }
+    @page { size:A4; margin:15mm; }
+  }
+
+  /* Responsive */
+  @media (max-width:420px) {
+    .key-card { width:calc(100vw - 40px); height:auto; min-height:500px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">QR Key Card — <span>Print & Hand to Guests</span></div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="window.print()">🖨 Print Cards</button>
+  <button class="ctrl-btn secondary" onclick="toggleEdit()">✏️ Customise</button>
+  <button class="ctrl-btn gold" onclick="addCard()">+ Add Card</button>
+</div>
+
+<!-- Edit panel -->
+<div class="edit-panel" id="edit-panel">
+  <div class="edit-title">Customise card content</div>
+  <div class="edit-row">
+    <label>Hotel Name</label>
+    <input id="e-hotel" value="The Maison" oninput="updateCards()">
+  </div>
+  <div class="edit-row">
+    <label>Location</label>
+    <input id="e-location" value="Bath, UK" oninput="updateCards()">
+  </div>
+  <div class="edit-row">
+    <label>App URL</label>
+    <input id="e-url" value="guest.arivo.app/maison-bath" oninput="updateCards()">
+  </div>
+  <div class="edit-row">
+    <label>WiFi Name</label>
+    <input id="e-wifi" value="TheMaison_Guest" oninput="updateCards()">
+  </div>
+  <div class="edit-row">
+    <label>WiFi Password</label>
+    <input id="e-pass" value="maison2026" oninput="updateCards()">
+  </div>
+</div>
+
+<!-- Cards -->
+<div class="cards-grid" id="cards-grid">
+
+  <!-- Card 1 — Standard -->
+  <div class="key-card" id="card-1">
+    <div class="card-top">
+      <div class="card-hotel-label" data-field="label">The Maison · Bath, UK</div>
+      <div class="card-hotel-name">Your stay,<br><em>your companion</em></div>
+      <div class="card-tagline">Everything you need, right in your pocket</div>
+    </div>
+    <div class="card-middle">
+      <div class="card-qr-wrap">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="8" width="34" height="34" fill="none" stroke="#1E3A2F" stroke-width="3.5"/>
+          <rect x="15" y="15" width="20" height="20" fill="#1E3A2F"/>
+          <rect x="58" y="8" width="34" height="34" fill="none" stroke="#1E3A2F" stroke-width="3.5"/>
+          <rect x="65" y="15" width="20" height="20" fill="#1E3A2F"/>
+          <rect x="8" y="58" width="34" height="34" fill="none" stroke="#1E3A2F" stroke-width="3.5"/>
+          <rect x="15" y="65" width="20" height="20" fill="#1E3A2F"/>
+          <rect x="58" y="58" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="71" y="58" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="83" y="58" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="58" y="71" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="83" y="71" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="58" y="83" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="71" y="83" width="9" height="9" fill="#1E3A2F"/>
+          <rect x="46" y="8" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="46" y="20" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="46" y="32" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="8" y="46" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="20" y="46" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="32" y="46" width="8" height="8" fill="#1E3A2F"/>
+          <rect x="46" y="46" width="8" height="8" fill="#B8933F"/>
+        </svg>
+      </div>
+      <div class="card-info">
+        <div class="card-welcome">Scan to access<br>your <em>stay app</em></div>
+        <div class="card-desc">
+          Local tips, room service, WiFi details, and your personal AI concierge — all in one place. No app download needed.
+        </div>
+      </div>
+    </div>
+
+    <div class="card-steps">
+      <div class="card-steps-title">How to get started</div>
+      <div class="card-step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Point your camera</strong> at the QR code above</div>
+      </div>
+      <div class="card-step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Enter your name</strong> and room number</div>
+      </div>
+      <div class="card-step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Enjoy your stay</strong> — everything you need is right there</div>
+      </div>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-footer">
+      <div>
+        <div class="card-url" data-field="url">guest.arivo.app/maison-bath</div>
+        <div style="font-size:8px;color:#B8B0A4;margin-top:4px;" data-field="wifi">WiFi: TheMaison_Guest · maison2026</div>
+      </div>
+      <div class="card-powered">Powered by <span>Arivo</span></div>
+    </div>
+    <div class="card-line"></div>
+  </div>
+
+  <!-- Card 2 — Compact WiFi focus -->
+  <div class="key-card room-variant" id="card-2">
+    <div class="card-top">
+      <div class="card-hotel-label" data-field="label">The Maison · Bath, UK</div>
+      <div class="card-hotel-name"><em>Welcome.</em><br>You're all set.</div>
+      <div class="card-tagline">Your room, your way</div>
+    </div>
+    <div class="card-middle">
+      <div class="card-qr-wrap">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="8" width="34" height="34" fill="none" stroke="#2C4A3E" stroke-width="3.5"/>
+          <rect x="15" y="15" width="20" height="20" fill="#2C4A3E"/>
+          <rect x="58" y="8" width="34" height="34" fill="none" stroke="#2C4A3E" stroke-width="3.5"/>
+          <rect x="65" y="15" width="20" height="20" fill="#2C4A3E"/>
+          <rect x="8" y="58" width="34" height="34" fill="none" stroke="#2C4A3E" stroke-width="3.5"/>
+          <rect x="15" y="65" width="20" height="20" fill="#2C4A3E"/>
+          <rect x="60" y="60" width="36" height="36" fill="none" stroke="#2C4A3E" stroke-width="2"/>
+          <rect x="67" y="67" width="22" height="22" fill="#2C4A3E" opacity="0.2"/>
+          <rect x="73" y="73" width="10" height="10" fill="#2C4A3E"/>
+          <rect x="46" y="8" width="8" height="8" fill="#2C4A3E"/>
+          <rect x="46" y="24" width="8" height="8" fill="#2C4A3E"/>
+          <rect x="8" y="46" width="8" height="8" fill="#2C4A3E"/>
+          <rect x="24" y="46" width="8" height="8" fill="#2C4A3E"/>
+          <rect x="46" y="46" width="8" height="8" fill="#B8933F"/>
+        </svg>
+      </div>
+      <div class="card-info">
+        <div class="card-welcome">Your <em>digital</em><br>welcome book</div>
+        <div class="card-desc">
+          Scan to instantly access hotel info, make requests, explore local recommendations, and chat with your AI concierge.
+        </div>
+      </div>
+    </div>
+
+    <div class="card-steps">
+      <div class="card-steps-title">Quick access</div>
+      <div class="card-step">
+        <div class="step-num">📶</div>
+        <div class="step-text">WiFi: <strong data-field="wifi-name">TheMaison_Guest</strong> · Password: <strong data-field="wifi-pass">maison2026</strong></div>
+      </div>
+      <div class="card-step">
+        <div class="step-num">🕐</div>
+        <div class="step-text">Checkout <strong>11:00 AM</strong> · Breakfast <strong>8–10 AM</strong></div>
+      </div>
+      <div class="card-step">
+        <div class="step-num">🛎</div>
+        <div class="step-text">Need anything? <strong>Scan the QR</strong> or dial <strong>0</strong> for reception</div>
+      </div>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-footer">
+      <div class="card-url" data-field="url">guest.arivo.app/maison-bath</div>
+      <div class="card-powered">Powered by <span>Arivo</span></div>
+    </div>
+    <div class="card-line"></div>
+  </div>
+
+</div>
+
+<script>
+function toggleEdit() {
+  var panel = document.getElementById('edit-panel');
+  panel.classList.toggle('open');
+}
+
+function updateCards() {
+  var hotel = document.getElementById('e-hotel').value;
+  var loc = document.getElementById('e-location').value;
+  var url = document.getElementById('e-url').value;
+  var wifi = document.getElementById('e-wifi').value;
+  var pass = document.getElementById('e-pass').value;
+
+  // Update all label fields
+  document.querySelectorAll('[data-field="label"]').forEach(function(el) {
+    el.textContent = hotel + ' \u00b7 ' + loc;
+  });
+  document.querySelectorAll('[data-field="url"]').forEach(function(el) {
+    el.textContent = url;
+  });
+  document.querySelectorAll('[data-field="wifi"]').forEach(function(el) {
+    el.textContent = 'WiFi: ' + wifi + ' \u00b7 ' + pass;
+  });
+  document.querySelectorAll('[data-field="wifi-name"]').forEach(function(el) {
+    el.textContent = wifi;
+  });
+  document.querySelectorAll('[data-field="wifi-pass"]').forEach(function(el) {
+    el.textContent = pass;
+  });
+}
+
+function addCard() {
+  alert('In the production version, this generates a new card variant. For now, print the two existing cards — they cover the main use cases.');
+}
+</script>
+</body>
+</html>
