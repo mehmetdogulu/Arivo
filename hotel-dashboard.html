@@ -619,6 +619,7 @@ function loadAll() {
   loadGuests();
   loadRequests();
   loadSettings();
+  loadAvgRating();
 }
 
 // ── GUESTS ──
@@ -1095,6 +1096,18 @@ function delRoomRow(btn) {
   row.remove(); saveRooms();
 }
 
+function loadAvgRating() {
+  if (!db) return;
+  db.from('ratings').select('stars').eq('hotel_id', HOTEL_ID).then(function(r) {
+    if (r.data && r.data.length) {
+      var avg = (r.data.reduce(function(s,x){return s+x.stars;},0) / r.data.length).toFixed(1);
+      document.getElementById('savg').textContent = avg;
+    } else {
+      document.getElementById('savg').textContent = '-';
+    }
+  });
+}
+
 // ── REAL-TIME ──
 function subscribeToAll() {
   if (!db) { setTimeout(subscribeToAll, 300); return; }
@@ -1123,8 +1136,7 @@ function subscribeToAll() {
       }
       db.from('ratings').select('stars').eq('hotel_id', HOTEL_ID).then(function(r) {
         if (r.data && r.data.length) document.getElementById('savg').textContent = (r.data.reduce(function(s, x) { return s + x.stars; }, 0) / r.data.length).toFixed(1);
-      });
-    })
+      });    })
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:'hotel_id=eq.' + HOTEL_ID}, function(payload) {
       if (payload.new.direction === 'guest_to_hotel') {
         toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
