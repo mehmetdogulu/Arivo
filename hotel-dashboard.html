@@ -672,9 +672,10 @@ function loadData(){
       var dotcls=req.status==='claimed'?'cl':'nw';
       var badgecls=req.status==='claimed'?'cl':'nw';
       var badgetxt=req.status==='claimed'?'Claimed':'New';
+      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="window.open(\''+req.photo_url+'\')">&#128247; Photo</button>':'';
       html+='<div class="row" id="req-'+req.id+'"><div class="dot '+dotcls+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+req.detail.slice(0,50)+'</div></div><div class="badge '+badgecls+'">'+badgetxt+'</div>';
       if(req.status==='new')html+='<button class="btn btn-s" onclick="claimReq(this)">Claim</button>';
-      html+='<button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
+      html+=photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
     });
     list.innerHTML=html;
     // Overview shows first 3
