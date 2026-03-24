@@ -413,7 +413,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div class="sec" id="s-set">
-  <div class="sech"><div class="secr"><div><div class="sect">Settings</div><div class="secs">Hotel profile, features &amp; staff</div></div><button class="btn btn-g" onclick="toast('Settings saved')">Save All</button></div></div>
+  <div class="sech"><div class="secr"><div><div class="sect">Settings</div><div class="secs">Hotel profile, features &amp; staff</div></div><button class="btn btn-g" onclick="saveHotelAddress();toast('Settings saved')">Save All</button></div></div>
   <div class="card"><div class="ch"><div class="ct">Hotel Logo</div></div><div class="cb">
     <div class="logoup" onclick="document.getElementById('logo-file-input').click()">
       <div id="logo-preview" style="font-size:36px;margin-bottom:8px">&#127968;</div>
@@ -429,14 +429,14 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="trow"><div><div class="tl">Guest Feedback (Star Rating)</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     <div class="trow"><div><div class="tl">Checkout Reminders</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
   </div></div>
-  <div class="card"><div class="ch"><div class="ct">Hotel Profile</div></div><div class="cb">
-    <div class="fg"><label class="fl">Hotel Name</label><input class="fi" id="hotel-name-input" value="The Maison Collective" oninput="document.getElementById('hname').textContent=this.value;saveHotelAddress()"></div>
-    <div class="fg"><label class="fl">Street Address</label><input class="fi" id="hotel-street" value="14 Brock Street" oninput="saveHotelAddress()"></div>
+  <div class="card"><div class="ch"><div class="ct">Hotel Profile</div><button class="btn btn-g" onclick="saveHotelAddress()">Save Profile</button></div><div class="cb">
+    <div class="fg"><label class="fl">Hotel Name</label><input class="fi" id="hotel-name-input" value="The Maison Collective" oninput="document.getElementById('hname').textContent=this.value"></div>
+    <div class="fg"><label class="fl">Street Address</label><input class="fi" id="hotel-street" value="14 Brock Street" ></div>
     <div class="frow">
-      <div class="fg"><label class="fl">City</label><input class="fi" id="hotel-city" value="Bath" oninput="document.getElementById('hloc').textContent=document.querySelectorAll('#roomlist .irow').length+' rooms &middot; '+this.value+', UK';saveHotelAddress()"></div>
-      <div class="fg"><label class="fl">Postcode</label><input class="fi" id="hotel-postcode" value="BA1 2LW" style="text-transform:uppercase" oninput="saveHotelAddress()"></div>
+      <div class="fg"><label class="fl">City</label><input class="fi" id="hotel-city" value="Bath" oninput="document.getElementById('hloc').textContent=document.querySelectorAll('#roomlist .irow').length+' rooms · '+this.value+', UK'"></div>
+      <div class="fg"><label class="fl">Postcode</label><input class="fi" id="hotel-postcode" value="BA1 2LW" style="text-transform:uppercase" ></div>
     </div>
-    <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="+44 1225 000123" oninput="saveHotelAddress()"></div>
+    <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="+44 1225 000123" ></div>
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Room Manager</div><div class="ca" onclick="addRoom()">+ Add Room</div></div>
     <div id="roomlist">
