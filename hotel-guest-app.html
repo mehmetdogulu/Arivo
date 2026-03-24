@@ -309,7 +309,7 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
   </div>
   <div class="reg-form">
     <div class="privacy-note">&#128274; Your details are used only for your stay and deleted 90 days after checkout.</div>
-    <div class="fg"><label class="fl">Your Name</label><input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name"><div class="f-err" id="err-name">Please enter your name</div></div>
+    <div class="fg"><label class="fl">Your Name</label><input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" onblur="lookupGuestByName(this.value)"><div class="f-err" id="err-name">Please enter your name</div></div>
     <div class="fg"><label class="fl">Room Number</label><select class="fi" id="reg-room"><option value="">Select your room...</option></select><div class="f-hint">Select the room shown on your key card</div><div class="f-err" id="err-room">Please select your room</div></div>
     <div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="reg-checkout" type="date"><div class="f-err" id="err-checkout">Please select your check-out date</div></div>
     <button class="btn-primary" onclick="submitReg()" style="margin-top:8px;">Let's go</button>
@@ -607,7 +607,13 @@ function loadRoomDropdown(){
   fetchFromSupabase();
 }
 
-document.addEventListener('DOMContentLoaded',function(){ loadRoomDropdown(); });
+document.addEventListener('DOMContentLoaded',function(){
+  loadRoomDropdown();
+  // Try to restore previous session first
+  if(!restoreSession()){
+    // No valid session — start from consent screen (already active by default)
+  }
+});
 
 function showTab(name,el){
   document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
@@ -679,6 +685,9 @@ function submitReg(){
           if(result.data&&result.data[0]){
             guestId=result.data[0].id;
             subscribeToUpdates();
+            // Update session with real guestId
+            var sess=JSON.parse(sessionStorage.getItem('arivo_session')||'{}');
+            if(sess.name) { sess.guestId=guestId; sessionStorage.setItem('arivo_session',JSON.stringify(sess)); }
           }
           state.registering=false;
         });
@@ -697,6 +706,8 @@ function submitReg(){
   document.getElementById('chat-greeting').textContent='Hello '+fn+'! I am your personal concierge for The Maison. How can I make your stay even better?';
   startCheckoutReminders(co);
   logEvent('guest_register','Guest registered: '+name+', Room '+room+', Checkout '+co,name,room);
+  // Save session so guest can return without re-registering
+  sessionStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
   showScreen('screen-welcome');
 }
 
@@ -704,6 +715,73 @@ function submitReg(){
 
 
 var hotelSettings = {};
+
+// ── SESSION RESTORE ──
+function restoreSession(){
+  var saved = sessionStorage.getItem('arivo_session');
+  if(!saved) return false;
+  var s = JSON.parse(saved);
+  if(!s.name||!s.room||!s.checkout) return false;
+  // Check checkout hasn't passed
+  var co = new Date(s.checkout);
+  co.setHours(12,0,0,0); // grace until noon
+  if(new Date() > co){
+    sessionStorage.removeItem('arivo_session');
+    return false;
+  }
+  // Restore state
+  state.name=s.name; state.room=s.room; state.checkout=s.checkout;
+  guestId=s.guestId||null;
+  setGuestContext(s.name,s.room);
+  var d=new Date(s.checkout);
+  var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  var fn=s.name.split(' ')[0];
+  document.getElementById('w-name').textContent=fn;
+  document.getElementById('w-room').textContent=s.room;
+  document.getElementById('w-co').textContent='Checkout '+fmt;
+  document.getElementById('app-name').textContent=fn;
+  document.getElementById('app-room').textContent=s.room;
+  document.getElementById('app-co').textContent='Out '+fmt;
+  document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
+  if(!guestId&&db){
+    // Re-fetch guestId from Supabase
+    db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).eq('checked_out',false).single().then(function(r){
+      if(r.data){guestId=r.data.id;subscribeToUpdates();}
+    });
+  } else if(guestId){
+    subscribeToUpdates();
+  }
+  startCheckoutReminders(s.checkout);
+  enterApp();
+  return true;
+}
+
+// ── NAME LOOKUP — pre-fill room if guest already registered ──
+function lookupGuestByName(name){
+  name=name.trim();
+  if(!name||!db) return;
+  db.from('guests').select('id,name,room,checkout_date').eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name).single().then(function(r){
+    if(r.data&&r.data.name.toLowerCase()===name.toLowerCase()){
+      // Found — pre-fill room and checkout
+      var roomSel=document.getElementById('reg-room');
+      var coInput=document.getElementById('reg-checkout');
+      // Set room dropdown
+      Array.from(roomSel.options).forEach(function(opt){
+        if(opt.value===r.data.room){
+          opt.disabled=false; // re-enable their own room
+          roomSel.value=r.data.room;
+        }
+      });
+      // Set checkout date
+      if(r.data.checkout_date&&coInput) coInput.value=r.data.checkout_date.split('T')[0];
+      // Store guest id for reuse
+      guestId=r.data.id;
+      toast('Welcome back! Your room has been pre-filled.');
+    }
+  });
+}
+
+
 
 function enterApp(){
   showScreen('screen-app');
