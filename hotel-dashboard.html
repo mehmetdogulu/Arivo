@@ -706,6 +706,21 @@ function loadGuestList(){
     glist.innerHTML=html;
     ovglist.innerHTML=html;
     document.getElementById('sg').textContent=r.data.length;
+    // Populate sessions list
+    var sesslist=document.getElementById('sesslist');
+    if(sesslist){
+      if(r.data.length===0){
+        sesslist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No active sessions.</div>';
+      } else {
+        var shtml='';
+        r.data.forEach(function(g){
+          var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+          var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
+          shtml+='<div class="srow"><div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+g.name+' \u2014 Room '+g.room+'</div><div class="ss">Checkout '+co+'</div></div><div class="sact">Active</div><button class="btn btn-r" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="killSess(\''+g.name+'\',\''+g.id+'\')">Kill</button></div>';
+        });
+        sesslist.innerHTML=shtml;
+      }
+    }
     // Repopulate message dropdown
     var sel=document.getElementById('msgto');
     sel.innerHTML='<option value="All guests" data-guest-id="">All guests (broadcast)</option>';
@@ -1141,11 +1156,13 @@ function addStaff(){
 }
 
 // ── SESSIONS ──
-function killSess(n){
+function killSess(n,guestId){
   if(!confirm('Kill session for '+n+'? They will be signed out immediately.'))return;
   var payload=JSON.stringify({type:'kill',name:n,time:Date.now()});
   localStorage.setItem('arivo_dashboard_to_guest',payload);
   window.dispatchEvent(new StorageEvent('storage',{key:'arivo_dashboard_to_guest',newValue:payload}));
+  // Mark as checked out in Supabase
+  if(db&&guestId) db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){loadGuestList();});
   toast('Session killed for '+n);
   logEvent('session_kill','Session killed: '+n,'Manager','-');
 }
