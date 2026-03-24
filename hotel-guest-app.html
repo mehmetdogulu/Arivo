@@ -572,37 +572,36 @@ function showScreen(id){
 function loadRoomDropdown(){
   var sel=document.getElementById('reg-room');
   if(!sel) return;
-  var rooms=JSON.parse(localStorage.getItem('arivo_hotel_rooms')||'[]');
-  // Default rooms 1-22 if not set by manager yet
-  if(!rooms.length){for(var i=1;i<=22;i++) rooms.push('Room '+i);}
-  // Get occupied rooms from Supabase
-  if(db){
-    db.from('guests').select('room').eq('hotel_id',HOTEL_ID).eq('checked_out',false).then(function(r){
-      var occupied=(r.data||[]).map(function(g){return g.room;});
-      sel.innerHTML='<option value="">Select your room...</option>';
-      rooms.forEach(function(room){
-        var opt=document.createElement('option');
-        opt.value=room;
-        opt.textContent=room+(occupied.indexOf(room)>=0?' (occupied)':'');
-        if(occupied.indexOf(room)>=0) opt.disabled=true;
-        sel.appendChild(opt);
-      });
-    });
-  } else {
-    // Fallback - show all rooms
+  // Default rooms while loading
+  var defaultRooms=[];
+  for(var i=1;i<=22;i++) defaultRooms.push('Room '+i);
+  function populateRooms(rooms, occupied){
     sel.innerHTML='<option value="">Select your room...</option>';
     rooms.forEach(function(room){
       var opt=document.createElement('option');
-      opt.value=room; opt.textContent=room;
+      opt.value=room;
+      var isOccupied=occupied.indexOf(room)>=0;
+      opt.textContent=room+(isOccupied?' (occupied)':'');
+      opt.disabled=isOccupied;
       sel.appendChild(opt);
     });
   }
+  if(db){
+    // Fetch rooms and occupied guests in parallel
+    Promise.all([
+      db.from('hotel_settings').select('rooms').eq('hotel_id',HOTEL_ID).single(),
+      db.from('guests').select('room').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
+    ]).then(function(results){
+      var rooms=(results[0].data&&results[0].data.rooms&&results[0].data.rooms.length)?results[0].data.rooms:defaultRooms;
+      var occupied=(results[1].data||[]).map(function(g){return g.room;});
+      populateRooms(rooms, occupied);
+    });
+  } else {
+    populateRooms(defaultRooms, []);
+  }
 }
 
-// Reload rooms if manager updates them
-window.addEventListener('storage',function(e){
-  if(e.key==='arivo_hotel_rooms') loadRoomDropdown();
-});
+document.addEventListener('DOMContentLoaded',function(){ loadRoomDropdown(); });
 
 function showTab(name,el){
   document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
