@@ -303,8 +303,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="lf"><label>Email</label><input type="email" id="le" placeholder="manager@hotel.com" autocomplete="email"></div>
     <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')login()"></div>
     <button class="lbtn" onclick="login()">Sign In &rarr;</button>
-    <div class="lerr" id="lerr">Invalid credentials. Try manager@hotel.com / password123</div>
-    <div class="lhint">Demo: <span>manager@hotel.com</span> / <span>password123</span></div>
+    <div class="lerr" id="lerr">Invalid credentials. Try <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e535f505f595b4c7e56514a5b52105d5153">[email&#160;protected]</a> / password123</div>
+    <div class="lhint">Demo: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e535f505f595b4c7e56514a5b52105d5153">[email&#160;protected]</a></span> / <span>password123</span></div>
   </div>
 </div>
 
@@ -495,12 +495,12 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="card"><div class="ch"><div class="ct">Hotel Profile</div></div><div class="cb">
     <div class="fg"><label class="fl">Hotel Name</label><input class="fi" value="The Maison Collective" oninput="document.getElementById('hname').textContent=this.value"></div>
     <div class="fg"><label class="fl">Rooms</label><input class="fi" type="number" value="22"></div>
-    <div class="fg"><label class="fl">Street Address</label><input class="fi" value="14 Brock Street"></div>
+    <div class="fg"><label class="fl">Street Address</label><input class="fi" id="hotel-street" value="14 Brock Street" oninput="saveHotelAddress()"></div>
     <div class="frow">
-      <div class="fg"><label class="fl">City</label><input class="fi" value="Bath" oninput="document.getElementById('hloc').textContent='22 rooms &middot; '+this.value+', UK'"></div>
-      <div class="fg"><label class="fl">Postcode</label><input class="fi" value="BA1 2LW" style="text-transform:uppercase"></div>
+      <div class="fg"><label class="fl">City</label><input class="fi" id="hotel-city" value="Bath" oninput="document.getElementById('hloc').textContent='22 rooms &middot; '+this.value+', UK';saveHotelAddress()"></div>
+      <div class="fg"><label class="fl">Postcode</label><input class="fi" id="hotel-postcode" value="BA1 2LW" style="text-transform:uppercase" oninput="saveHotelAddress()"></div>
     </div>
-    <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" value="+44 1225 000123"></div>
+    <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="+44 1225 000123" oninput="saveHotelAddress()"></div>
   </div></div>
   <div class="card"><div class="ch"><div class="ct">&#128274; My Credentials</div></div><div class="cb">
     <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cname" value="James Mitchell"></div>
@@ -579,9 +579,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div id="nband"></div>
-<div id="toast"></div>
-
-<script>
+<div id="toast"></div><script>
 var openReqs = 0;
 var curBtn = null;
 var selStaff = '';
@@ -1213,6 +1211,19 @@ function initPing(){
   }catch(e){}
 }
 
+// ── HOTEL ADDRESS SYNC ──
+function saveHotelAddress(){
+  var street=document.getElementById('hotel-street')?document.getElementById('hotel-street').value:'14 Brock Street';
+  var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';
+  var postcode=document.getElementById('hotel-postcode')?document.getElementById('hotel-postcode').value.toUpperCase():'BA1 2LW';
+  var phone=document.getElementById('hotel-phone')?document.getElementById('hotel-phone').value:'+44 1225 000123';
+  var hotelName=document.getElementById('hname')?document.getElementById('hname').textContent:'The Maison Collective';
+  var address={name:hotelName,street:street,city:city,postcode:postcode,phone:phone,updated:new Date().toISOString()};
+  localStorage.setItem('arivo_hotel_address',JSON.stringify(address));
+  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_hotel_address',newValue:JSON.stringify(address)}));
+  toast('Address updated — AI will use new location');
+}
+
 // ── ACTIVITY LOGS ──
 function logEvent(action,detail,user,room){
   var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
@@ -1251,13 +1262,4 @@ function exportLogs(){
     csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
   });
   var blob=new Blob([csv],{type:'text/csv'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='arivo-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
-  toast('Log exported');
-}
-
-// ── INIT ──
-document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-</script>
-</body>
-</html>
+  var a=document.createEl
