@@ -1190,7 +1190,7 @@ async function pushGuestMessage(text){
 // Listen for real-time messages and session kills from dashboard
 function subscribeToUpdates(){
   if(!guestId) return;
-  // Listen for new messages from hotel
+  // Listen for messages addressed specifically to this guest
   db.channel('guest-messages-'+guestId)
     .on('postgres_changes', {
       event: 'INSERT',
@@ -1199,6 +1199,20 @@ function subscribeToUpdates(){
       filter: 'guest_id=eq.'+guestId
     }, function(payload){
       if(payload.new.direction === 'hotel_to_guest'){
+        showHotelMessage(payload.new.body);
+      }
+    })
+    .subscribe();
+
+  // Listen for broadcast messages (guest_id is null = sent to all guests)
+  db.channel('guest-broadcast-'+HOTEL_ID)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'hotel_id=eq.'+HOTEL_ID
+    }, function(payload){
+      if(payload.new.direction === 'hotel_to_guest' && !payload.new.guest_id){
         showHotelMessage(payload.new.body);
       }
     })
@@ -1216,7 +1230,7 @@ function subscribeToUpdates(){
     })
     .subscribe();
 
-  // Listen for request status updates
+  // Listen for request status updates for this guest only
   db.channel('guest-requests-'+guestId)
     .on('postgres_changes', {
       event: 'UPDATE',
