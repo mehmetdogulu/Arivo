@@ -796,7 +796,16 @@ function enterApp(){
   if(db){
     db.from('hotel_settings').select('address,logo_url,menu_url').eq('hotel_id',HOTEL_ID).single().then(function(r){
       if(r.data){
-        if(r.data.address) hotelSettings=r.data.address;
+        if(r.data.address){
+          hotelSettings=r.data.address;
+          // Update local tab label with real postcode
+          var aiLabel=document.querySelector('.ai-banner');
+          if(aiLabel&&r.data.address.postcode){
+            var city=r.data.address.city||'Bath';
+            var pc=r.data.address.postcode;
+            aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;
+          }
+        }
         if(r.data.logo_url){
           var logoEl=document.getElementById('hotel-logo-display');
           if(logoEl) logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';
@@ -960,23 +969,14 @@ function loadMessagesFromStorage(){
 }
 function dismissHotelMsg(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
-  loadMessagesFromSupabase();
+  // Silently reload so message appears if guest checks tab later
+  setTimeout(loadMessagesFromSupabase, 300);
 }
 
 function viewInMessages(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
-  // Switch to messages tab
-  var msgTab = document.querySelector('.tab[onclick*="messages"]');
-  if(msgTab) msgTab.click();
-  else {
-    document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-    var tabEl = document.getElementById('tab-messages');
-    if(tabEl) tabEl.classList.add('active');
-    var navEl = document.querySelector('[onclick*="showTab(\'messages"]');
-    if(navEl) navEl.classList.add('active');
-  }
-  loadMessagesFromSupabase();
+  // Use showTab directly - same as tapping the Messages tab
+  showTab('messages', document.getElementById('tab-messages'));
 }
 
 // ── EDIT PROFILE ──
