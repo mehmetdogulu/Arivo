@@ -635,6 +635,7 @@ function closeSidebar(){document.getElementById('sbar').classList.remove('open')
 
 // ── SUPABASE: LOAD DATA ──
 function loadData(){
+  if(!db){setTimeout(loadData,300);return;}
   // Load guests
   db.from('guests').select('*').eq('hotel_id',HOTEL_ID).eq('checked_out',false).order('registered_at',{ascending:false}).then(function(r){
     if(r.error||!r.data)return;
@@ -717,6 +718,7 @@ setInterval(function(){loadGuestRequests();loadGuestMessages();},3000);
 
 // ── SUPABASE: REAL-TIME ──
 function subscribeToAll(){
+  if(!db){setTimeout(subscribeToAll,300);return;}
   db.channel('dashboard-live')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'requests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
       db.from('guests').select('name,room').eq('id',payload.new.guest_id).single().then(function(r){
