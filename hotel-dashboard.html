@@ -487,15 +487,41 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="trow"><div><div class="tl">Checkout Reminders</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Hotel Profile</div></div><div class="cb">
-    <div class="fg"><label class="fl">Hotel Name</label><input class="fi" value="The Maison Collective" oninput="document.getElementById('hname').textContent=this.value"></div>
-    <div class="fg"><label class="fl">Rooms</label><input class="fi" type="number" value="22"></div>
+    <div class="fg"><label class="fl">Hotel Name</label><input class="fi" id="hotel-name-input" value="The Maison Collective" oninput="document.getElementById('hname').textContent=this.value;saveHotelAddress()"></div>
     <div class="fg"><label class="fl">Street Address</label><input class="fi" id="hotel-street" value="14 Brock Street" oninput="saveHotelAddress()"></div>
     <div class="frow">
-      <div class="fg"><label class="fl">City</label><input class="fi" id="hotel-city" value="Bath" oninput="document.getElementById('hloc').textContent='22 rooms &middot; '+this.value+', UK';saveHotelAddress()"></div>
+      <div class="fg"><label class="fl">City</label><input class="fi" id="hotel-city" value="Bath" oninput="document.getElementById('hloc').textContent=document.querySelectorAll('#roomlist .irow').length+' rooms &middot; '+this.value+', UK';saveHotelAddress()"></div>
       <div class="fg"><label class="fl">Postcode</label><input class="fi" id="hotel-postcode" value="BA1 2LW" style="text-transform:uppercase" oninput="saveHotelAddress()"></div>
     </div>
     <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="+44 1225 000123" oninput="saveHotelAddress()"></div>
   </div></div>
+  <div class="card"><div class="ch"><div class="ct">Room Manager</div><div class="ca" onclick="addRoom()">+ Add Room</div></div>
+    <div id="roomlist">
+      <div class="irow"><div class="irk">Room 1</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 1</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 2</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 2</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 3</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 3</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 4</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 4</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 5</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 5</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 6</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 6</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 7</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 7</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 8</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 8</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 9</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 9</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 10</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 10</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 11</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 11</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 12</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 12</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 13</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 13</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 14</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 14</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 15</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 15</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 16</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 16</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 17</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 17</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 18</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 18</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 19</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 19</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 20</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 20</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 21</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 21</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+      <div class="irow"><div class="irk">Room 22</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 22</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
+    </div>
+    <div style="padding:10px 16px;font-size:11px;color:var(--tx3)">Rooms are shown to guests as a dropdown. Edit names to match your operation (e.g. "The Garden Suite").</div>
+  </div>
   <div class="card"><div class="ch"><div class="ct">&#128274; My Credentials</div></div><div class="cb">
     <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cname" value="James Mitchell"></div>
     <div class="fg"><label class="fl">Email</label><input class="fi" id="cemail" type="email" value="james@maisonbath.co.uk"></div>
@@ -1292,17 +1318,65 @@ function initPing(){
   }catch(e){}
 }
 
-// ── HOTEL ADDRESS SYNC ──
+// ── ROOM MANAGEMENT ──
+function saveRooms(){
+  var rooms=[];
+  document.querySelectorAll('#roomlist .irow').forEach(function(row){
+    var v=row.querySelector('.irv');
+    if(v&&v.textContent.trim()) rooms.push(v.textContent.trim());
+  });
+  localStorage.setItem('arivo_hotel_rooms',JSON.stringify(rooms));
+  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_hotel_rooms',newValue:JSON.stringify(rooms)}));
+  // Update room count in sidebar
+  var hloc=document.getElementById('hloc');
+  if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rooms.length+' rooms \u00b7 '+city+', UK';}
+  toast('Rooms saved');
+}
+
+function addRoom(){
+  var list=document.getElementById('roomlist');
+  var count=list.querySelectorAll('.irow').length+1;
+  var row=document.createElement('div');row.className='irow';
+  row.innerHTML='<div class="irk">Room '+count+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room '+count+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';
+  list.appendChild(row);
+  saveRooms();
+}
+
+function delRoomRow(btn){
+  var row=btn.closest('.irow');
+  var roomName=row.querySelector('.irv')?row.querySelector('.irv').textContent.trim():'';
+  // Check if room is currently occupied
+  var activeGuests=document.querySelectorAll('#glist .grow');
+  var occupied=false;
+  activeGuests.forEach(function(g){
+    if(g.querySelector('.gs')&&g.querySelector('.gs').textContent.indexOf(roomName)>=0) occupied=true;
+  });
+  if(occupied){toast('Cannot remove — room is currently occupied','err');return;}
+  row.remove();
+  saveRooms();
+}
+
+// Save rooms on initial load
+document.addEventListener('DOMContentLoaded',function(){
+  var saved=localStorage.getItem('arivo_hotel_rooms');
+  if(!saved) saveRooms(); // save defaults on first load
+});
+
+
 function saveHotelAddress(){
   var street=document.getElementById('hotel-street')?document.getElementById('hotel-street').value:'14 Brock Street';
   var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';
   var postcode=document.getElementById('hotel-postcode')?document.getElementById('hotel-postcode').value.toUpperCase():'BA1 2LW';
   var phone=document.getElementById('hotel-phone')?document.getElementById('hotel-phone').value:'+44 1225 000123';
-  var hotelName=document.getElementById('hname')?document.getElementById('hname').textContent:'The Maison Collective';
+  var hotelName=document.getElementById('hotel-name-input')?document.getElementById('hotel-name-input').value:(document.getElementById('hname')?document.getElementById('hname').textContent:'The Maison Collective');
   var address={name:hotelName,street:street,city:city,postcode:postcode,phone:phone,updated:new Date().toISOString()};
   localStorage.setItem('arivo_hotel_address',JSON.stringify(address));
   window.dispatchEvent(new StorageEvent('storage',{key:'arivo_hotel_address',newValue:JSON.stringify(address)}));
-  toast('Address updated — AI will use new location');
+  // Update Local Guide postcode label live
+  document.querySelectorAll('#s-local div').forEach(function(d){
+    if(d.textContent.indexOf('Arivo AI suggests')>=0) d.textContent='\u2728 Arivo AI suggests local spots based on postcode '+postcode+'.';
+  });
+  toast('Address saved \u2014 AI will use new location');
 }
 
 // ── ACTIVITY LOGS ──
