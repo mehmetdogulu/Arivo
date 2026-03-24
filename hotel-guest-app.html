@@ -426,22 +426,13 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
 
   <!-- LOCAL TAB -->
   <div class="tc" id="tab-local">
-    <div class="ai-banner">&#10024; Powered by Arivo AI &bull; Suggestions based on your hotel's location in Bath BA1 2LW</div>
-    <div class="rc-lbl">&#9749; Coffee &amp; Breakfast</div>
-    <div class="rc"><div class="rc-thumb">&#9749;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=Fold+Coffee+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">Fold Coffee &#8599;</a></div><div class="rc-d">Exceptional single-origin espresso. A neighbourhood gem.</div><div class="rc-tags"><span class="rc-tag">5 min walk</span><span class="rc-tag g">&#11088; Staff pick</span></div></div></div>
-    <div class="rc"><div class="rc-thumb">&#129360;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=The+Larder+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">The Larder &#8599;</a></div><div class="rc-d">Artisan pastries and homemade granola bowls.</div><div class="rc-tags"><span class="rc-tag">8 min walk</span><span class="rc-tag">Opens 7:30</span></div></div></div>
-    <div class="rc-lbl">&#127869; Restaurants</div>
-    <div class="rc"><div class="rc-thumb">&#127837;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=Osteria+Filo+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">Osteria Filo &#8599;</a></div><div class="rc-d">Intimate Italian, handmade pasta, only 20 covers. Book ahead.</div><div class="rc-tags"><span class="rc-tag">12 min walk</span><span class="rc-tag g">&#11088; Staff pick</span></div></div></div>
-    <div class="rc"><div class="rc-thumb">&#129385;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=The+Hearth+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">The Hearth &#8599;</a></div><div class="rc-d">Open-fire cooking, seasonal British menu.</div><div class="rc-tags"><span class="rc-tag">6 min walk</span><span class="rc-tag">£££</span></div></div></div>
-    <div class="rc-lbl">&#127867; Bars</div>
-    <div class="rc"><div class="rc-thumb">&#127867;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=The+Star+Inn+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">The Star Inn &#8599;</a></div><div class="rc-d">Bath's oldest pub, real ales and a proper atmosphere.</div><div class="rc-tags"><span class="rc-tag">7 min walk</span><span class="rc-tag ai">&#10024; Arivo suggestion</span></div></div></div>
-    <div class="rc"><div class="rc-thumb">&#127863;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=Same+Same+But+Different+Bath" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">Same Same But Different &#8599;</a></div><div class="rc-d">Craft cocktail bar, intimate and inventive.</div><div class="rc-tags"><span class="rc-tag">10 min walk</span><span class="rc-tag ai">&#10024; Arivo suggestion</span></div></div></div>
-    <div class="rc-lbl">&#127973; Useful Nearby</div>
-    <div class="rc"><div class="rc-thumb">&#128138;</div><div><div class="rc-n"><a href="https://www.google.com/maps/search/?api=1&query=Boots+Pharmacy+Bath+Brock+Street" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">Boots Pharmacy &#8599;</a></div><div class="rc-d">Mon-Sat 8am-7pm, Sun 10am-4pm.</div><div class="rc-tags"><span class="rc-tag">4 min walk</span><span class="rc-tag ai">&#10024; Arivo suggestion</span></div></div></div>
-    <div class="rc"><div class="rc-thumb">&#128652;</div><div><div class="rc-n">Bath Spa Train Station</div><div class="rc-d">Trains to London Paddington every 30 min. Journey ~75 min.</div><div class="rc-tags"><span class="rc-tag">12 min walk</span><span class="rc-tag ai">&#10024; Arivo suggestion</span></div></div></div>
-    <div class="rc-lbl">&#127963; Culture &amp; Sights</div>
-    <div class="rc"><div class="rc-thumb">&#127912;</div><div><div class="rc-n">Printworks Gallery</div><div class="rc-d">Independent gallery in a converted Victorian printworks.</div><div class="rc-tags"><span class="rc-tag">15 min walk</span><span class="rc-tag">Free entry</span></div></div></div>
-    <div class="rc"><div class="rc-thumb">&#127807;</div><div><div class="rc-n">Botanical Gardens</div><div class="rc-d">A hidden escape in the city. Stunning in any season.</div><div class="rc-tags"><span class="rc-tag">10 min walk</span><span class="rc-tag">Free</span></div></div></div>
+    <div class="ai-banner" id="local-ai-label">&#10024; Powered by Arivo AI &bull; Suggestions based on your hotel's location in Bath BA1 2LW</div>
+    <div id="local-suggestions-container">
+      <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">
+        <div style="font-size:28px;margin-bottom:12px">&#10024;</div>
+        Loading local suggestions...
+      </div>
+    </div>
   </div>
 
   <!-- REQUESTS TAB -->
@@ -627,6 +618,11 @@ function showTab(name,el){
     markMessagesRead();
     loadMessagesFromSupabase();
   }
+  if(name==='local'){
+    var city = hotelSettings.city || '';
+    var postcode = hotelSettings.postcode || '';
+    if(postcode) loadLocalSuggestions(city, postcode);
+  }
 }
 
 function markMessagesRead(){
@@ -805,6 +801,8 @@ function enterApp(){
             var pc=r.data.address.postcode;
             aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;
           }
+          // Load dynamic local suggestions for this postcode
+          if(r.data.address.postcode) loadLocalSuggestions(r.data.address.city||'', r.data.address.postcode);
         }
         if(r.data.logo_url){
           var logoEl=document.getElementById('hotel-logo-display');
@@ -1049,6 +1047,79 @@ function rateStar(n){
     }
   }, 400);
 }
+
+var _localLoaded = null; // cache by postcode so we don't re-call on every tab switch
+
+function loadLocalSuggestions(city, postcode) {
+  var container = document.getElementById('local-suggestions-container');
+  if (!container) return;
+  var cacheKey = (postcode || 'default').trim().toUpperCase();
+  if (_localLoaded === cacheKey) return; // already loaded for this postcode
+
+  container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Finding the best spots near ' + (city || postcode) + '...</div>';
+
+  var prompt = 'You are a knowledgeable local guide for a boutique hotel in ' + (city || '') + ', postcode ' + postcode + ', UK.\n\nGenerate a curated list of genuinely local recommendations near this postcode. Include:\n- 2 coffee/breakfast spots\n- 3 restaurants (mix of price ranges)\n- 2 bars or pubs\n- 2 useful nearby (pharmacy, transport, supermarket)\n- 2 culture or sights\n\nRespond ONLY with a valid JSON array. No markdown, no explanation, no backticks. Each item:\n{\n  "category": "Coffee & Breakfast" | "Restaurants" | "Bars" | "Useful Nearby" | "Culture & Sights",\n  "emoji": "one emoji",\n  "name": "Place name",\n  "description": "One sentence, specific and evocative",\n  "tags": ["e.g. 5 min walk", "e.g. Opens 7am"]\n}';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{role: 'user', content: prompt}]
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var text = data.content && data.content[0] ? data.content[0].text : '';
+    // Strip any accidental markdown fences
+    text = text.replace(/```json|```/g, '').trim();
+    var places;
+    try { places = JSON.parse(text); } catch(e) {
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions. Ask our concierge instead &#10024;</div>';
+      return;
+    }
+    _localLoaded = cacheKey;
+    renderLocalSuggestions(places, city || postcode);
+  })
+  .catch(function() {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions. Ask our concierge instead &#10024;</div>';
+  });
+}
+
+function renderLocalSuggestions(places, cityName) {
+  var container = document.getElementById('local-suggestions-container');
+  if (!container) return;
+
+  // Group by category
+  var cats = {};
+  var catOrder = ['Coffee & Breakfast','Restaurants','Bars','Useful Nearby','Culture & Sights'];
+  var catEmojis = {'Coffee & Breakfast':'&#9749;','Restaurants':'&#127869;','Bars':'&#127867;','Useful Nearby':'&#127973;','Culture & Sights':'&#127963;'};
+  places.forEach(function(p) {
+    if (!cats[p.category]) cats[p.category] = [];
+    cats[p.category].push(p);
+  });
+
+  var html = '';
+  catOrder.forEach(function(cat) {
+    if (!cats[cat] || !cats[cat].length) return;
+    html += '<div class="rc-lbl">' + (catEmojis[cat] || '') + ' ' + cat.toUpperCase() + '</div>';
+    cats[cat].forEach(function(p) {
+      var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.name + ' ' + cityName);
+      var tags = (p.tags || []).map(function(t) { return '<span class="rc-tag">' + t + '</span>'; }).join('');
+      html += '<div class="rc">'
+            + '<div class="rc-thumb">' + (p.emoji || '&#128205;') + '</div>'
+            + '<div>'
+            + '<div class="rc-n"><a href="' + mapsUrl + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">' + p.name + ' &#8599;</a></div>'
+            + '<div class="rc-d">' + p.description + '</div>'
+            + '<div class="rc-tags">' + tags + '<span class="rc-tag ai">&#10024; Arivo AI</span></div>'
+            + '</div></div>';
+    });
+  });
+
+  container.innerHTML = html;
+}
+
 
 function checkIfAlreadyRated(){
   if(sessionStorage.getItem('arivo_rated')){
