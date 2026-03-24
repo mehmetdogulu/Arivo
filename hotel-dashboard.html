@@ -6,12 +6,6 @@
 <title>Arivo &mdash; Hotel Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
-</script>
 <style>
 :root{
   --bg:#0F1117;--sur:#181B23;--sur2:#1E2130;--bor:#2A2D3A;
@@ -580,6 +574,14 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 
 <div id="nband"></div>
 <div id="toast"></div><script>
+const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
+const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
+var db = null;
+document.addEventListener('DOMContentLoaded', function(){
+  try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
+});
+
 var openReqs = 0;
 var curBtn = null;
 var selStaff = '';
