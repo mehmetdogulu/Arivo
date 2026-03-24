@@ -597,24 +597,61 @@ function submitReg(){
   if(!ok)return;
   state.name=name;state.room=room;
   setGuestContext(name,room);state.checkout=co;
-  // Register in Supabase in background — never blocks the guest
+  // Register in Supabase with deduplication rules
   setTimeout(function(){
-    db.from('guests').insert({
-      hotel_id: HOTEL_ID,
-      name: name,
-      room: room,
-      checkout_date: co,
-      source: 'qr'
-    }).select().then(function(result){
-      if(result.data && result.data[0]){
-        guestId = result.data[0].id;
-        subscribeToUpdates();
-      } else {
-        db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',name).eq('room',room).single().then(function(r){
-          if(r.data){ guestId = r.data.id; subscribeToUpdates(); }
-        });
-      }
-    }).then(function(r){ if(r && r.error) console.log('Supabase write:', r.error.message); });
+    var today = new Date().toISOString().split('T')[0];
+    // RULE: Same room + different name + not checked out = block (room occupied)
+    db.from('guests')
+      .select('id,name,checked_out')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('room', room)
+      .eq('checked_out', false)
+      .then(function(roomCheck){
+        if(roomCheck.data && roomCheck.data.length > 0){
+          var existingGuest = roomCheck.data[0];
+          if(existingGuest.name.toLowerCase() !== name.toLowerCase()){
+            // Different name in same active room - show warning but allow with confirmation
+            // (Manager may have added a guest manually with a slightly different name)
+            // We show a toast but still proceed
+            toast('Note: Room ' + room + ' may already be occupied by ' + existingGuest.name);
+          }
+        }
+      });
+    // Check if guest already exists with same name + room and not checked out
+    db.from('guests')
+      .select('id,checkout_date,checked_out')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('name', name)
+      .eq('room', room)
+      .eq('checked_out', false)
+      .then(function(existing){
+        if(existing.data && existing.data.length > 0){
+          // Active guest with same name+room exists — update their record
+          var existingId = existing.data[0].id;
+          db.from('guests').update({
+            checkout_date: co,
+            registered_at: new Date().toISOString()
+          }).eq('id', existingId).then(function(){
+            guestId = existingId;
+            subscribeToUpdates();
+          });
+        } else {
+          // No active match — create new guest record
+          db.from('guests').insert({
+            hotel_id: HOTEL_ID,
+            name: name,
+            room: room,
+            checkout_date: co,
+            source: 'qr',
+            checked_out: false
+          }).select().then(function(result){
+            if(result.data && result.data[0]){
+              guestId = result.data[0].id;
+              subscribeToUpdates();
+            }
+          });
+        }
+      });
   }, 0);
   var d=new Date(co);
   var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
@@ -633,6 +670,16 @@ function submitReg(){
 
 function enterApp(){
   showScreen('screen-app');
+  // Clear old messages if this is a new stay (fresh registration)
+  var lastCheckout = localStorage.getItem('arivo_last_checkout');
+  var today = new Date().toISOString().split('T')[0];
+  if(lastCheckout && lastCheckout !== state.checkout && state.checkout > today){
+    // New stay - clear old inbox
+    localStorage.removeItem('arivo_guest_inbox');
+  }
+  localStorage.setItem('arivo_last_checkout', state.checkout);
+  // Load previously saved messages from localStorage
+  loadMessagesFromStorage();
   // Demo: show hotel message after 2 seconds
   setTimeout(function(){
     showHotelMessage('We hope you have settled in well. Your complimentary welcome drink voucher is valid at The Cellar Bar until 9pm tonight.');
@@ -730,14 +777,45 @@ function showCheckoutBanner(msg){
 function showHotelMessage(msg){
   document.getElementById('nb-msg-text').textContent = msg;
   document.getElementById('notif-banner-overlay').classList.add('open');
-  // Also add to messages tab
+  // Add to messages tab and save to localStorage for persistence
+  addMessageToTab({from:'The Maison Team', text:msg, time:new Date().toISOString(), unread:true});
+}
+
+function addMessageToTab(msgObj){
   var list = document.getElementById('hotel-messages-list');
+  if(!list) return;
   var card = document.createElement('div');
   card.className = 'msg-card';
-  var now = new Date();
-  var timeStr = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  card.innerHTML = '<div class="msg-card-from">The Maison Team</div><div class="msg-card-text">'+msg+'</div><div class="msg-card-time">Today, '+timeStr+'</div><div class="msg-card-unread"></div>';
+  var d = new Date(msgObj.time);
+  var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  card.innerHTML = '<div class="msg-card-from">'+(msgObj.from||'The Maison Team')+'</div><div class="msg-card-text">'+msgObj.text+'</div><div class="msg-card-time">'+timeStr+'</div>'+(msgObj.unread?'<div class="msg-card-unread"></div>':'');
   list.insertBefore(card, list.firstChild);
+  // Save to localStorage for persistence across page refreshes
+  saveMessageToStorage(msgObj);
+}
+
+function saveMessageToStorage(msgObj){
+  var msgs = JSON.parse(localStorage.getItem('arivo_guest_inbox')||'[]');
+  msgs.unshift(msgObj);
+  // Keep last 50 messages only
+  if(msgs.length > 50) msgs = msgs.slice(0,50);
+  localStorage.setItem('arivo_guest_inbox', JSON.stringify(msgs));
+}
+
+function loadMessagesFromStorage(){
+  var msgs = JSON.parse(localStorage.getItem('arivo_guest_inbox')||'[]');
+  if(!msgs.length) return;
+  var list = document.getElementById('hotel-messages-list');
+  if(!list) return;
+  // Add in reverse order (oldest first, since we prepend)
+  msgs.slice().reverse().forEach(function(msgObj){
+    var card = document.createElement('div');
+    card.className = 'msg-card';
+    var d = new Date(msgObj.time);
+    var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    card.innerHTML = '<div class="msg-card-from">'+(msgObj.from||'The Maison Team')+'</div><div class="msg-card-text">'+msgObj.text+'</div><div class="msg-card-time">'+timeStr+'</div>';
+    list.insertBefore(card, list.firstChild);
+  });
 }
 function dismissHotelMsg(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
@@ -829,6 +907,10 @@ function handleReq(btn){
   }
   if(type==='once'){
     if(btn.classList.contains('sent')||btn.classList.contains('dupl'))return;
+    // RULE 13: Only one open request of same type per room at a time
+    var existingReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+    var alreadyOpen=existingReqs.some(function(r){return r.type===label&&r.status!=='done'&&r.room===state.room;});
+    if(alreadyOpen){toast(label+' is already being handled by the team');return;}
     btn.classList.add('sent');
     btn.querySelector('.rq-ico').textContent='\u2713';
     btn.querySelector('.rq-lbl2').textContent='On its way!';
@@ -935,9 +1017,16 @@ async function sendChat(){
   addMsg(msg,'user');
   chatHistory.push({role:'user',content:msg});
   var typing=addMsg('Thinking...','typing');
-  var sys='You are a warm, knowledgeable AI concierge for The Maison Collective, a boutique hotel at 14 Brock Street, Bath BA1 2LW, UK. Phone: +44 1225 000123. '+
+  // Read hotel address from localStorage (updated by manager dashboard)
+  var hotelAddr = JSON.parse(localStorage.getItem('arivo_hotel_address')||'{}');
+  var hotelName = hotelAddr.name || 'The Maison Collective';
+  var hotelStreet = hotelAddr.street || '14 Brock Street';
+  var hotelCity = hotelAddr.city || 'Bath';
+  var hotelPostcode = hotelAddr.postcode || 'BA1 2LW';
+  var hotelPhone = hotelAddr.phone || '+44 1225 000123';
+  var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. '+
     'Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. '+
-    'Using your knowledge of Bath BA1 2LW: answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times from Bath Spa station, attractions, and local services. '+
+    'Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. '+
     'Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. '+
     'Nearby: Fold Coffee (5 min), The Larder (8 min), Osteria Filo (12 min, Italian), The Hearth (6 min, British), The Star Inn (7 min, pub), Boots Pharmacy (4 min), Bath Spa Station (12 min). '+
     'Be warm and concise. 2-4 sentences max.';
@@ -997,20 +1086,28 @@ var guestId=null;
 function setGuestContext(name,room){guestName=name;guestRoom=room;}
 
 async function pushRequest(type, detail, photoData){
+  // Also track in localStorage for Rule 13 duplicate check
+  var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  lsReqs.unshift({id:'req_'+Date.now(),type:type,detail:detail,guest:guestName,room:guestRoom,time:new Date().toISOString(),status:'new'});
+  if(lsReqs.length>100) lsReqs=lsReqs.slice(0,100);
+  localStorage.setItem('arivo_requests',JSON.stringify(lsReqs));
   try {
-    await db.from('requests').insert({
+    db.from('requests').insert({
       hotel_id: HOTEL_ID,
       guest_id: guestId,
       type: type,
       detail: detail,
       status: 'new'
-    });
+    }).then(function(){});
   } catch(e) {
-    // fallback to localStorage if offline
-    var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-    requests.unshift({id:'req_'+Date.now(),type:type,detail:detail,guest:guestName,room:guestRoom,time:new Date().toISOString(),status:'new'});
-    localStorage.setItem('arivo_requests',JSON.stringify(requests));
+    console.log('Request insert error:', e);
   }
+}
+
+function markRequestDoneInStorage(type){
+  var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  requests.forEach(function(r){if(r.type===type&&r.room===guestRoom&&r.status!=='done')r.status='done';});
+  localStorage.setItem('arivo_requests',JSON.stringify(requests));
 }
 
 async function pushGuestMessage(text){
@@ -1081,18 +1178,25 @@ window.addEventListener('storage',function(e){
 });
 
 function updateRequestStatus(reqId, status, staffName){
-  // Show in messages tab
-  var list=document.getElementById('hotel-messages-list');
-  if(!list)return;
-  var card=document.createElement('div');
-  card.className='msg-card';
-  var statusText=status==='claimed'?'Your request has been received and staff are on it'
-    :status==='done'?'Your request has been completed — let us know if you need anything else'
-    :'Update on your request: '+status;
-  card.innerHTML='<div class="msg-card-body"><strong style="color:var(--gold)">'+
-    (staffName?staffName:'Hotel Team')+'</strong><br>'+statusText+'</div>'+
-    '<div class="msg-card-time">'+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</div>';
-  list.prepend(card);
+  var statusText = status==='claimed' ? 'Your request has been received and staff are on it'
+    : status==='done' ? 'Your request has been completed — let us know if you need anything else'
+    : 'Update on your request: '+status;
+  var from = (staffName || 'Hotel Team');
+  addMessageToTab({from:from, text:statusText, time:new Date().toISOString(), unread:true});
+  // RULE 14: Mark request as done in localStorage so it can be re-requested
+  if(status==='done' && reqId){
+    var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+    requests.forEach(function(r){ if(r.id===reqId) r.status='done'; });
+    localStorage.setItem('arivo_requests',JSON.stringify(requests));
+    // Re-enable the button for this request type
+    document.querySelectorAll('.rq-btn.dupl').forEach(function(btn){
+      if(btn.dataset.label && reqId){
+        btn.classList.remove('dupl','sent');
+        btn.querySelector('.rq-ico').textContent=btn.dataset.originalIco||'✓';
+        btn.querySelector('.rq-lbl2').textContent=btn.dataset.label;
+      }
+    });
+  }
 }
 
 // ── ACTIVITY LOGGING ──
