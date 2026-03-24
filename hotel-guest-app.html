@@ -710,10 +710,6 @@ function enterApp(){
   localStorage.setItem('arivo_last_checkout', state.checkout);
   // Load previously saved messages from localStorage
   loadMessagesFromStorage();
-  // Demo: show hotel message after 2 seconds
-  setTimeout(function(){
-    showHotelMessage('We hope you have settled in well. Your complimentary welcome drink voucher is valid at The Cellar Bar until 9pm tonight.');
-  }, 2000);
 }
 
 // ── BYPASS CODE ──
