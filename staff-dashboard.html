@@ -162,13 +162,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
 #toast.warn{background:var(--amber);color:var(--bg);}
 #toast.err{background:var(--red);color:white;}
 
-/* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bor);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;font-size:9px;color:var(--muted);cursor:pointer;position:relative;gap:2px;}
-.nav-item.active{color:var(--gold);}
-.nav-ico{font-size:20px;}
-.nav-lbl{font-size:9px;font-weight:500;}
-.task-badge{position:absolute;top:6px;right:50%;margin-right:-18px;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;}
+
 
 /* ── MODAL ── */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center;}
@@ -243,7 +237,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
   </div>
 
   <div class="tab-bar">
-    <div class="tab active" onclick="showTab('tasks',this)"><span class="tab-ico">&#9646;&#9646;</span>My Tasks<span class="tab-badge" id="task-badge">3</span></div>
+    <div class="tab active" onclick="showTab('tasks',this)"><span class="tab-ico">&#9646;&#9646;</span>My Tasks<span class="tab-badge" id="task-badge" style="display:none">0</span></div>
     <div class="tab" onclick="showTab('done',this)"><span class="tab-ico">&#10003;</span>Done</div>
     <div class="tab" onclick="showTab('profile',this)"><span class="tab-ico">&#128100;</span>Me</div>
   </div>
@@ -290,22 +284,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
 
   </div><!-- /tabs -->
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <div class="nav-item active" id="nav-tasks" onclick="showTab('tasks',this);setNav('nav-tasks')">
-      <div class="nav-ico">&#128718;</div>
-      <div class="nav-lbl">Tasks</div>
-      <div class="task-badge" id="task-badge" style="display:none">0</div>
-    </div>
-    <div class="nav-item" id="nav-done" onclick="showTab('done',this);setNav('nav-done')">
-      <div class="nav-ico">&#10003;</div>
-      <div class="nav-lbl">Done</div>
-    </div>
-    <div class="nav-item" id="nav-profile" onclick="showTab('profile',this);setNav('nav-profile')">
-      <div class="nav-ico">&#128100;</div>
-      <div class="nav-lbl">Profile</div>
-    </div>
-  </nav>
+
 
 </div><!-- /screen-app -->
 
@@ -685,7 +664,6 @@ function playPing() {
 
 function initPing() { ping = playPing; }
 
-function setNav(id){ document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');}); var el=document.getElementById(id); if(el) el.classList.add('active'); }
 </script>
 </body>
 </html>
