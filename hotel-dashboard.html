@@ -582,8 +582,27 @@ document.addEventListener('DOMContentLoaded', function(){
   try { if(window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
-var openReqs = 0;
-var curBtn = null;
+var photoCache = {};
+
+function showPhoto(reqId){
+  var src = photoCache[reqId];
+  if(!src){toast('No photo available','err');return;}
+  var overlay = document.getElementById('photo-overlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'photo-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    overlay.onclick = function(){overlay.style.display='none';};
+    var img = document.createElement('img');
+    img.id = 'photo-overlay-img';
+    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('photo-overlay-img').src = src;
+  overlay.style.display = 'flex';
+}
+
 var selStaff = '';
 var currentEditRow = null;
 var ping = null;
@@ -672,7 +691,8 @@ function loadData(){
       var dotcls=req.status==='claimed'?'cl':'nw';
       var badgecls=req.status==='claimed'?'cl':'nw';
       var badgetxt=req.status==='claimed'?'Claimed':'New';
-      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="window.open(\''+req.photo_url+'\')">&#128247; Photo</button>':'';
+      if(req.photo_url)photoCache[req.id]=req.photo_url;
+      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">&#128247; Photo</button>':'';
       html+='<div class="row" id="req-'+req.id+'"><div class="dot '+dotcls+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+req.detail.slice(0,50)+'</div></div><div class="badge '+badgecls+'">'+badgetxt+'</div>';
       if(req.status==='new')html+='<button class="btn btn-s" onclick="claimReq(this)">Claim</button>';
       html+=photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
@@ -726,7 +746,7 @@ function subscribeToAll(){
       db.from('guests').select('name,room').eq('id',payload.new.guest_id).single().then(function(r){
         var gname=r.data?r.data.name:'Guest';
         var groom=r.data?r.data.room:'?';
-        var req=Object.assign({},payload.new,{guests:{name:gname,room:groom}});
+        var req=Object.assign({},payload.new,{guests:{name:gname,room:groom},photo_url:payload.new.photo_url||null});
         addRequestRow(req);
         ping&&ping();flashTab('New Request!');
         notify('mgr','&#128718; New Request',req.type+' from Room '+groom,'Guest: '+gname);
@@ -784,7 +804,9 @@ function addRequestRow(req){
   var row=document.createElement('div');row.className='row';row.id='req-'+req.id;
   var gname=req.guests?req.guests.name:'Guest';
   var groom=req.guests?req.guests.room:'?';
-  row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+(req.detail||'').slice(0,50)+'</div></div><div class="badge nw">New</div><button class="btn btn-s" onclick="claimReq(this)">Claim</button><button class="btn btn-s" onclick="openETA(this)">Done</button>';
+  if(req.photo_url)photoCache[req.id]=req.photo_url;
+  var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">&#128247;</button>':'';
+  row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+(req.detail||'').slice(0,50)+'</div></div><div class="badge nw">New</div><button class="btn btn-s" onclick="claimReq(this)">Claim</button>'+photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button>';
   list.insertBefore(row,list.firstChild);
   openReqs++;updateCnts();
   // Also add to overview
