@@ -1419,31 +1419,29 @@ var guestId=null;
 function setGuestContext(name,room){guestName=name;guestRoom=room;}
 
 async function pushRequest(type, detail, photoData){
-  // Also track in localStorage for Rule 13 duplicate check
-  var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-  var reqId='req_'+Date.now();
-  lsReqs.unshift({id:reqId,type:type,detail:detail,photo:photoData||null,guest:guestName,room:guestRoom,time:new Date().toISOString(),status:'new'});
-  if(lsReqs.length>100) lsReqs=lsReqs.slice(0,100);
-  localStorage.setItem('arivo_requests',JSON.stringify(lsReqs));
-  // Store photo separately so dashboard can retrieve it
-  if(photoData){
-    var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
-    photos[reqId]=photoData;
-    localStorage.setItem('arivo_photos',JSON.stringify(photos));
-    window.dispatchEvent(new StorageEvent('storage',{key:'arivo_photos'}));
-  }
-  try {
-    db.from('requests').insert({
-      hotel_id: HOTEL_ID,
-      guest_id: guestId,
-      type: type,
-      detail: detail,
-      photo_url: photoData||null,
-      status: 'new'
-    }).then(function(){});
-  } catch(e) {
-    console.log('Request insert error:', e);
-  }
+  // Track in localStorage for Rule 13 duplicate check
+  var lsReqs = JSON.parse(localStorage.getItem('arivo_requests') || '[]');
+  var reqId = 'req_' + Date.now();
+  lsReqs.unshift({id:reqId, type:type, detail:detail, guest:state.name, room:state.room, time:new Date().toISOString(), status:'new'});
+  if(lsReqs.length > 100) lsReqs = lsReqs.slice(0, 100);
+  localStorage.setItem('arivo_requests', JSON.stringify(lsReqs));
+  // Fire storage event so same-browser dashboard picks it up
+  window.dispatchEvent(new StorageEvent('storage', {key:'arivo_requests', newValue:JSON.stringify(lsReqs)}));
+
+  if(!db){ console.log('db not ready - request saved to localStorage only'); return; }
+  if(!guestId){ console.log('guestId not set - retrying in 1s'); setTimeout(function(){ pushRequest(type, detail, photoData); }, 1000); return; }
+
+  // Insert to Supabase - photo is already uploaded separately as a URL
+  db.from('requests').insert({
+    hotel_id: HOTEL_ID,
+    guest_id: guestId,
+    type: type,
+    detail: detail,
+    photo_url: (photoData && photoData.startsWith('http')) ? photoData : null,
+    status: 'new'
+  }).then(function(r){
+    if(r.error) console.log('Request insert error:', r.error.message);
+  });
 }
 
 function markRequestDoneInStorage(type){
