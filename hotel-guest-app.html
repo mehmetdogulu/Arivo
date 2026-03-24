@@ -703,17 +703,23 @@ function submitReg(){
 
 
 
+var hotelSettings = {};
+
 function enterApp(){
   showScreen('screen-app');
+  // Load hotel settings from Supabase (address, name etc)
+  if(db){
+    db.from('hotel_settings').select('address').eq('hotel_id',HOTEL_ID).single().then(function(r){
+      if(r.data&&r.data.address) hotelSettings=r.data.address;
+    });
+  }
   // Clear old messages if this is a new stay (fresh registration)
   var lastCheckout = localStorage.getItem('arivo_last_checkout');
   var today = new Date().toISOString().split('T')[0];
   if(lastCheckout && lastCheckout !== state.checkout && state.checkout > today){
-    // New stay - clear old inbox
     localStorage.removeItem('arivo_guest_inbox');
   }
   localStorage.setItem('arivo_last_checkout', state.checkout);
-  // Load previously saved messages from localStorage
   loadMessagesFromStorage();
 }
 
@@ -1076,13 +1082,12 @@ async function sendChat(){
   addMsg(msg,'user');
   chatHistory.push({role:'user',content:msg});
   var typing=addMsg('Thinking...','typing');
-  // Read hotel address from localStorage (updated by manager dashboard)
-  var hotelAddr = JSON.parse(localStorage.getItem('arivo_hotel_address')||'{}');
-  var hotelName = hotelAddr.name || 'The Maison Collective';
-  var hotelStreet = hotelAddr.street || '14 Brock Street';
-  var hotelCity = hotelAddr.city || 'Bath';
-  var hotelPostcode = hotelAddr.postcode || 'BA1 2LW';
-  var hotelPhone = hotelAddr.phone || '+44 1225 000123';
+  // Read hotel address from Supabase (loaded on enterApp)
+  var hotelName = hotelSettings.name || 'The Maison Collective';
+  var hotelStreet = hotelSettings.street || '14 Brock Street';
+  var hotelCity = hotelSettings.city || 'Bath';
+  var hotelPostcode = hotelSettings.postcode || 'BA1 2LW';
+  var hotelPhone = hotelSettings.phone || '+44 1225 000123';
   var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. '+
     'Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. '+
     'Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. '+
