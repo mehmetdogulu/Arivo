@@ -358,9 +358,9 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="sech"><div class="sect">Overview</div><div class="secs" id="odate"></div></div>
   <div class="palert" id="palert"><div class="pat">&#9888; Priority Alert</div><div class="pam" id="pam">A guest rated 3 stars or below. Please attend immediately.</div></div>
   <div class="stats">
-    <div class="stat"><div class="stat-l">Active Guests</div><div class="stat-v" id="sg">0</div><div class="stat-n">Registered via app</div></div>
-    <div class="stat"><div class="stat-l">Open Requests</div><div class="stat-v bad" id="sr">0</div><div class="stat-n bad">Awaiting action</div></div>
-    <div class="stat"><div class="stat-l">Avg Rating</div><div class="stat-v" style="color:var(--gold)" id="savg">-</div><div class="stat-n up">&#11088; Today</div></div>
+    <div class="stat" onclick="go('guests',null);setBN('bn2')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Active Guests</div><div class="stat-v" id="sg">0</div><div class="stat-n">Registered via app</div></div>
+    <div class="stat" onclick="go('req',null);setBN('bn1')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Open Requests</div><div class="stat-v bad" id="sr">0</div><div class="stat-n bad">Awaiting action</div></div>
+    <div class="stat" onclick="go('logs',null);setBN('bn4')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Avg Rating</div><div class="stat-v" style="color:var(--gold)" id="savg">-</div><div class="stat-n up">&#11088; Today</div></div>
   </div>
   <div class="card">
     <div class="ch"><div class="ct">Live Requests <span class="ndot" id="rndot" style="display:none"></span></div><div class="ca" onclick="go('req',null)">View all &rarr;</div></div>
@@ -374,6 +374,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 
 <!-- REQUESTS -->
 <div class="sec" id="s-req">
+  <div class="palert" id="palert-req"><div class="pat">&#9888; Priority Alert</div><div class="pam" id="pam-req">A guest rated 3 stars or below. Please attend immediately.</div></div>
   <div class="sech"><div class="secr"><div><div class="sect">Requests</div><div class="secs" id="rcntlbl">0 open</div></div><button class="btn btn-g" onclick="markAll()">Mark all done</button></div></div>
   <div class="card" id="reqlist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No requests yet. They will appear here when guests submit them.</div></div>
 </div>
@@ -876,6 +877,7 @@ function subscribeToAll(){
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'ratings',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
       if(payload.new.stars<=3){
         var p=document.getElementById('palert');if(p)p.classList.add('on');
+        var p2=document.getElementById('palert-req');if(p2)p2.classList.add('on');
         ping&&ping();flashTab('\u26a0\ufe0f Low Rating!');
         notify('warn','\u2605 Low Rating','Guest rated '+payload.new.stars+' stars. Please attend immediately.','Priority alert');
       }
@@ -898,8 +900,11 @@ function subscribeToAll(){
       var d=JSON.parse(e.newValue||'{}');
       if(d.stars<=3){
         var p=document.getElementById('palert');if(p)p.classList.add('on');
+        var p2=document.getElementById('palert-req');if(p2)p2.classList.add('on');
         var pam=document.getElementById('pam');
-        if(pam)pam.textContent='Guest in Room '+d.room+' rated '+d.stars+' star'+(d.stars>1?'s':'')+'. Please attend immediately.';
+        var pam2=document.getElementById('pam-req');
+        if(pam)pam.textContent='Guest in '+d.room+' rated '+d.stars+' star'+(d.stars>1?'s':'')+'. Please attend immediately.';
+        if(pam2)pam2.textContent='Guest in '+d.room+' rated '+d.stars+' star'+(d.stars>1?'s':'')+'. Please attend immediately.';
         ping&&ping();flashTab('\u26a0\ufe0f Low Rating!');
         notify('warn','\u2605 Low Rating','Room '+d.room+' rated '+d.stars+' stars.','Priority alert');
       }
