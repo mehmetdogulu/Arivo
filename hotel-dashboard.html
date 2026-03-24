@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
 <title>Arivo &mdash; Hotel Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.supabase=null;console.log('Supabase CDN blocked - running in offline mode');"></script>
 <style>
 :root{
   --bg:#0F1117;--sur:#181B23;--sur2:#1E2130;--bor:#2A2D3A;
@@ -579,7 +579,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
 var db = null;
 document.addEventListener('DOMContentLoaded', function(){
-  try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
+  try { if(window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
 var openReqs = 0;
@@ -1267,4 +1267,7 @@ function exportLogs(){
     csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
   });
   var blob=new Blob([csv],{type:'text/csv'});
-  var a=document.createEl
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='arivo-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('Log exported');}
+</script>
+</body>
+</html>
