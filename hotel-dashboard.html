@@ -874,9 +874,11 @@ function claimReq(btn, reqId, taskTitle) {
   var row = btn.closest('.row');
   if (!row) return;
   var guestLine = row.querySelector('.rs') ? row.querySelector('.rs').textContent.split('\u00b7')[0].trim() : '';
-  // Update Supabase
-  if (db) db.from('requests').update({status:'claimed', claimed_at: new Date().toISOString()}).eq('id', reqId).then(function() {});
-  // Update this row in place
+  // Update Supabase then reload both lists to keep overview in sync
+  if (db) db.from('requests').update({status:'claimed', claimed_at: new Date().toISOString()}).eq('id', reqId).then(function() {
+    loadRequests(); // reloads both reqlist and ov-reqlist from Supabase
+  });
+  // Update this row in place immediately (optimistic UI)
   row.querySelector('.dot').className = 'dot cl';
   var badge = row.querySelector('.badge');
   if (badge) { badge.className = 'badge cl'; badge.textContent = 'Claimed'; }
@@ -957,8 +959,8 @@ function doETA(mins) {
     return;
   }
 
-  // Update Supabase status to in_progress so refresh shows correct state
-  if (db && reqId) db.from('requests').update({status:'in_progress'}).eq('id', reqId).then(function(){});
+  // Update Supabase status to in_progress — reload both lists to keep overview in sync
+  if (db && reqId) db.from('requests').update({status:'in_progress'}).eq('id', reqId).then(function(){ loadRequests(); });
   // Set ETA — update row UI and send ETA message to guest
   if (row) {
     row.querySelector('.dot').className = 'dot pr';
