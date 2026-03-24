@@ -276,7 +276,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
+// Hotel ID — read from URL ?hotel= param, fallback to default for The Maison
+var _urlParams = new URLSearchParams(window.location.search);
+var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
 </script>
 </head>
 <body>
