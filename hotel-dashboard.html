@@ -598,6 +598,7 @@ function login(){
     err.style.display='none';
     document.getElementById('sl').classList.add('hide');
     document.getElementById('sd').classList.add('on');
+    document.getElementById('sd').style.display='flex';
     document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
     ['agc','glc'].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
