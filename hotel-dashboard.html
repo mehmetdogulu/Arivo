@@ -677,11 +677,21 @@ function loadData(){
     r.data.forEach(function(g){
       var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">Room '+g.room+' &middot; Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.name+'\',\'Room '+g.room+'\')">&#128172;</button></div>';
+      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">Room '+g.room+' &middot; Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.id+'\',\''+g.name+'\',\'Room '+g.room+'\')">💬</button></div>';
     });
     glist.innerHTML=html;
     ovglist.innerHTML=html;
     document.getElementById('sg').textContent=r.data.length;
+    // Populate message dropdown with real guests
+    var sel=document.getElementById('msgto');
+    sel.innerHTML='<option value="All guests" data-guest-id="">All guests (broadcast)</option>';
+    r.data.forEach(function(g){
+      var opt=document.createElement('option');
+      opt.value=g.name+' \u00b7 Room '+g.room;
+      opt.textContent=g.name+' \u00b7 Room '+g.room+' \u00b7 Out '+( g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC');
+      opt.dataset.guestId=g.id;
+      sel.appendChild(opt);
+    });
   });
 
   // Load open requests
@@ -975,31 +985,30 @@ function updateCnts(){
 
 // ── SEND MESSAGE ──
 function sendMsg(){
-  var t=document.getElementById('msgto').value;
+  var sel=document.getElementById('msgto');
   var b=document.getElementById('msgbody').value.trim();
   if(!b){toast('Type a message','err');return;}
-  // Write to Supabase
-  db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:null,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(r){
+  var targetGuestId=sel.options[sel.selectedIndex].dataset.guestId||null;
+  var targetLabel=sel.value;
+  if(db) db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(r){
     if(r.error)console.log('Msg error:',r.error.message);
   });
-  // localStorage fallback
-  notifyGuest('message',b,null,null,null);
-  logEvent('msg_sent','Manager sent message: '+b.slice(0,60),'Manager','-');
-  toast('Message sent to: '+t);
+  logEvent('msg_sent','Manager sent message to '+targetLabel+': '+b.slice(0,60),'Manager','-');
+  toast('Message sent to: '+targetLabel);
   document.getElementById('msgbody').value='';
-  notify('guest','&#128172; Sent',b.slice(0,60),t);
+  notify('mgr','💬 Sent',b.slice(0,60),targetLabel);
 }
 function sendMsgM(){
   var b=document.getElementById('msgb2').value.trim();
   var to=document.getElementById('msgto2').textContent;
+  var targetGuestId=document.getElementById('mmsg').dataset.guestId||null;
   if(!b){toast('Type a message','err');return;}
-  db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:null,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(){});
-  notifyGuest('message',b,null,null,null);
+  if(db) db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(){});
   closeM('mmsg');
   toast('Message sent to '+to);
-  notify('guest','&#128172; Sent',b.slice(0,60),to);
+  notify('mgr','💬 Sent',b.slice(0,60),to);
 }
-function openMsgM(name,room){document.getElementById('msgto2').textContent=name+' \u00b7 '+room;document.getElementById('msgb2').value='';openM('mmsg');}
+function openMsgM(guestId,name,room){document.getElementById('msgto2').textContent=name+' \u00b7 '+room;document.getElementById('msgb2').value='';document.getElementById('mmsg').dataset.guestId=guestId;openM('mmsg');}
 function loadTpl(t){
   var tpls={checkout:'Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready. We hope you have had a wonderful stay!',welcome:'Welcome to The Maison! We hope your room is everything you hoped for. Please do not hesitate to reach out if you need anything at all.'};
   document.getElementById('msgbody').value=tpls[t]||'';
