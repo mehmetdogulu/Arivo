@@ -247,8 +247,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="lf"><label>Email</label><input type="email" id="le" placeholder="manager@hotel.com" autocomplete="email"></div>
     <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onkeydown="if(event.key==='Enter')login()"></div>
     <button class="lbtn" onclick="login()">Sign In &rarr;</button>
-    <div class="lerr" id="lerr">Invalid credentials. Try manager@hotel.com / password123</div>
-    <div class="lhint">Demo: <span>manager@hotel.com</span> / <span>password123</span></div>
+    <div class="lerr" id="lerr">Invalid credentials. Try <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="771a161916101205371f1803121b5914181a">[email&#160;protected]</a> / password123</div>
+    <div class="lhint">Demo: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="402d212e2127253200282f34252c6e232f2d">[email&#160;protected]</a></span> / <span>password123</span></div>
   </div>
 </div>
 
@@ -555,7 +555,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div id="nband"></div>
 <div id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
 var _up = new URLSearchParams(window.location.search);
@@ -756,7 +756,7 @@ function addGuest() {
 function loadRequests() {
   if (!db) return;
   db.from('requests').select('*, guests(name,room)').eq('hotel_id', HOTEL_ID)
-    .in('status', ['new','claimed']).order('created_at', {ascending: false}).then(function(r) {
+    .in('status', ['new','claimed','in_progress']).order('created_at', {ascending: false}).then(function(r) {
     if (r.error || !r.data) return;
     renderRequests(r.data);
   });
@@ -778,12 +778,13 @@ function renderRequests(reqs) {
     reqs.forEach(function(req) {
       var gname   = req.guests ? req.guests.name : 'Guest';
       var groom   = req.guests ? req.guests.room : '?';
-      var dotcls  = req.status === 'claimed' ? 'cl' : 'nw';
-      var badgetxt = req.status === 'claimed' ? 'Claimed' : 'New';
+      var dotcls  = req.status === 'claimed' ? 'cl' : req.status === 'in_progress' ? 'pr' : 'nw';
+      var badgetxt = req.status === 'claimed' ? 'Claimed' : req.status === 'in_progress' ? 'In Progress' : 'New';
       if (req.photo_url) photoCache[req.id] = req.photo_url;
       var safeType = req.type.replace(/'/g, '').replace(/\\/g, '');
       var photoBtn = req.photo_url ? '<button class="btn btn-s" onclick="showPhoto(\'' + req.id + '\')">&#128247;</button>' : '';
       var claimBtn = req.status === 'new' ? '<button class="btn btn-s" onclick="claimReq(this,\'' + req.id + '\',\'' + safeType + '\')">Claim</button>' : '';
+      var etaChip  = req.status === 'in_progress' ? '<span class="echip">&#9203; In Progress</span>' : '';
       var doneBtn  = '<button class="btn btn-s" onclick="openETA(this,\'' + req.id + '\',\'' + safeType + '\')">Done</button>';
       html += '<div class="row" id="req-' + req.id + '">'
             + '<div class="dot ' + dotcls + '"></div>'
@@ -792,7 +793,7 @@ function renderRequests(reqs) {
             + '<div class="rs">' + gname + ' \u00b7 ' + (req.detail||'').slice(0, 50) + '</div>'
             + '</div>'
             + '<div class="badge ' + dotcls + '">' + badgetxt + '</div>'
-            + claimBtn + photoBtn + doneBtn
+            + claimBtn + etaChip + photoBtn + doneBtn
             + '</div>';
     });
     if (list) list.innerHTML = html;
@@ -803,7 +804,7 @@ function renderRequests(reqs) {
       reqs.slice(0, 3).forEach(function(req) {
         var gname  = req.guests ? req.guests.name : 'Guest';
         var groom  = req.guests ? req.guests.room : '?';
-        var sc     = req.status === 'claimed' ? 'cl' : 'nw';
+        var sc     = req.status === 'claimed' ? 'cl' : req.status === 'in_progress' ? 'pr' : 'nw';
         var safeType = req.type.replace(/'/g, '').replace(/\\/g, '');
         ovHtml += '<div class="row">'
                 + '<div class="dot ' + sc + '"></div>'
@@ -956,6 +957,8 @@ function doETA(mins) {
     return;
   }
 
+  // Update Supabase status to in_progress so refresh shows correct state
+  if (db && reqId) db.from('requests').update({status:'in_progress'}).eq('id', reqId).then(function(){});
   // Set ETA — update row UI and send ETA message to guest
   if (row) {
     row.querySelector('.dot').className = 'dot pr';
@@ -1351,7 +1354,6 @@ function renderLogReport() { var container=document.getElementById('log-entries'
 function exportLogs() { var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');if(!logs.length){toast('No logs to export','err');return;}var csv='Timestamp,Action,Detail,User,Room,Source\n';logs.forEach(function(l){csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';});var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='arivo-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('Log exported'); }
 
 document.getElementById('odate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
 </script>
 </body>
 </html>
