@@ -664,7 +664,36 @@ function setBN(id){document.querySelectorAll('.bnitem').forEach(function(b){b.cl
 function openSidebar(){document.getElementById('sbar').classList.add('open');document.getElementById('ov').classList.add('on');}
 function closeSidebar(){document.getElementById('sbar').classList.remove('open');document.getElementById('ov').classList.remove('on');}
 
-// ── SUPABASE: LOAD DATA ──
+function loadGuestList(){
+  if(!db){setTimeout(loadGuestList,300);return;}
+  db.from('guests').select('*').eq('hotel_id',HOTEL_ID).eq('checked_out',false).order('registered_at',{ascending:false}).then(function(r){
+    if(r.error||!r.data)return;
+    var glist=document.getElementById('glist');
+    var ovglist=document.getElementById('ov-guestlist');
+    if(r.data.length===0){glist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div>';return;}
+    var html='';
+    r.data.forEach(function(g){
+      var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
+      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">Room '+g.room+' &middot; Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.id+'\',\''+g.name+'\',\'Room '+g.room+'\')">💬</button></div>';
+    });
+    glist.innerHTML=html;
+    ovglist.innerHTML=html;
+    document.getElementById('sg').textContent=r.data.length;
+    // Repopulate message dropdown
+    var sel=document.getElementById('msgto');
+    sel.innerHTML='<option value="All guests" data-guest-id="">All guests (broadcast)</option>';
+    r.data.forEach(function(g){
+      var opt=document.createElement('option');
+      opt.value=g.name+' \u00b7 Room '+g.room;
+      opt.textContent=g.name+' \u00b7 Room '+g.room+' \u00b7 Out '+(g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC');
+      opt.dataset.guestId=g.id;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+
 function loadData(){
   if(!db){setTimeout(loadData,300);return;}
   // Load guests
@@ -793,7 +822,7 @@ function subscribeToAll(){
       updateAvgRating();
     })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'guests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
-      loadData(); // Reload guests list when new guest registers
+      loadGuestList(); // Only reload guests list when new guest registers
     })
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},function(payload){
       if(payload.new.read&&!payload.old.read&&payload.new.direction==='hotel_to_guest'){
@@ -804,7 +833,7 @@ function subscribeToAll(){
 
   // localStorage fallback for same-browser testing
   window.addEventListener('storage',function(e){
-    if(e.key==='arivo_requests')loadData();
+    if(e.key==='arivo_requests')loadGuestRequests();
     if(e.key==='arivo_rating'){
       var d=JSON.parse(e.newValue||'{}');
       if(d.stars<=3){
