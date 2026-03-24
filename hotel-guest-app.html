@@ -818,6 +818,8 @@ function enterApp(){
     });
     // Load messages from Supabase for this guest
     loadMessagesFromSupabase();
+    // Check if guest has already rated this stay
+    setTimeout(checkIfAlreadyRated, 800);
   }
   // Also load from localStorage
   loadMessagesFromStorage();
@@ -1023,18 +1025,18 @@ function applyEdit(){
 
 // ── STAR RATING ──
 function rateStar(n){
+  if(sessionStorage.getItem('arivo_rated')) return; // one rating per stay
   var stars = document.querySelectorAll('.star');
   stars.forEach(function(s,i){s.classList.toggle('active', i<n);});
   setTimeout(function(){
+    sessionStorage.setItem('arivo_rated','1');
     document.getElementById('feedback-sent').style.display='block';
     document.getElementById('stars').style.display='none';
-    // Push rating to localStorage so dashboard Priority Alert fires
     logEvent('guest_rating','Guest rated stay: '+n+' star'+(n>1?'s':''),state.name,state.room);
-  var ratingData = {stars:n, room:state.room||'-', guest:state.name||'Guest', time:new Date().toISOString()};
+    var ratingData = {stars:n, room:state.room||'-', guest:state.name||'Guest', time:new Date().toISOString()};
     localStorage.setItem('arivo_rating', JSON.stringify(ratingData));
     window.dispatchEvent(new StorageEvent('storage',{key:'arivo_rating',newValue:JSON.stringify(ratingData)}));
-    // Write to Supabase
-    db.from('ratings').insert({
+    if(db) db.from('ratings').insert({
       hotel_id: HOTEL_ID,
       guest_id: guestId,
       stars: n,
@@ -1046,6 +1048,22 @@ function rateStar(n){
       toast('Thank you for your feedback!');
     }
   }, 400);
+}
+
+function checkIfAlreadyRated(){
+  if(sessionStorage.getItem('arivo_rated')){
+    document.getElementById('feedback-sent').style.display='block';
+    document.getElementById('stars').style.display='none';
+    return;
+  }
+  if(!db||!guestId) return;
+  db.from('ratings').select('id').eq('hotel_id',HOTEL_ID).eq('guest_id',guestId).limit(1).then(function(r){
+    if(r.data&&r.data.length){
+      sessionStorage.setItem('arivo_rated','1');
+      document.getElementById('feedback-sent').style.display='block';
+      document.getElementById('stars').style.display='none';
+    }
+  });
 }
 
 // ── SMART REQUESTS ──
