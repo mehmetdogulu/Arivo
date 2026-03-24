@@ -801,10 +801,14 @@ function renderRequests(reqs) {
         var groom  = req.guests ? req.guests.room : '?';
         var sc     = req.status === 'claimed' ? 'cl' : req.status === 'in_progress' ? 'pr' : 'nw';
         var safeType = req.type.replace(/'/g, '').replace(/\\/g, '');
+        var badgetxt = req.status === 'claimed' ? 'Claimed' : req.status === 'in_progress' ? 'In Progress' : 'New';
+        if (req.photo_url) photoCache[req.id] = req.photo_url;
+        var photoBtn = req.photo_url ? '<button class="btn btn-s" onclick="showPhoto(\'' + req.id + '\')">&#128247;</button>' : '';
         ovHtml += '<div class="row">'
                 + '<div class="dot ' + sc + '"></div>'
                 + '<div class="ri"><div class="rt">' + req.type + ' &mdash; ' + groom + '</div><div class="rs">' + gname + '</div></div>'
-                + '<div class="badge ' + sc + '">' + (req.status === 'claimed' ? 'Claimed' : 'New') + '</div>'
+                + '<div class="badge ' + sc + '">' + badgetxt + '</div>'
+                + photoBtn
                 + '<button class="btn btn-s" onclick="openETA(this,\'' + req.id + '\',\'' + safeType + '\')">Done</button>'
                 + '</div>';
       });
