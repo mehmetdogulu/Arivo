@@ -380,10 +380,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="sec" id="s-fac">
   <div class="sech"><div class="secr"><div><div class="sect">Facilities</div><div class="secs">Shown in guest app</div></div><button class="btn btn-g" onclick="openM('mfac')">+ Add</button></div></div>
   <div class="card" id="faclist">
-    <div class="rrow"><div class="rthumb">&#127870;</div><div class="rinfo"><div class="rn">The Garden Room</div><div class="rc">Restaurant &middot; 7am&ndash;10pm</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127863;</div><div class="rinfo"><div class="rn">The Cellar Bar</div><div class="rc">Bar &middot; 5pm&ndash;Midnight</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#129498;</div><div class="rinfo"><div class="rn">Spa &amp; Wellness</div><div class="rc">9am&ndash;7pm &middot; Book at reception</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127947;</div><div class="rinfo"><div class="rn">Fitness Suite</div><div class="rc">24 hours &middot; Guests only</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#127870;</div><div class="rinfo"><div class="rn">The Garden Room</div><div class="rc">Restaurant &middot; 7am&ndash;10pm</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#127863;</div><div class="rinfo"><div class="rn">The Cellar Bar</div><div class="rc">Bar &middot; 5pm&ndash;Midnight</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#129498;</div><div class="rinfo"><div class="rn">Spa &amp; Wellness</div><div class="rc">9am&ndash;7pm &middot; Book at reception</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#127947;</div><div class="rinfo"><div class="rn">Fitness Suite</div><div class="rc">24 hours &middot; Guests only</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
   </div>
 </div>
 
@@ -391,10 +391,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="sech"><div class="secr"><div><div class="sect">Local Guide</div><div class="secs">Staff picks + Arivo AI suggestions</div></div><button class="btn btn-g" onclick="openM('mrec')">+ Add Place</button></div></div>
   <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; Arivo AI suggests local spots based on postcode BA1 2LW.</div>
   <div class="card" id="reclist">
-    <div class="rrow"><div class="rthumb">&#9749;</div><div class="rinfo"><div class="rn">Fold Coffee</div><div class="rc">Coffee &middot; 5 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127837;</div><div class="rinfo"><div class="rn">Osteria Filo</div><div class="rc">Dinner &middot; 12 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127867;</div><div class="rinfo"><div class="rn">The Star Inn</div><div class="rc">Bar &middot; 7 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#128138;</div><div class="rinfo"><div class="rn">Boots Pharmacy</div><div class="rc">4 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#9749;</div><div class="rinfo"><div class="rn">Fold Coffee</div><div class="rc">Coffee &middot; 5 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#127837;</div><div class="rinfo"><div class="rn">Osteria Filo</div><div class="rc">Dinner &middot; 12 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#127867;</div><div class="rinfo"><div class="rn">The Star Inn</div><div class="rc">Bar &middot; 7 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div class="rrow"><div class="rthumb">&#128138;</div><div class="rinfo"><div class="rn">Boots Pharmacy</div><div class="rc">4 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
   </div>
 </div>
 
@@ -510,6 +510,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="bnitem" id="bn4" onclick="go('set',null);setBN('bn4')"><div class="bnico">&#9881;</div><div class="bnlbl">Settings</div></div>
   </div></div>
 </div>
+
+<div class="mov" id="medit-rec"><div class="modal"><div class="mhdr"><div class="mt" id="edit-rec-title">Edit</div><div class="mclose" onclick="closeM('medit-rec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Emoji</label><input class="fi" id="edit-rec-emoji" maxlength="2" placeholder="e.g. &#127968;"></div><div class="fg"><label class="fl">Name</label><input class="fi" id="edit-rec-name" placeholder="Name"></div><div class="fg"><label class="fl">Details</label><input class="fi" id="edit-rec-detail" placeholder="e.g. Restaurant &middot; 7am&ndash;10pm"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveRecEdit()">Save Changes</button><button class="btn btn-s" onclick="closeM('medit-rec')">Cancel</button></div></div></div>
 
 <div class="mov" id="mag"><div class="modal"><div class="mhdr"><div class="mt">Add Guest</div><div class="mclose" onclick="closeM('mag')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="agn" placeholder="e.g. Sarah Chen"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="agr" placeholder="e.g. 7" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="agc" type="date"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addGuest()">Add Guest</button><button class="btn btn-s" onclick="closeM('mag')">Cancel</button></div></div></div>
 <div class="mov" id="msec"><div class="modal"><div class="mhdr"><div class="mt">Add Section</div><div class="mclose" onclick="closeM('msec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Title</label><input class="fi" id="nst" placeholder="e.g. Spa &amp; Wellness"></div><div class="fg"><label class="fl">Icon (emoji)</label><input class="fi" id="nsi" placeholder="e.g. &#129498;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addSec()">Create</button><button class="btn btn-s" onclick="closeM('msec')">Cancel</button></div></div></div>
@@ -1228,7 +1230,7 @@ function addFac() {
   var n = document.getElementById('afn').value.trim(); var d = document.getElementById('afd').value.trim(); var e = document.getElementById('afe').value.trim();
   if (!n) { toast('Enter facility name', 'err'); return; }
   var row = document.createElement('div'); row.className = 'rrow';
-  row.innerHTML = '<div class="rthumb">' + (e || '&#127968;') + '</div><div class="rinfo"><div class="rn">' + n + '</div><div class="rc">' + d + '</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
+  row.innerHTML = '<div class="rthumb">' + (e || '&#127968;') + '</div><div class="rinfo"><div class="rn">' + n + '</div><div class="rc">' + d + '</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,\'fac\')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
   document.getElementById('faclist').appendChild(row); closeM('mfac'); toast('Facility added');
   document.getElementById('afn').value = ''; document.getElementById('afd').value = ''; document.getElementById('afe').value = '';
 }
@@ -1236,10 +1238,43 @@ function addRec() {
   var n = document.getElementById('arn').value.trim(); var c = document.getElementById('arc').value.trim(); var e = document.getElementById('are').value.trim();
   if (!n) { toast('Enter place name', 'err'); return; }
   var row = document.createElement('div'); row.className = 'rrow';
-  row.innerHTML = '<div class="rthumb">' + (e || '&#128205;') + '</div><div class="rinfo"><div class="rn">' + n + '</div><div class="rc">' + c + '</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
+  row.innerHTML = '<div class="rthumb">' + (e || '&#128205;') + '</div><div class="rinfo"><div class="rn">' + n + '</div><div class="rc">' + c + '</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,\'rec\')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
   document.getElementById('reclist').appendChild(row); closeM('mrec'); toast('Place added');
   document.getElementById('arn').value = ''; document.getElementById('arc').value = ''; document.getElementById('are').value = '';
 }
+function editRec(btn, mode) {
+  var row = btn.closest('.rrow'); if (!row) return;
+  var emoji  = row.querySelector('.rthumb') ? row.querySelector('.rthumb').textContent.trim() : '';
+  var name   = row.querySelector('.rn')     ? row.querySelector('.rn').textContent.trim()     : '';
+  var detail = row.querySelector('.rc')     ? row.querySelector('.rc').textContent.trim()     : '';
+  document.getElementById('edit-rec-title').textContent  = mode === 'fac' ? 'Edit Facility' : 'Edit Place';
+  document.getElementById('edit-rec-emoji').value  = emoji;
+  document.getElementById('edit-rec-name').value   = name;
+  document.getElementById('edit-rec-detail').value = detail;
+  document.getElementById('medit-rec').dataset.row  = '';
+  // Store reference via a temp id
+  var tempId = 'edit-target-' + Date.now();
+  row.id = tempId;
+  document.getElementById('medit-rec').dataset.rowId = tempId;
+  openM('medit-rec');
+}
+
+function saveRecEdit() {
+  var emoji  = document.getElementById('edit-rec-emoji').value.trim();
+  var name   = document.getElementById('edit-rec-name').value.trim();
+  var detail = document.getElementById('edit-rec-detail').value.trim();
+  if (!name) { toast('Enter a name', 'err'); return; }
+  var rowId = document.getElementById('medit-rec').dataset.rowId;
+  var row = document.getElementById(rowId);
+  if (!row) { closeM('medit-rec'); return; }
+  if (emoji) row.querySelector('.rthumb').textContent = emoji;
+  if (row.querySelector('.rn')) row.querySelector('.rn').textContent = name;
+  if (row.querySelector('.rc')) row.querySelector('.rc').textContent = detail;
+  row.removeAttribute('id');
+  closeM('medit-rec');
+  toast('Saved');
+}
+
 function delRec(btn) { btn.closest('.rrow').remove(); }
 
 // ── UPLOADS ──
