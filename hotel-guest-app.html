@@ -978,6 +978,8 @@ function cancelCar(){
 
 // ── REPORT ISSUE ──
 function triggerPhotoUpload(){document.getElementById('photo-input').click();}
+var pendingPhotoBlob = null;
+
 function previewPhoto(input){
   if(input.files&&input.files[0]){
     var reader=new FileReader();
@@ -992,6 +994,13 @@ function previewPhoto(input){
         canvas.width=w; canvas.height=h;
         canvas.getContext('2d').drawImage(img,0,0,w,h);
         var compressed=canvas.toDataURL('image/jpeg',0.6);
+        // Check size - warn if over 2MB
+        var sizeKB=Math.round(compressed.length*0.75/1024);
+        if(sizeKB>2048){toast('Image too large. Please try a different photo.');return;}
+        // Store as blob for Supabase upload
+        canvas.toBlob(function(blob){
+          pendingPhotoBlob=blob;
+        },'image/jpeg',0.6);
         var prev=document.getElementById('photo-preview');
         prev.src=compressed;
         prev.style.display='block';
@@ -1005,14 +1014,41 @@ function previewPhoto(input){
 function sendIssueReport(){
   var desc=document.getElementById('issue-desc').value.trim();
   if(!desc){toast('Please describe the issue');return;}
-  var preview=document.getElementById('photo-preview');
-  var photoData=preview.style.display!=='none'?preview.src:null;
-  pushRequest('Maintenance Issue', desc, photoData);
-  logEvent('guest_issue','Maintenance reported: '+desc.slice(0,60)+(photoData?' [photo attached]':''),state.name,state.room);
-  toast('Issue reported - a member of staff will attend shortly');
-  document.getElementById('issue-desc').value='';
-  preview.style.display='none';
-  document.getElementById('photo-upload-area').style.display='block';
+  toast('Sending report...');
+  if(pendingPhotoBlob && db){
+    // Upload photo to Supabase Storage
+    var fileName='photo_'+Date.now()+'.jpg';
+    db.storage.from('request-photos').upload(fileName, pendingPhotoBlob, {
+      contentType:'image/jpeg',
+      upsert:false
+    }).then(function(result){
+      if(result.error){
+        console.log('Photo upload error:', result.error.message);
+        // Submit without photo if upload fails
+        pushRequest('Maintenance Issue', desc, null);
+      } else {
+        // Get public URL
+        var urlResult = db.storage.from('request-photos').getPublicUrl(fileName);
+        var photoUrl = urlResult.data ? urlResult.data.publicUrl : null;
+        pushRequest('Maintenance Issue', desc, photoUrl);
+      }
+      logEvent('guest_issue','Maintenance reported: '+desc.slice(0,60)+(pendingPhotoBlob?' [photo attached]':''),state.name,state.room);
+      toast('Issue reported - a member of staff will attend shortly');
+      document.getElementById('issue-desc').value='';
+      document.getElementById('photo-preview').style.display='none';
+      document.getElementById('photo-upload-area').style.display='block';
+      pendingPhotoBlob=null;
+    });
+  } else {
+    // No photo or no db connection
+    pushRequest('Maintenance Issue', desc, null);
+    logEvent('guest_issue','Maintenance reported: '+desc.slice(0,60),state.name,state.room);
+    toast('Issue reported - a member of staff will attend shortly');
+    document.getElementById('issue-desc').value='';
+    document.getElementById('photo-preview').style.display='none';
+    document.getElementById('photo-upload-area').style.display='block';
+    pendingPhotoBlob=null;
+  }
 }
 
 function sendCustom(){
@@ -1104,9 +1140,17 @@ function setGuestContext(name,room){guestName=name;guestRoom=room;}
 async function pushRequest(type, detail, photoData){
   // Also track in localStorage for Rule 13 duplicate check
   var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-  lsReqs.unshift({id:'req_'+Date.now(),type:type,detail:detail,guest:guestName,room:guestRoom,time:new Date().toISOString(),status:'new'});
+  var reqId='req_'+Date.now();
+  lsReqs.unshift({id:reqId,type:type,detail:detail,photo:photoData||null,guest:guestName,room:guestRoom,time:new Date().toISOString(),status:'new'});
   if(lsReqs.length>100) lsReqs=lsReqs.slice(0,100);
   localStorage.setItem('arivo_requests',JSON.stringify(lsReqs));
+  // Store photo separately so dashboard can retrieve it
+  if(photoData){
+    var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
+    photos[reqId]=photoData;
+    localStorage.setItem('arivo_photos',JSON.stringify(photos));
+    window.dispatchEvent(new StorageEvent('storage',{key:'arivo_photos'}));
+  }
   try {
     db.from('requests').insert({
       hotel_id: HOTEL_ID,
