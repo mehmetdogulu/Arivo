@@ -356,7 +356,7 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
       <span class="app-chip" id="app-co">Out 23 Mar</span>
     </div>
     <button class="edit-btn" onclick="openEdit()">&#9999; Edit my details</button>
-    <div class="pending-chip" id="pending-chip">&#9203; Change pending hotel confirmation</div>
+    <div class="pending-chip" id="pending-chip">⏳ Change pending hotel confirmation</div>
     <div class="powered-by">Powered by <span>Arivo</span></div>
   </div>
 
@@ -785,20 +785,41 @@ function lookupGuestByName(name){
 
 function enterApp(){
   showScreen('screen-app');
-  // Load hotel settings from Supabase (address, name etc)
+  // Load hotel settings from Supabase (address, logo, menu)
   if(db){
-    db.from('hotel_settings').select('address').eq('hotel_id',HOTEL_ID).single().then(function(r){
-      if(r.data&&r.data.address) hotelSettings=r.data.address;
+    db.from('hotel_settings').select('address,logo_url,menu_url').eq('hotel_id',HOTEL_ID).single().then(function(r){
+      if(r.data){
+        if(r.data.address) hotelSettings=r.data.address;
+        if(r.data.logo_url){
+          var logoEl=document.getElementById('hotel-logo-display');
+          if(logoEl) logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';
+        }
+        if(r.data.menu_url){
+          var menuBtn=document.querySelector('.menu-btn-wrap');
+          if(menuBtn) menuBtn.onclick=function(){window.open(r.data.menu_url,'_blank');};
+        }
+      }
     });
+    // Load messages from Supabase for this guest
+    if(guestId){
+      db.from('messages').select('*').eq('hotel_id',HOTEL_ID).or('guest_id.eq.'+guestId+',guest_id.is.null').eq('direction','hotel_to_guest').order('created_at',{ascending:false}).limit(30).then(function(r){
+        if(r.data&&r.data.length){
+          r.data.reverse().forEach(function(msg){
+            addMessageToTab({from:'Hotel Team',text:msg.body,time:msg.created_at,unread:false});
+          });
+        }
+      });
+    }
   }
-  // Clear old messages if this is a new stay (fresh registration)
+  // Also load from localStorage
+  loadMessagesFromStorage();
+  // Clear old messages if this is a new stay
   var lastCheckout = localStorage.getItem('arivo_last_checkout');
   var today = new Date().toISOString().split('T')[0];
   if(lastCheckout && lastCheckout !== state.checkout && state.checkout > today){
     localStorage.removeItem('arivo_guest_inbox');
   }
   localStorage.setItem('arivo_last_checkout', state.checkout);
-  loadMessagesFromStorage();
 }
 
 // ── BYPASS CODE ──
@@ -994,7 +1015,7 @@ function handleReq(btn){
   if(type==='car'){
     if(btn.classList.contains('sent'))return;
     btn.classList.add('sent');
-    btn.querySelector('.rq-ico').textContent='&#9203;';
+    btbtn.querySelector('.rq-ico').textContent='\u23F3';
     btn.querySelector('.rq-lbl2').textContent='';
     startCarCountdown();
     toast('Your car is being brought around - 10 minutes');
