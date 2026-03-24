@@ -689,10 +689,10 @@ function submitReg(){
   var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   var fn=name.split(' ')[0];
   document.getElementById('w-name').textContent=fn;
-  document.getElementById('w-room').textContent='Room '+room;
+  document.getElementById('w-room').textContent=room;
   document.getElementById('w-co').textContent='Checkout '+fmt;
   document.getElementById('app-name').textContent=fn;
-  document.getElementById('app-room').textContent='Room '+room;
+  document.getElementById('app-room').textContent=room;
   document.getElementById('app-co').textContent='Out '+fmt;
   document.getElementById('chat-greeting').textContent='Hello '+fn+'! I am your personal concierge for The Maison. How can I make your stay even better?';
   startCheckoutReminders(co);
@@ -740,43 +740,23 @@ function submitBypass(){
 // ── CHECKOUT REMINDERS ──
 function startCheckoutReminders(coDateStr){
   var coDate = new Date(coDateStr);
-  // Set checkout to 11am
   coDate.setHours(11,0,0,0);
   var now = new Date();
   var msUntilCheckout = coDate.getTime() - now.getTime();
   var msUntil2hr = msUntilCheckout - 2*60*60*1000;
   var msUntil1hr = msUntilCheckout - 1*60*60*1000;
-  // 1 hour AFTER checkout = checkout + 60 min = grace period expiry
   var msUntilExpiry = msUntilCheckout + 60*60*1000;
-
-  // For demo purposes — 2hr reminder after 5s, 1hr reminder after 10s, expiry after 15s
-  var demo = true;
-
-  if(demo){
-    setTimeout(function(){
-      showCheckoutBanner('Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready.');
-      showHotelMessage('Friendly reminder: your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!');
-    }, 5000);
-    setTimeout(function(){
-      showCheckoutBanner('Your checkout is in 1 hour (11:00 AM). Please drop your key at reception.');
-      showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us — we would love to see you again!');
-    }, 10000);
-    // Demo expiry timer disabled — expiry only fires in production via real checkout time
-    // setTimeout(function(){ expireGuestSession(); }, 15000);
-  } else {
-    // Production timers
-    if(msUntil2hr > 0) setTimeout(function(){
-      showCheckoutBanner('Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready.');
-      showHotelMessage('Friendly reminder: your checkout is in 2 hours at 11:00 AM.');
-    }, msUntil2hr);
-    if(msUntil1hr > 0) setTimeout(function(){
-      showCheckoutBanner('Your checkout is in 1 hour (11:00 AM). Please drop your key at reception.');
-      showHotelMessage('Your checkout is in 1 hour. Thank you for your stay!');
-    }, msUntil1hr);
-    if(msUntilExpiry > 0) setTimeout(function(){
-      expireGuestSession();
-    }, msUntilExpiry);
-  }
+  if(msUntil2hr > 0) setTimeout(function(){
+    showCheckoutBanner('Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready.');
+    showHotelMessage('Friendly reminder: your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!');
+  }, msUntil2hr);
+  if(msUntil1hr > 0) setTimeout(function(){
+    showCheckoutBanner('Your checkout is in 1 hour (11:00 AM). Please drop your key at reception.');
+    showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');
+  }, msUntil1hr);
+  if(msUntilExpiry > 0) setTimeout(function(){
+    expireGuestSession();
+  }, msUntilExpiry);
 }
 
 function expireGuestSession(){
@@ -887,7 +867,7 @@ function applyEdit(){
   var fn=state.name.split(' ')[0];
   var d=state.checkout?new Date(state.checkout).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
   document.getElementById('app-name').textContent=fn;
-  document.getElementById('app-room').textContent='Room '+state.room;
+  document.getElementById('app-room').textContent=state.room;
   document.getElementById('app-co').textContent='Out '+d;
   document.getElementById('pending-chip').style.display='none';
   toast('Profile updated - confirmed by hotel');
