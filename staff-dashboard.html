@@ -455,9 +455,8 @@ function buildTaskCard(req) {
   var safeType   = req.type.replace(/'/g,'').replace(/\\/g,'');
   var safeRoom   = groom.replace(/'/g,'');
   var safeId     = req.id;
-
-  var timeAgo = getTimeAgo(req.created_at);
-  var etaChip = isIP ? '<div class="meta-chip eta">&#9203; In Progress</div>' : '';
+  var timeAgo    = getTimeAgo(req.created_at);
+  var etaChip    = isIP ? '<div class="meta-chip eta">&#9203; In Progress</div>' : '';
 
   var actionBtn = '';
   if (isNew) {
@@ -468,6 +467,11 @@ function buildTaskCard(req) {
     actionBtn = '<button class="task-btn complete" onclick="openCompleteModal(\'' + safeId + '\',\'' + safeType + '\',\'' + safeRoom + '\')">&#10003; Mark Complete</button>';
   }
 
+  // Photo button if photo exists
+  var photoBtn = req.photo_url
+    ? '<button class="task-btn" style="background:var(--bdim);color:var(--blu);border-color:rgba(96,165,250,.3);margin-top:8px" onclick="showStaffPhoto(\'' + req.photo_url + '\')">&#128247; View Photo</button>'
+    : '';
+
   card.innerHTML =
     '<div class="task-card-hdr">'
     + '<div class="task-type">' + req.type + '</div>'
@@ -477,9 +481,26 @@ function buildTaskCard(req) {
     + '<div class="task-room">&#128682; ' + groom + ' &mdash; ' + gname + '</div>'
     + '<div class="task-note">' + (req.detail || req.type) + '</div>'
     + '<div class="task-meta"><div class="meta-chip">&#128336; ' + timeAgo + '</div>' + etaChip + '</div>'
-    + '<div class="task-actions">' + actionBtn + '</div>';
+    + '<div class="task-actions">' + actionBtn + photoBtn + '</div>';
 
   return card;
+}
+
+function showStaffPhoto(url) {
+  var overlay = document.getElementById('staff-photo-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'staff-photo-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    overlay.onclick = function() { overlay.style.display = 'none'; };
+    var img = document.createElement('img');
+    img.id = 'staff-photo-img';
+    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('staff-photo-img').src = url;
+  overlay.style.display = 'flex';
 }
 
 function getTimeAgo(ts) {
