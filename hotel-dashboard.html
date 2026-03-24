@@ -602,7 +602,9 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div id="toast"></div><script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-const HOTEL_ID = '00000000-0000-0000-0000-000000000001';
+// Hotel ID — read from URL ?hotel= param, fallback to default for The Maison
+var _urlParams = new URLSearchParams(window.location.search);
+var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
 var db = null;
 document.addEventListener('DOMContentLoaded', function(){
   try { if(window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
@@ -692,6 +694,23 @@ function closeSidebar(){document.getElementById('sbar').classList.remove('open')
 
 function loadGuestList(){
   if(!db){setTimeout(loadGuestList,300);return;}
+  // Load rooms from Supabase first
+  db.from('hotel_settings').select('rooms').eq('hotel_id',HOTEL_ID).single().then(function(rs){
+    if(rs.data&&rs.data.rooms&&rs.data.rooms.length){
+      var list=document.getElementById('roomlist');
+      if(list){
+        list.innerHTML='';
+        rs.data.rooms.forEach(function(room){
+          var row=document.createElement('div');row.className='irow';
+          row.innerHTML='<div class="irk">'+room+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">'+room+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';
+          list.appendChild(row);
+        });
+      }
+      // Update sidebar room count
+      var hloc=document.getElementById('hloc');
+      if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rs.data.rooms.length+' rooms \u00b7 '+city+', UK';}
+    }
+  });
   db.from('guests').select('*').eq('hotel_id',HOTEL_ID).eq('checked_out',false).order('registered_at',{ascending:false}).then(function(r){
     if(r.error||!r.data)return;
     var glist=document.getElementById('glist');
@@ -1340,10 +1359,14 @@ function saveRooms(){
   var rooms=[];
   document.querySelectorAll('#roomlist .irow').forEach(function(row){
     var v=row.querySelector('.irv');
-    if(v&&v.textContent.trim()) rooms.push(v.textContent.trim());
+    if(v&&v.textContent.trim()) rooms.push(String(v.textContent.trim()));
   });
-  localStorage.setItem('arivo_hotel_rooms',JSON.stringify(rooms));
-  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_hotel_rooms',newValue:JSON.stringify(rooms)}));
+  // Save to Supabase as plain JSON string to avoid DataCloneError
+  if(db){
+    db.from('hotel_settings').update({rooms:rooms,updated_at:new Date().toISOString()}).eq('hotel_id',HOTEL_ID).then(function(r){
+      if(r.error) console.log('Rooms save error:',r.error.message);
+    });
+  }
   // Update room count in sidebar
   var hloc=document.getElementById('hloc');
   if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rooms.length+' rooms \u00b7 '+city+', UK';}
@@ -1374,11 +1397,6 @@ function delRoomRow(btn){
 }
 
 // Save rooms on initial load
-document.addEventListener('DOMContentLoaded',function(){
-  var saved=localStorage.getItem('arivo_hotel_rooms');
-  if(!saved) saveRooms(); // save defaults on first load
-});
-
 
 function saveHotelAddress(){
   var street=document.getElementById('hotel-street')?document.getElementById('hotel-street').value:'14 Brock Street';
