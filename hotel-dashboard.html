@@ -586,6 +586,17 @@ var photoCache = {};
 
 function showPhoto(reqId){
   var src = photoCache[reqId];
+  // Also check localStorage photos (same-browser fallback)
+  if(!src){
+    var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
+    src=photos[reqId];
+  }
+  // Check localStorage requests for photo field
+  if(!src){
+    var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+    var req=lsReqs.find(function(r){return r.id===reqId;});
+    if(req)src=req.photo||null;
+  }
   if(!src){toast('No photo available','err');return;}
   var overlay = document.getElementById('photo-overlay');
   if(!overlay){
@@ -692,7 +703,7 @@ function loadData(){
       var badgecls=req.status==='claimed'?'cl':'nw';
       var badgetxt=req.status==='claimed'?'Claimed':'New';
       if(req.photo_url)photoCache[req.id]=req.photo_url;
-      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">&#128247; Photo</button>':'';
+      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">📷 Photo</button>':'';
       html+='<div class="row" id="req-'+req.id+'"><div class="dot '+dotcls+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+req.detail.slice(0,50)+'</div></div><div class="badge '+badgecls+'">'+badgetxt+'</div>';
       if(req.status==='new')html+='<button class="btn btn-s" onclick="claimReq(this)">Claim</button>';
       html+=photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
@@ -711,19 +722,23 @@ function loadData(){
 // ── LOCALSTORAGE FALLBACK (same-browser testing) ──
 function loadGuestRequests(){
   var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
   var list=document.getElementById('reqlist');
   if(!list||!requests.length)return;
   requests.forEach(function(req){
     if(document.getElementById('req-'+req.id))return;
     var row=document.createElement('div');row.className='row';row.id='req-'+req.id;
-    var photoTag=req.photo?'<span style="font-size:10px;background:var(--bdim);color:var(--blu);padding:2px 6px;border-radius:5px;margin-left:6px;">&#128247; Photo</span>':'';
+    if(req.photo)photoCache[req.id]=req.photo;
+    else if(photos[req.id])photoCache[req.id]=photos[req.id];
+    var hasPhoto=req.photo||photos[req.id];
+    var photoTag=hasPhoto?'<span style="font-size:10px;background:var(--bdim);color:var(--blu);padding:2px 6px;border-radius:5px;margin-left:6px;">📷 Photo</span>':'';
     row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+(req.room?' — Room '+req.room:'')+'</div><div class="rs">'+(req.guest||'Guest')+' · '+req.detail.slice(0,50)+photoTag+'</div></div><div class="badge nw">New</div>';
     var cb=document.createElement('button');cb.className='btn btn-s';cb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';cb.textContent='Claim';
     cb.onclick=function(){claimReq(cb);};
     var db=document.createElement('button');db.className='btn btn-s';db.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';db.textContent='Done';
     db.onclick=function(){openETA(db);};
     row.appendChild(cb);row.appendChild(db);
-    if(req.photo){var vb=document.createElement('button');vb.className='btn btn-s';vb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';vb.textContent='&#128247;';vb.onclick=function(){var w=window.open();w.document.write('<img src="'+req.photo+'" style="max-width:100%">');};row.appendChild(vb);}
+    if(req.photo){var vb=document.createElement('button');vb.className='btn btn-s';vb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';vb.textContent='📷';vb.onclick=function(){var w=window.open();w.document.write('<img src="'+req.photo+'" style="max-width:100%">');};row.appendChild(vb);}
     list.insertBefore(row,list.firstChild);
     openReqs++;updateCnts();
   });
@@ -805,7 +820,7 @@ function addRequestRow(req){
   var gname=req.guests?req.guests.name:'Guest';
   var groom=req.guests?req.guests.room:'?';
   if(req.photo_url)photoCache[req.id]=req.photo_url;
-  var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">&#128247;</button>':'';
+  var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">📷</button>':'';
   row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+(req.detail||'').slice(0,50)+'</div></div><div class="badge nw">New</div><button class="btn btn-s" onclick="claimReq(this)">Claim</button>'+photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button>';
   list.insertBefore(row,list.firstChild);
   openReqs++;updateCnts();
