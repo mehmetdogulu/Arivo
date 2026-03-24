@@ -1140,9 +1140,19 @@ function subscribeToAll() {
       if (payload.new.direction === 'guest_to_hotel') {
         toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
         notify('mgr', '&#128172; Guest Message', payload.new.body, payload.new.sender_name);
+        // Show reply button in notification
+        showGuestMessageAlert(payload.new.guest_id, payload.new.sender_name, payload.new.body);
       }
     })
     .subscribe();
+}
+
+function showGuestMessageAlert(guestId, guestName, body) {
+  // Open the quick-reply modal pre-filled
+  if(guestId && guestName) {
+    openMsgM(guestId, guestName, '');
+    document.getElementById('msgb2').placeholder = 'Reply to: "' + body.slice(0,50) + '"';
+  }
 }
 
 // ── MESSAGING ──
