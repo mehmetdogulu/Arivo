@@ -161,6 +161,30 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 #toast.warn{background:var(--amber);color:var(--bg);}
 #toast.err{background:var(--red);color:white;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bor);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;font-size:9px;color:var(--muted);cursor:pointer;position:relative;gap:2px;}
+.nav-item.active{color:var(--gold);}
+.nav-ico{font-size:20px;}
+.nav-lbl{font-size:9px;font-weight:500;}
+.task-badge{position:absolute;top:6px;right:50%;margin-right:-18px;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-box{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:24px 20px 40px;}
+.modal-title{font-family:'Instrument Serif',serif;font-size:22px;color:var(--tx);margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.modal-notes{width:100%;background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13px;color:var(--tx);outline:none;resize:none;min-height:70px;margin-bottom:14px;}
+.modal-notes:focus{border-color:var(--gold);}
+.modal-confirm{width:100%;background:var(--gold);color:#000;border:none;border-radius:12px;padding:14px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+.modal-cancel{width:100%;background:none;border:1px solid var(--bor);border-radius:12px;padding:12px;font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer;}
+
+/* ── PROFILE FORM ── */
+.p-input{width:100%;background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13px;color:var(--tx);outline:none;margin-bottom:10px;}
+.p-input:focus{border-color:var(--gold);}
+.p-btn{width:100%;background:var(--gold);color:#000;border:none;border-radius:12px;padding:13px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -286,6 +310,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
     <button class="modal-confirm" onclick="confirmComplete()">&#10003; Confirm Complete</button>
     <button class="modal-cancel" onclick="closeModal()">Cancel</button>
   </div>
+
+
 </div>
 
 <div id="toast"></div>
