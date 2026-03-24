@@ -574,7 +574,7 @@ function showScreen(id){
 function loadRoomDropdown(){
   var sel=document.getElementById('reg-room');
   if(!sel) return;
-  // Default rooms while loading
+  // Default rooms 1-22
   var defaultRooms=[];
   for(var i=1;i<=22;i++) defaultRooms.push('Room '+i);
   function populateRooms(rooms, occupied){
@@ -588,8 +588,11 @@ function loadRoomDropdown(){
       sel.appendChild(opt);
     });
   }
-  if(db){
-    // Fetch rooms and occupied guests in parallel
+  // Always show defaults immediately so dropdown is never empty
+  populateRooms(defaultRooms, []);
+  // Then fetch from Supabase and update
+  function fetchFromSupabase(){
+    if(!db){setTimeout(fetchFromSupabase, 300); return;}
     Promise.all([
       db.from('hotel_settings').select('rooms').eq('hotel_id',HOTEL_ID).single(),
       db.from('guests').select('room').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
@@ -597,10 +600,11 @@ function loadRoomDropdown(){
       var rooms=(results[0].data&&results[0].data.rooms&&results[0].data.rooms.length)?results[0].data.rooms:defaultRooms;
       var occupied=(results[1].data||[]).map(function(g){return g.room;});
       populateRooms(rooms, occupied);
+    }).catch(function(e){
+      console.log('Room load error:', e);
     });
-  } else {
-    populateRooms(defaultRooms, []);
   }
+  fetchFromSupabase();
 }
 
 document.addEventListener('DOMContentLoaded',function(){ loadRoomDropdown(); });
