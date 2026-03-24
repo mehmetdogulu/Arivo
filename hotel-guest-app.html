@@ -598,7 +598,10 @@ function submitReg(){
   state.name=name;state.room=room;
   setGuestContext(name,room);state.checkout=co;
   // Register in Supabase with deduplication rules
+  if(state.registering) return; // prevent double submission
+  state.registering = true;
   setTimeout(function(){
+    if(!db){ state.registering=false; return; }
     var today = new Date().toISOString().split('T')[0];
     // RULE: Same room + different name + not checked out = block (room occupied)
     db.from('guests')
@@ -649,6 +652,7 @@ function submitReg(){
               guestId = result.data[0].id;
               subscribeToUpdates();
             }
+            state.registering = false;
           });
         }
       });
@@ -1097,6 +1101,7 @@ async function pushRequest(type, detail, photoData){
       guest_id: guestId,
       type: type,
       detail: detail,
+      photo_url: photoData||null,
       status: 'new'
     }).then(function(){});
   } catch(e) {
