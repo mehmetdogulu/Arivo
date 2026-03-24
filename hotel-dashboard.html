@@ -380,10 +380,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="sec" id="s-fac">
   <div class="sech"><div class="secr"><div><div class="sect">Facilities</div><div class="secs">Shown in guest app</div></div><button class="btn btn-g" onclick="openM('mfac')">+ Add</button></div></div>
   <div class="card" id="faclist">
-    <div class="rrow"><div class="rthumb">&#127870;</div><div class="rinfo"><div class="rn">The Garden Room</div><div class="rc">Restaurant &middot; 7am&ndash;10pm</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127863;</div><div class="rinfo"><div class="rn">The Cellar Bar</div><div class="rc">Bar &middot; 5pm&ndash;Midnight</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#129498;</div><div class="rinfo"><div class="rn">Spa &amp; Wellness</div><div class="rc">9am&ndash;7pm &middot; Book at reception</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127947;</div><div class="rinfo"><div class="rn">Fitness Suite</div><div class="rc">24 hours &middot; Guests only</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'fac')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="faclist-empty">No facilities added yet. Use the button above to add your hotel's facilities.</div>
   </div>
 </div>
 
@@ -391,10 +388,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="sech"><div class="secr"><div><div class="sect">Local Guide</div><div class="secs">Staff picks + Arivo AI suggestions</div></div><button class="btn btn-g" onclick="openM('mrec')">+ Add Place</button></div></div>
   <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; Arivo AI suggests local spots based on postcode BA1 2LW.</div>
   <div class="card" id="reclist">
-    <div class="rrow"><div class="rthumb">&#9749;</div><div class="rinfo"><div class="rn">Fold Coffee</div><div class="rc">Coffee &middot; 5 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127837;</div><div class="rinfo"><div class="rn">Osteria Filo</div><div class="rc">Dinner &middot; 12 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#127867;</div><div class="rinfo"><div class="rn">The Star Inn</div><div class="rc">Bar &middot; 7 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
-    <div class="rrow"><div class="rthumb">&#128138;</div><div class="rinfo"><div class="rn">Boots Pharmacy</div><div class="rc">4 min walk</div><div class="rsrc ai">Arivo AI</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,'rec')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
+    <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="reclist-empty">No places added yet. Use the button above to add your first staff pick.</div>
   </div>
 </div>
 
