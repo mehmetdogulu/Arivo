@@ -247,8 +247,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="lf"><label>Email</label><input type="email" id="le" placeholder="manager@hotel.com" autocomplete="email"></div>
     <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onkeydown="if(event.key==='Enter')login()"></div>
     <button class="lbtn" onclick="login()">Sign In &rarr;</button>
-    <div class="lerr" id="lerr">Invalid credentials. Try <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="771a161916101205371f1803121b5914181a">[email&#160;protected]</a> / password123</div>
-    <div class="lhint">Demo: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="402d212e2127253200282f34252c6e232f2d">[email&#160;protected]</a></span> / <span>password123</span></div>
+    <div class="lerr" id="lerr">Invalid credentials. Please check your email and password.</div>
+    <div class="lhint">Sign in with your manager credentials.</div>
   </div>
 </div>
 
@@ -256,7 +256,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="ov" id="ov" onclick="closeSidebar()"></div>
   <div class="sbar" id="sbar">
     <div class="slogo"><div class="slogo-mark">Ari<em>vo</em></div><div class="ssub">Hotel Dashboard</div></div>
-    <div class="hchip"><div class="hcn" id="hname">The Maison Collective</div><div class="hcs" id="hloc">22 rooms &middot; Bath, UK</div></div>
+    <div class="hchip"><div class="hcn" id="hname"><span id="hname">Your Hotel</span></div><div class="hcs" id="hloc">0 rooms</div></div>
     <div class="nav-body">
       <div class="nlbl">Live</div>
       <div class="ni on" onclick="go('ov',this)"><span class="ni-ic">&#9646;&#9646;</span>Overview</div>
@@ -274,7 +274,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="ni" onclick="go('set',this)"><span class="ni-ic">&#9881;</span>Settings</div>
     </div>
     <div class="sfooter">
-      <div class="urow"><div class="uav" id="uav">JM</div><div><div class="uname" id="uname">James Mitchell</div><div class="urole">Hotel Manager</div></div></div>
+      <div class="urow"><div class="uav" id="uav">HM</div><div><div class="uname" id="uname">Hotel Manager</div><div class="urole">Hotel Manager</div></div></div>
       <button class="logoutbtn" onclick="logout()">Sign out</button>
     </div>
   </div>
@@ -357,14 +357,14 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="sech"><div class="secr"><div><div class="sect">Hotel Info</div><div class="secs">Appears in guest app immediately</div></div><button class="btn btn-g" onclick="openM('msec')">+ Add Section</button></div></div>
   <div class="isec" id="sec-wifi">
     <div class="ish"><div class="ist"><div class="ith">&#128246;</div>WiFi</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR('sec-wifi','WiFi')">&#65291;</div><div class="icb del" onclick="delSec('sec-wifi')">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Network</div><div class="irv" contenteditable="true" onblur="toast('Saved')">TheMaison_Guest</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Password</div><div class="irv" contenteditable="true" onblur="toast('Saved')">maison2026</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk">Network</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">Your WiFi network name</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk">Password</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">Your WiFi password</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
     <button class="addrow" onclick="openAR('sec-wifi','WiFi')">&#65291; Add row</button>
   </div>
   <div class="isec" id="sec-times">
     <div class="ish"><div class="ist"><div class="ith">&#128336;</div>Key Times</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR('sec-times','Key Times')">&#65291;</div><div class="icb del" onclick="delSec('sec-times')">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Check-out</div><div class="irv" contenteditable="true" onblur="toast('Saved')">11:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Breakfast</div><div class="irv" contenteditable="true" onblur="toast('Saved')">8:00 &ndash; 10:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk">Check-out</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">e.g. 11:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk">Breakfast</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">e.g. 8:00 - 10:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
     <button class="addrow" onclick="openAR('sec-times','Key Times')">&#65291; Add row</button>
   </div>
   <div class="card"><div class="ch"><div class="ct">&#128196; Restaurant Menu (PDF)</div></div><div class="cb">
@@ -466,8 +466,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div style="padding:10px 16px;font-size:11px;color:var(--tx3)">Edit names to match your operation (e.g. "The Garden Suite").</div>
   </div>
   <div class="card"><div class="ch"><div class="ct">&#128274; My Credentials</div></div><div class="cb">
-    <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cname" value="James Mitchell"></div>
-    <div class="fg"><label class="fl">Email</label><input class="fi" id="cemail" type="email" value="james@maisonbath.co.uk"></div>
+    <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cname" value=""></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="cemail" type="email" value=""></div>
     <button class="btn btn-g" onclick="saveCreds('name')" style="margin-bottom:14px">Save Name &amp; Email</button>
     <div style="height:1px;background:var(--bor);margin:4px 0 16px"></div>
     <div class="fg"><label class="fl">Current Password</label><input class="fi" id="cpc" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"></div>
@@ -487,9 +487,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Staff Members</div><div class="ca" onclick="openM('mstaff')">+ Add Staff</div></div>
     <div id="stafflist">
-      <div class="srow"><div class="sav" style="background:rgba(61,214,140,.1);color:var(--grn)">MR</div><div class="sin"><div class="sn">Maria Rodriguez</div><div class="ss">Housekeeping &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
-      <div class="srow"><div class="sav" style="background:rgba(96,165,250,.1);color:var(--blu)">TK</div><div class="sin"><div class="sn">Tom Kim</div><div class="ss">Front Desk &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
-      <div class="srow"><div class="sav" style="background:rgba(201,168,76,.1);color:var(--gold)">LP</div><div class="sin"><div class="sn">Lena Petrov</div><div class="ss">Concierge &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
+      <div style="padding:16px;text-align:center;color:var(--tx3);font-size:12px;" id="staff-empty">No staff added yet.</div>
     </div>
   </div>
 </div>
@@ -1030,6 +1028,7 @@ function loadSettings() {
     if (rs.data.menu_url) { var lbl = document.getElementById('menu-upload-label'); if (lbl) lbl.textContent = 'Menu uploaded \u2714 Tap to replace'; }
   });
   loadHotelAddress();
+  loadHotelInfo();
 }
 
 function loadHotelAddress() {
@@ -1193,7 +1192,63 @@ function genBypass() {
   document.getElementById('bypres').style.display = 'block';
 }
 
-// ── HOTEL INFO SECTIONS ──
+// ── HOTEL INFO SAVE/LOAD ──
+function saveHotelInfo() {
+  if (!db) return;
+  // Collect all info sections into a JSON object
+  var info = {};
+  document.querySelectorAll('.isec').forEach(function(sec) {
+    var title = sec.querySelector('.ist') ? sec.querySelector('.ist').textContent.trim() : sec.id;
+    var rows = [];
+    sec.querySelectorAll('.irow').forEach(function(row) {
+      var k = row.querySelector('.irk') ? row.querySelector('.irk').textContent.trim() : '';
+      var v = row.querySelector('.irv') ? row.querySelector('.irv').textContent.trim() : '';
+      if (k) rows.push({k: k, v: v});
+    });
+    if (rows.length) info[sec.id] = {title: title, rows: rows};
+  });
+  db.from('hotel_settings').update({hotel_info: info}).eq('hotel_id', HOTEL_ID).then(function(r) {
+    if (r.error) console.log('hotel_info save error:', r.error.message);
+  });
+  toast('Saved');
+}
+
+function loadHotelInfo() {
+  if (!db) return;
+  db.from('hotel_settings').select('hotel_info,manager_name,manager_email').eq('hotel_id', HOTEL_ID).single().then(function(r) {
+    if (!r.data) return;
+    // Restore hotel info sections
+    if (r.data.hotel_info) {
+      Object.keys(r.data.hotel_info).forEach(function(secId) {
+        var sec = document.getElementById(secId);
+        var data = r.data.hotel_info[secId];
+        if (!sec || !data.rows) return;
+        // Remove existing irows and repopulate
+        sec.querySelectorAll('.irow').forEach(function(row) { row.remove(); });
+        var addBtn = sec.querySelector('.addrow');
+        data.rows.forEach(function(row) {
+          var el = document.createElement('div'); el.className = 'irow';
+          el.innerHTML = '<div class="irk">' + row.k + '</div>'
+                       + '<div class="irv" contenteditable="true" onblur="saveHotelInfo()">' + row.v + '</div>'
+                       + '<div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';
+          sec.insertBefore(el, addBtn);
+        });
+      });
+    }
+    // Restore manager name/email
+    if (r.data.manager_name) {
+      var cn = document.getElementById('cname'); if (cn) cn.value = r.data.manager_name;
+      document.getElementById('uname').textContent = r.data.manager_name;
+      var ini = r.data.manager_name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      var uav = document.getElementById('uav'); if (uav) uav.textContent = ini;
+    }
+    if (r.data.manager_email) {
+      var ce = document.getElementById('cemail'); if (ce) ce.value = r.data.manager_email;
+    }
+  });
+}
+
+
 var curSecId = '';
 function openAR(secId, secName) { curSecId = secId; document.getElementById('arsl').textContent = secName; document.getElementById('ark').value = ''; document.getElementById('arv').value = ''; openM('marow'); }
 function addRow() {
@@ -1202,9 +1257,9 @@ function addRow() {
   var sec = document.getElementById(curSecId); if (!sec) return;
   var row = document.createElement('div'); row.className = 'irow';
   row.innerHTML = '<div class="irk">' + k + '</div><div class="irv" contenteditable="true" onblur="toast(\'Saved\')">' + v + '</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';
-  sec.insertBefore(row, sec.querySelector('.addrow')); closeM('marow'); toast('Row added');
+  sec.insertBefore(row, sec.querySelector('.addrow')); closeM('marow'); toast('Row added'); saveHotelInfo();
 }
-function delRow(btn) { btn.closest('.irow').remove(); }
+function delRow(btn) { btn.closest('.irow').remove(); saveHotelInfo(); }
 function addSec() {
   var t = document.getElementById('nst').value.trim(); var i = document.getElementById('nsi').value.trim();
   if (!t) { toast('Enter a title', 'err'); return; }
@@ -1322,10 +1377,46 @@ function saveStaffEdit() { var name=document.getElementById('edit-sfn').value.tr
 function removeStaff(btn) { var row=btn.closest('.srow');if(!row)return;var name=row.querySelector('.sn')?row.querySelector('.sn').textContent:'this staff member';if(!confirm('Remove '+name+'?'))return;revokeStaffAccess(name);row.remove();toast(name+' removed'); }
 function removeStaffById() { if(!currentEditRow)return;var name=currentEditRow.querySelector('.sn')?currentEditRow.querySelector('.sn').textContent:'this staff member';if(!confirm('Remove '+name+'?'))return;revokeStaffAccess(name);currentEditRow.remove();closeM('medit-staff');toast(name+' removed');currentEditRow=null; }
 function revokeStaffAccess(name) { var revoked=JSON.parse(localStorage.getItem('arivo_revoked_staff')||'[]');if(revoked.indexOf(name)<0)revoked.push(name);localStorage.setItem('arivo_revoked_staff',JSON.stringify(revoked));window.dispatchEvent(new StorageEvent('storage',{key:'arivo_revoked_staff',newValue:JSON.stringify(revoked)})); }
-function addStaff() { var name=document.getElementById('sfn').value.trim();var role=document.getElementById('sfr').value;if(!name){toast('Enter a name','err');return;}var ini=name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var row=document.createElement('div');row.className='srow';row.innerHTML='<div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+name+'</div><div class="ss">'+role+' \u00b7 Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div>';document.getElementById('stafflist').appendChild(row);closeM('mstaff');toast(name+' added');document.getElementById('sfn').value='';document.getElementById('sfe').value=''; }
+function addStaff() {
+  var name = document.getElementById('sfn').value.trim();
+  var role = document.getElementById('sfr').value;
+  if (!name) { toast('Enter a name', 'err'); return; }
+  var ini = name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  var empty = document.getElementById('staff-empty'); if (empty) empty.remove();
+  var row = document.createElement('div'); row.className = 'srow';
+  row.innerHTML = '<div class="sav" style="background:var(--gdim);color:var(--gold)">' + ini + '</div>'
+                + '<div class="sin"><div class="sn">' + name + '</div><div class="ss">' + role + ' \u00b7 Active</div></div>'
+                + '<div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div>';
+  document.getElementById('stafflist').appendChild(row);
+  closeM('mstaff'); toast(name + ' added');
+  document.getElementById('sfn').value = ''; document.getElementById('sfe').value = '';
+}
 
 // ── CREDENTIALS ──
-function saveCreds(mode) { if(mode==='name'){var n=document.getElementById('cname').value.trim();if(!n){toast('Enter your name','err');return;}document.getElementById('uname').textContent=n;var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var ua=document.getElementById('uav');if(ua)ua.textContent=ini;toast('Name updated');}else{var cur=document.getElementById('cpc').value;var nw=document.getElementById('cpn').value;var cf=document.getElementById('cpcf').value;var err=document.getElementById('cperr');if(!cur||!nw||!cf){toast('Fill in all fields','err');return;}if(nw.length<8){toast('Minimum 8 characters','err');return;}if(nw!==cf){err.style.display='block';return;}err.style.display='none';['cpc','cpn','cpcf'].forEach(function(id){document.getElementById(id).value='';});toast('Password updated');} }
+function saveCreds(mode) {
+  if (mode==='name') {
+    var n  = document.getElementById('cname').value.trim();
+    var em = document.getElementById('cemail').value.trim();
+    if (!n) { toast('Enter your name', 'err'); return; }
+    document.getElementById('uname').textContent = n;
+    var ini = n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+    var ua = document.getElementById('uav'); if (ua) ua.textContent = ini;
+    // Save to Supabase
+    if (db) db.from('hotel_settings').update({manager_name: n, manager_email: em}).eq('hotel_id', HOTEL_ID).then(function(){});
+    toast('Name and email updated');
+  } else {
+    var cur = document.getElementById('cpc').value;
+    var nw  = document.getElementById('cpn').value;
+    var cf  = document.getElementById('cpcf').value;
+    var err = document.getElementById('cperr');
+    if (!cur||!nw||!cf) { toast('Fill in all fields', 'err'); return; }
+    if (nw.length < 8) { toast('Minimum 8 characters', 'err'); return; }
+    if (nw !== cf) { err.style.display='block'; return; }
+    err.style.display = 'none';
+    ['cpc','cpn','cpcf'].forEach(function(id) { document.getElementById(id).value=''; });
+    toast('Password updated');
+  }
+}
 
 // ── ETA OPTIONS ──
 function addEtaOpt() { var row=document.createElement('div');row.className='fg etarow';row.style.cssText='display:flex;gap:8px;align-items:center';row.innerHTML='<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">&#10005;</div>';document.getElementById('etalist').appendChild(row); }
