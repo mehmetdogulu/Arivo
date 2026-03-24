@@ -18,8 +18,6 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
-
-/* LOGIN */
 #sl{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;}
 #sl.hide{display:none;}
 .lb{width:100%;max-width:400px;padding:32px 28px;}
@@ -36,14 +34,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .lerr{font-size:12px;color:var(--red);margin-top:10px;display:none;}
 .lhint{font-size:11px;color:var(--tx3);margin-top:12px;text-align:center;}
 .lhint span{color:var(--gold);}
-
-/* LAYOUT */
 #sd{display:none;}
 #sd.on{display:flex;min-height:100vh;}
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;}
 .ov.on{display:block;}
-
-/* SIDEBAR */
 .sbar{width:240px;background:var(--sur);border-right:1px solid var(--bor);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:300;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 @media(max-width:768px){.sbar{transform:translateX(-100%);}.sbar.open{transform:translateX(0);}}
 .slogo{padding:22px 20px 18px;border-bottom:1px solid var(--bor);}
@@ -55,7 +49,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .hcs{font-size:11px;color:var(--tx3);margin-top:2px;}
 .nav-body{flex:1;overflow-y:auto;padding:8px 0;}
 .nlbl{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:2px;padding:12px 20px 4px;}
-.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:var(--tx2);cursor:pointer;border-radius:0;transition:all .15s;position:relative;}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:var(--tx2);cursor:pointer;transition:all .15s;position:relative;}
 .ni:hover{color:var(--tx);background:var(--sur2);}
 .ni.on{color:var(--gold);background:var(--gdim);}
 .ni-ic{font-size:16px;width:20px;text-align:center;}
@@ -66,8 +60,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .uname{font-size:13px;font-weight:500;color:var(--wh);}
 .urole{font-size:11px;color:var(--tx3);}
 .logoutbtn{width:100%;background:var(--rdim);border:1px solid rgba(248,113,113,.2);color:var(--red);border-radius:8px;padding:9px;font-family:'Geist',sans-serif;font-size:12px;font-weight:500;cursor:pointer;}
-
-/* MAIN */
 .main{flex:1;margin-left:240px;display:flex;flex-direction:column;min-height:100vh;}
 @media(max-width:768px){.main{margin-left:0;}}
 .tbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--bor);background:var(--sur);position:sticky;top:0;z-index:100;}
@@ -77,23 +69,17 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .ttl{font-family:'Instrument Serif',serif;font-size:20px;color:var(--wh);}
 .tbr{display:flex;align-items:center;gap:8px;}
 .cnt{flex:1;padding:24px;}
-
-/* SECTIONS */
 .sec{display:none;}
 .sec.on{display:block;}
 .sech{margin-bottom:18px;}
 .secr{display:flex;align-items:center;justify-content:space-between;}
 .sect{font-family:'Instrument Serif',serif;font-size:24px;color:var(--wh);}
 .secs{font-size:12px;color:var(--tx3);margin-top:2px;}
-
-/* CARDS */
 .card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;margin-bottom:14px;overflow:hidden;}
 .ch{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bor);}
 .ct{font-size:13px;font-weight:600;color:var(--wh);}
 .ca{font-size:12px;color:var(--gold);cursor:pointer;}
 .cb{padding:14px 16px;}
-
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
 .stat{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:16px;}
 .stat-l{font-size:11px;color:var(--tx3);margin-bottom:6px;}
@@ -102,14 +88,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .stat-n{font-size:10px;color:var(--tx3);margin-top:4px;}
 .stat-n.bad{color:var(--red);}
 .stat-n.up{color:var(--grn);}
-
-/* PRIORITY ALERT */
 .palert{background:var(--rdim);border:1px solid rgba(248,113,113,.3);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:none;}
 .palert.on{display:block;}
 .pat{font-size:13px;font-weight:600;color:var(--red);margin-bottom:4px;}
 .pam{font-size:12px;color:var(--tx2);}
-
-/* ROWS */
 .row{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--bor);}
 .row:last-child{border-bottom:none;}
 .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -126,8 +108,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .badge.pr{background:var(--bdim);color:var(--blu);}
 .badge.dn{background:var(--gdm);color:var(--grn);}
 .echip{background:var(--bdim);border:1px solid rgba(96,165,250,.2);color:var(--blu);font-size:10px;border-radius:20px;padding:3px 10px;cursor:pointer;flex-shrink:0;}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:8px 14px;font-family:'Geist',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--bor);color:var(--tx2);background:var(--sur2);transition:all .15s;}
 .btn:hover{border-color:var(--gold);color:var(--gold);}
 .btn-g{background:var(--gdim);border-color:var(--gbor);color:var(--gold);}
@@ -137,8 +117,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .btn-w{width:100%;justify-content:center;}
 .tbhide{display:none;}
 @media(min-width:768px){.tbhide{display:inline-flex;}}
-
-/* GUESTS */
 .grow{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bor);}
 .grow:last-child{border-bottom:none;}
 .gav{width:36px;height:36px;border-radius:50%;background:var(--gdim);border:1px solid var(--gbor);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;}
@@ -148,8 +126,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .pill{font-size:10px;font-weight:600;border-radius:20px;padding:2px 8px;}
 .pill.in{background:var(--gdm);color:var(--grn);}
 .pill.out{background:var(--rdim);color:var(--red);}
-
-/* STAFF */
 .srow{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bor);}
 .srow:last-child{border-bottom:none;}
 .sav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
@@ -160,8 +136,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .icb{width:28px;height:28px;border-radius:8px;background:var(--sur2);border:1px solid var(--bor);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--tx2);}
 .icb:hover{border-color:var(--gold);color:var(--gold);}
 .icb.del:hover{border-color:var(--red);color:var(--red);}
-
-/* FORMS */
 .fg{margin-bottom:14px;}
 .fl{display:block;font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
 .fi{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:10px 12px;font-family:'Geist',sans-serif;font-size:13px;color:var(--tx);outline:none;}
@@ -169,8 +143,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .msgin{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:10px 12px;font-family:'Geist',sans-serif;font-size:13px;color:var(--tx);outline:none;resize:none;min-height:80px;}
 .msgin:focus{border-color:var(--gold);}
-
-/* TOGGLES */
 .trow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bor);}
 .trow:last-child{border-bottom:none;}
 .tl{font-size:13px;font-weight:500;color:var(--wh);}
@@ -179,8 +151,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .tog.on{background:var(--gold);}
 .tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;}
 .tog.on::after{transform:translateX(18px);}
-
-/* INFO SECTIONS */
 .isec{background:var(--sur);border:1px solid var(--bor);border-radius:12px;margin-bottom:12px;overflow:hidden;}
 .ish{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--bor);}
 .ist{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--wh);}
@@ -192,8 +162,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .iract{display:flex;gap:4px;}
 .addrow{display:block;width:100%;padding:8px;font-family:'Geist',sans-serif;font-size:11px;color:var(--tx3);background:none;border:none;cursor:pointer;text-align:left;padding-left:14px;}
 .addrow:hover{color:var(--gold);}
-
-/* RECS */
 .rrow{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bor);}
 .rrow:last-child{border-bottom:none;}
 .rthumb{width:36px;height:36px;background:var(--sur2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
@@ -203,8 +171,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .rsrc{font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
 .rsrc.staff{color:var(--gold);}
 .rsrc.ai{color:var(--blu);}
-
-/* QR */
 .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:600px){.twocol{grid-template-columns:1fr;}}
 .qrbox{background:white;border-radius:10px;padding:12px;display:inline-block;margin-bottom:10px;}
@@ -213,12 +179,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .upl:hover{border-color:var(--gold);}
 .upll{font-size:12px;color:var(--tx3);}
 .logoup{border:2px dashed var(--bor);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:14px;}
-
-/* BYPASS */
 .byp{background:var(--sur2);border:1px solid var(--gbor);border-radius:10px;padding:14px;margin-top:14px;}
 .bypc{font-family:'Instrument Serif',serif;font-size:36px;color:var(--gold);letter-spacing:8px;text-align:center;margin:8px 0;}
-
-/* ETA POPUP */
 #etapop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px;}
 #etapop.on{display:flex;}
 .etabox{background:var(--sur);border:1px solid var(--bor);border-radius:16px;padding:24px;width:100%;max-width:380px;}
@@ -234,8 +196,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .etaopt:hover{border-color:var(--gold);color:var(--gold);}
 .etacustom{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
 .etacancel{background:none;border:none;font-family:'Geist',sans-serif;font-size:12px;color:var(--tx3);cursor:pointer;display:block;width:100%;text-align:center;padding:6px;}
-
-/* MODALS */
 .mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;align-items:center;justify-content:center;padding:20px;}
 .mov.on{display:flex;}
 .modal{background:var(--sur);border:1px solid var(--bor);border-radius:16px;width:100%;max-width:400px;overflow:hidden;}
@@ -245,8 +205,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .mclose:hover{background:var(--sur2);color:var(--tx);}
 .mbdy{padding:16px 20px;}
 .mftr{padding:12px 20px;border-top:1px solid var(--bor);display:flex;gap:8px;}
-
-/* NOTIFICATION BANNERS */
 #nband{position:fixed;top:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:8px;max-width:340px;}
 .nbanner{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:12px 14px;animation:slideIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .nbanner.guest{border-color:var(--gbor);}
@@ -256,14 +214,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .nbm{font-size:11px;color:var(--tx2);}
 .nbs{font-size:10px;color:var(--tx3);margin-top:4px;}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-
-/* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--sur);border:1px solid var(--bor);color:var(--tx);padding:10px 18px;border-radius:30px;font-size:12px;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
 #toast.err{border-color:rgba(248,113,113,.5);color:var(--red);}
 #toast.warn{border-color:rgba(251,176,64,.5);color:var(--amb);}
-
-/* BOTTOM NAV */
 .bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bor);z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 @media(max-width:768px){.bnav{display:block;}}
 .bni{display:flex;}
@@ -272,8 +226,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .bnico{font-size:18px;margin-bottom:2px;}
 .bnlbl{font-size:9px;}
 .bndot{position:absolute;top:6px;right:50%;margin-right:-14px;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;}
-
-/* LOG SECTION */
 .log-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bor);font-size:12px;}
 .log-row:last-child{border-bottom:none;}
 .log-time{flex-shrink:0;width:80px;font-size:10px;color:var(--tx3);padding-top:2px;}
@@ -281,13 +233,11 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 .log-detail{flex:1;}
 .log-detail-main{color:var(--tx);font-weight:500;}
 .log-detail-sub{font-size:10px;color:var(--tx3);margin-top:2px;}
-
 @media(max-width:768px){.main{padding-bottom:60px;}.cnt{padding:16px;}.stats{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="sl">
   <div class="lb">
     <div class="ll">Ari<em>vo</em></div>
@@ -295,25 +245,18 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="lh">Welcome back</div>
     <div class="ls">Sign in to manage your property</div>
     <div class="lf"><label>Email</label><input type="email" id="le" placeholder="manager@hotel.com" autocomplete="email"></div>
-    <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onkeydown="if(event.key==='Enter')login()"></div>
     <button class="lbtn" onclick="login()">Sign In &rarr;</button>
-    <div class="lerr" id="lerr">Invalid credentials. Try <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e535f505f595b4c7e56514a5b52105d5153">[email&#160;protected]</a> / password123</div>
-    <div class="lhint">Demo: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e535f505f595b4c7e56514a5b52105d5153">[email&#160;protected]</a></span> / <span>password123</span></div>
+    <div class="lerr" id="lerr">Invalid credentials. Try manager@hotel.com / password123</div>
+    <div class="lhint">Demo: <span>manager@hotel.com</span> / <span>password123</span></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="sd">
   <div class="ov" id="ov" onclick="closeSidebar()"></div>
   <div class="sbar" id="sbar">
-    <div class="slogo">
-      <div class="slogo-mark">Ari<em>vo</em></div>
-      <div class="ssub">Hotel Dashboard</div>
-    </div>
-    <div class="hchip">
-      <div class="hcn" id="hname">The Maison Collective</div>
-      <div class="hcs" id="hloc">22 rooms &middot; Bath, UK</div>
-    </div>
+    <div class="slogo"><div class="slogo-mark">Ari<em>vo</em></div><div class="ssub">Hotel Dashboard</div></div>
+    <div class="hchip"><div class="hcn" id="hname">The Maison Collective</div><div class="hcs" id="hloc">22 rooms &middot; Bath, UK</div></div>
     <div class="nav-body">
       <div class="nlbl">Live</div>
       <div class="ni on" onclick="go('ov',this)"><span class="ni-ic">&#9646;&#9646;</span>Overview</div>
@@ -331,29 +274,21 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="ni" onclick="go('set',this)"><span class="ni-ic">&#9881;</span>Settings</div>
     </div>
     <div class="sfooter">
-      <div class="urow">
-        <div class="uav" id="uav">JM</div>
-        <div><div class="uname" id="uname">James Mitchell</div><div class="urole">Hotel Manager</div></div>
-      </div>
+      <div class="urow"><div class="uav" id="uav">JM</div><div><div class="uname" id="uname">James Mitchell</div><div class="urole">Hotel Manager</div></div></div>
       <button class="logoutbtn" onclick="logout()">Sign out</button>
     </div>
   </div>
 
   <div class="main">
     <div class="tbar">
-      <div class="tbl">
-        <div class="mbtn" onclick="openSidebar()">&#9776;</div>
-        <div class="ttl" id="ttl">Overview</div>
-      </div>
+      <div class="tbl"><div class="mbtn" onclick="openSidebar()">&#9776;</div><div class="ttl" id="ttl">Overview</div></div>
       <div class="tbr">
         <div class="btn btn-s tbhide" onclick="simReq()" style="border-color:var(--amb);color:var(--amb)">&#128718; Simulate</div>
         <div class="btn btn-g" onclick="openM('mag')">+ Add Guest</div>
       </div>
     </div>
-
     <div class="cnt">
 
-<!-- OVERVIEW -->
 <div class="sec on" id="s-ov">
   <div class="sech"><div class="sect">Overview</div><div class="secs" id="odate"></div></div>
   <div class="palert" id="palert"><div class="pat">&#9888; Priority Alert</div><div class="pam" id="pam">A guest rated 3 stars or below. Please attend immediately.</div></div>
@@ -363,7 +298,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="stat" onclick="go('logs',null);setBN('bn4')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Avg Rating</div><div class="stat-v" style="color:var(--gold)" id="savg">-</div><div class="stat-n up">&#11088; Today</div></div>
   </div>
   <div class="card">
-    <div class="ch"><div class="ct">Live Requests <span class="ndot" id="rndot" style="display:none"></span></div><div class="ca" onclick="go('req',null)">View all &rarr;</div></div>
+    <div class="ch"><div class="ct">Live Requests</div><div class="ca" onclick="go('req',null)">View all &rarr;</div></div>
     <div id="ov-reqlist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No open requests</div></div>
   </div>
   <div class="card">
@@ -372,20 +307,17 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div>
 </div>
 
-<!-- REQUESTS -->
 <div class="sec" id="s-req">
   <div class="palert" id="palert-req"><div class="pat">&#9888; Priority Alert</div><div class="pam" id="pam-req">A guest rated 3 stars or below. Please attend immediately.</div></div>
   <div class="sech"><div class="secr"><div><div class="sect">Requests</div><div class="secs" id="rcntlbl">0 open</div></div><button class="btn btn-g" onclick="markAll()">Mark all done</button></div></div>
-  <div class="card" id="reqlist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No requests yet. They will appear here when guests submit them.</div></div>
+  <div class="card" id="reqlist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No requests yet.</div></div>
 </div>
 
-<!-- GUESTS -->
 <div class="sec" id="s-guests">
   <div class="sech"><div class="secr"><div><div class="sect">Guests</div><div class="secs">Registered via app</div></div><button class="btn btn-g" onclick="openM('mag')">+ Add Guest</button></div></div>
   <div class="card" id="glist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div></div>
 </div>
 
-<!-- SESSIONS -->
 <div class="sec" id="s-sess">
   <div class="sech"><div class="sect">Sessions &amp; Access</div><div class="secs">Kill sessions or generate bypass codes</div></div>
   <div class="card"><div class="ch"><div class="ct">Active Sessions</div></div>
@@ -399,7 +331,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
 </div>
 
-<!-- MESSAGE GUESTS -->
 <div class="sec" id="s-msgs">
   <div class="sech"><div class="sect">Message Guests</div><div class="secs">Send messages to guest apps in real time</div></div>
   <div class="card"><div class="ch"><div class="ct">New Message</div></div><div class="cb">
@@ -413,7 +344,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
 </div>
 
-<!-- HOTEL INFO -->
 <div class="sec" id="s-info">
   <div class="sech"><div class="secr"><div><div class="sect">Hotel Info</div><div class="secs">Appears in guest app immediately</div></div><button class="btn btn-g" onclick="openM('msec')">+ Add Section</button></div></div>
   <div class="isec" id="sec-wifi">
@@ -438,7 +368,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
 </div>
 
-<!-- FACILITIES -->
 <div class="sec" id="s-fac">
   <div class="sech"><div class="secr"><div><div class="sect">Facilities</div><div class="secs">Shown in guest app</div></div><button class="btn btn-g" onclick="openM('mfac')">+ Add</button></div></div>
   <div class="card" id="faclist">
@@ -449,10 +378,9 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div>
 </div>
 
-<!-- LOCAL GUIDE -->
 <div class="sec" id="s-local">
   <div class="sech"><div class="secr"><div><div class="sect">Local Guide</div><div class="secs">Staff picks + Arivo AI suggestions</div></div><button class="btn btn-g" onclick="openM('mrec')">+ Add Place</button></div></div>
-  <div style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; Arivo AI suggests local spots based on postcode BA1 2LW.</div>
+  <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; Arivo AI suggests local spots based on postcode BA1 2LW.</div>
   <div class="card" id="reclist">
     <div class="rrow"><div class="rthumb">&#9749;</div><div class="rinfo"><div class="rn">Fold Coffee</div><div class="rc">Coffee &middot; 5 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
     <div class="rrow"><div class="rthumb">&#127837;</div><div class="rinfo"><div class="rn">Osteria Filo</div><div class="rc">Dinner &middot; 12 min walk</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div></div>
@@ -461,33 +389,30 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div>
 </div>
 
-<!-- QR & LINKS -->
 <div class="sec" id="s-qr">
   <div class="sech"><div class="sect">QR &amp; Links</div><div class="secs">Guest access tools</div></div>
   <div class="twocol">
     <div class="card"><div class="ch"><div class="ct">&#9633; Room QR Code</div></div><div class="cb" style="text-align:center">
       <div class="qrbox"><svg viewBox="0 0 100 100" width="118" height="118" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="34" height="34" fill="none" stroke="#000" stroke-width="3.5"/><rect x="15" y="15" width="20" height="20" fill="#000"/><rect x="58" y="8" width="34" height="34" fill="none" stroke="#000" stroke-width="3.5"/><rect x="65" y="15" width="20" height="20" fill="#000"/><rect x="8" y="58" width="34" height="34" fill="none" stroke="#000" stroke-width="3.5"/><rect x="15" y="65" width="20" height="20" fill="#000"/><rect x="60" y="60" width="8" height="8" fill="#000"/><rect x="72" y="60" width="8" height="8" fill="#000"/><rect x="84" y="60" width="8" height="8" fill="#000"/><rect x="60" y="72" width="8" height="8" fill="#000"/><rect x="84" y="72" width="8" height="8" fill="#000"/><rect x="60" y="84" width="8" height="8" fill="#000"/><rect x="72" y="84" width="8" height="8" fill="#000"/><rect x="46" y="8" width="8" height="8" fill="#000"/><rect x="8" y="46" width="8" height="8" fill="#000"/><rect x="46" y="46" width="8" height="8" fill="#C9A84C"/></svg></div>
-      <div class="qrurl">myarivo.netlify.app/hotel-guest-app.html</div>
+      <div class="qrurl">myarivo.pages.dev/hotel-guest-app.html</div>
       <div style="display:flex;gap:8px;justify-content:center"><button class="btn btn-g" onclick="toast('Download available once hosted on custom domain')">&#8659; Download</button><button class="btn btn-s" onclick="window.print()">&#128424; Print</button></div>
     </div></div>
     <div class="card"><div class="ch"><div class="ct">&#9993; Pre-arrival Links</div><div class="ca" onclick="openM('mlink')">Generate &rarr;</div></div><div class="cb"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Send guests a personalised link before arrival.</p><button class="btn btn-g btn-w" onclick="openM('mlink')">+ Generate Link</button></div></div>
   </div>
 </div>
 
-<!-- ACTIVITY LOGS -->
 <div class="sec" id="s-logs">
   <div class="sech"><div class="secr"><div><div class="sect">Activity Logs</div><div class="secs">All guest, staff and manager actions</div></div><div style="display:flex;gap:8px"><button class="btn btn-s" onclick="renderLogReport()">&#8635; Refresh</button><button class="btn btn-s" onclick="exportLogs()">&#8659; Export CSV</button></div></div></div>
   <div class="card">
     <div class="ch"><div class="ct">Log Entries</div><div style="font-size:11px;color:var(--tx3)">Newest first</div></div>
-    <div id="log-entries" style="max-height:600px;overflow-y:auto;"><div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">No logs yet. Activity appears here as guests and staff use the system.</div></div>
+    <div id="log-entries" style="max-height:600px;overflow-y:auto;"><div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">No logs yet.</div></div>
   </div>
 </div>
 
-<!-- SETTINGS -->
 <div class="sec" id="s-set">
   <div class="sech"><div class="secr"><div><div class="sect">Settings</div><div class="secs">Hotel profile, features &amp; staff</div></div><button class="btn btn-g" onclick="toast('Settings saved')">Save All</button></div></div>
   <div class="card"><div class="ch"><div class="ct">Hotel Logo</div></div><div class="cb">
-    <div class="logoup" onclick="document.getElementById('logo-file-input').click()" id="logo-upload-area">
+    <div class="logoup" onclick="document.getElementById('logo-file-input').click()">
       <div id="logo-preview" style="font-size:36px;margin-bottom:8px">&#127968;</div>
       <div style="font-size:12px;color:var(--tx3)">Tap to upload your hotel logo</div>
       <div style="font-size:10px;color:var(--tx3);margin-top:4px">JPEG, PNG or WebP &middot; Max 2MB</div>
@@ -496,7 +421,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Feature Toggles</div></div><div class="cb">
     <div class="trow"><div><div class="tl">AI Concierge</div><div class="tsub">Claude-powered chat for guests</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
-    <div class="trow"><div><div class="tl">Guest Requests</div><div class="tsub">Allow guests to submit requests</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="trow"><div><div class="tl">Guest Requests</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     <div class="trow"><div><div class="tl">WhatsApp Routing</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     <div class="trow"><div><div class="tl">Guest Feedback (Star Rating)</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     <div class="trow"><div><div class="tl">Checkout Reminders</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
@@ -535,14 +460,14 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="irow"><div class="irk">Room 21</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 21</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
       <div class="irow"><div class="irk">Room 22</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room 22</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div></div>
     </div>
-    <div style="padding:10px 16px;font-size:11px;color:var(--tx3)">Rooms are shown to guests as a dropdown. Edit names to match your operation (e.g. "The Garden Suite").</div>
+    <div style="padding:10px 16px;font-size:11px;color:var(--tx3)">Edit names to match your operation (e.g. "The Garden Suite").</div>
   </div>
   <div class="card"><div class="ch"><div class="ct">&#128274; My Credentials</div></div><div class="cb">
     <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cname" value="James Mitchell"></div>
     <div class="fg"><label class="fl">Email</label><input class="fi" id="cemail" type="email" value="james@maisonbath.co.uk"></div>
     <button class="btn btn-g" onclick="saveCreds('name')" style="margin-bottom:14px">Save Name &amp; Email</button>
     <div style="height:1px;background:var(--bor);margin:4px 0 16px"></div>
-    <div class="fg"><label class="fl">Current Password</label><input class="fi" id="cpc" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+    <div class="fg"><label class="fl">Current Password</label><input class="fi" id="cpc" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"></div>
     <div class="fg"><label class="fl">New Password</label><input class="fi" id="cpn" type="password" placeholder="Minimum 8 characters"></div>
     <div class="fg"><label class="fl">Confirm New Password</label><input class="fi" id="cpcf" type="password" placeholder="Repeat new password"></div>
     <div id="cperr" style="font-size:11px;color:var(--red);margin-bottom:10px;display:none">Passwords do not match</div>
@@ -559,16 +484,15 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Staff Members</div><div class="ca" onclick="openM('mstaff')">+ Add Staff</div></div>
     <div id="stafflist">
-      <div class="srow"><div class="sav" style="background:rgba(61,214,140,.1);color:var(--grn)">MR</div><div class="sin"><div class="sn">Maria Rodriguez</div><div class="ss">Housekeeping &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)" title="Edit">&#9999;</div><div class="icb del" onclick="removeStaff(this)" title="Remove">&#10005;</div></div></div>
-      <div class="srow"><div class="sav" style="background:rgba(96,165,250,.1);color:var(--blu)">TK</div><div class="sin"><div class="sn">Tom Kim</div><div class="ss">Front Desk &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)" title="Edit">&#9999;</div><div class="icb del" onclick="removeStaff(this)" title="Remove">&#10005;</div></div></div>
-      <div class="srow"><div class="sav" style="background:rgba(201,168,76,.1);color:var(--gold)">LP</div><div class="sin"><div class="sn">Lena Petrov</div><div class="ss">Concierge &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)" title="Edit">&#9999;</div><div class="icb del" onclick="removeStaff(this)" title="Remove">&#10005;</div></div></div>
+      <div class="srow"><div class="sav" style="background:rgba(61,214,140,.1);color:var(--grn)">MR</div><div class="sin"><div class="sn">Maria Rodriguez</div><div class="ss">Housekeeping &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
+      <div class="srow"><div class="sav" style="background:rgba(96,165,250,.1);color:var(--blu)">TK</div><div class="sin"><div class="sn">Tom Kim</div><div class="ss">Front Desk &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
+      <div class="srow"><div class="sav" style="background:rgba(201,168,76,.1);color:var(--gold)">LP</div><div class="sin"><div class="sn">Lena Petrov</div><div class="ss">Concierge &middot; Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div></div>
     </div>
   </div>
 </div>
 
-    </div><!-- /cnt -->
-  </div><!-- /main -->
-
+    </div>
+  </div>
   <div class="bnav"><div class="bni">
     <div class="bnitem on" id="bn0" onclick="go('ov',null);setBN('bn0')"><div class="bnico">&#9646;&#9646;</div><div class="bnlbl">Overview</div></div>
     <div class="bnitem" id="bn1" onclick="go('req',null);setBN('bn1')"><div class="bnico">&#128718;</div><div class="bnlbl">Requests</div><div class="bndot" id="bndot">0</div></div>
@@ -576,9 +500,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="bnitem" id="bn3" onclick="go('msgs',null);setBN('bn3')"><div class="bnico">&#128172;</div><div class="bnlbl">Message</div></div>
     <div class="bnitem" id="bn4" onclick="go('set',null);setBN('bn4')"><div class="bnico">&#9881;</div><div class="bnlbl">Settings</div></div>
   </div></div>
-</div><!-- /sd -->
+</div>
 
-<!-- MODALS -->
 <div class="mov" id="mag"><div class="modal"><div class="mhdr"><div class="mt">Add Guest</div><div class="mclose" onclick="closeM('mag')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="agn" placeholder="e.g. Sarah Chen"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="agr" placeholder="e.g. 7" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="agc" type="date"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addGuest()">Add Guest</button><button class="btn btn-s" onclick="closeM('mag')">Cancel</button></div></div></div>
 <div class="mov" id="msec"><div class="modal"><div class="mhdr"><div class="mt">Add Section</div><div class="mclose" onclick="closeM('msec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Title</label><input class="fi" id="nst" placeholder="e.g. Spa &amp; Wellness"></div><div class="fg"><label class="fl">Icon (emoji)</label><input class="fi" id="nsi" placeholder="e.g. &#129498;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addSec()">Create</button><button class="btn btn-s" onclick="closeM('msec')">Cancel</button></div></div></div>
 <div class="mov" id="marow"><div class="modal"><div class="mhdr"><div class="mt">Add Row</div><div class="mclose" onclick="closeM('marow')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Adding to: <strong id="arsl" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Label</label><input class="fi" id="ark" placeholder="e.g. Pool hours"></div><div class="fg"><label class="fl">Value</label><input class="fi" id="arv" placeholder="e.g. 7am - 9pm"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRow()">Add Row</button><button class="btn btn-s" onclick="closeM('marow')">Cancel</button></div></div></div>
@@ -589,7 +512,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Add Staff Member</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
 <div class="mov" id="medit-staff"><div class="modal"><div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="edit-sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="edit-sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Status</label><select class="fi" id="edit-sfs"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveStaffEdit()">Save Changes</button><button class="btn btn-r" onclick="removeStaffById()">Remove Staff</button></div></div></div>
 
-<!-- ETA POPUP -->
 <div id="etapop">
   <div class="etabox">
     <div class="etatitle">Assign &amp; set ETA</div>
@@ -614,78 +536,68 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div id="nband"></div>
-<div id="toast"></div><script>
+<div id="toast"></div>
+
+<script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-// Hotel ID — read from URL ?hotel= param, fallback to default for The Maison
 var _urlParams = new URLSearchParams(window.location.search);
 var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
 var db = null;
 document.addEventListener('DOMContentLoaded', function(){
   try { if(window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
+  // Session restore
+  var saved = sessionStorage.getItem('arivo_mgr_session');
+  if(saved){try{var s=JSON.parse(saved);if(s.email){enterDashboard();return;}}catch(e){}}
 });
 
-var photoCache = {};
-
-function showPhoto(reqId){
-  var src = photoCache[reqId];
-  // Also check localStorage photos (same-browser fallback)
-  if(!src){
-    var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
-    src=photos[reqId];
-  }
-  // Check localStorage requests for photo field
-  if(!src){
-    var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-    var req=lsReqs.find(function(r){return r.id===reqId;});
-    if(req)src=req.photo||null;
-  }
-  if(!src){toast('No photo available','err');return;}
-  var overlay = document.getElementById('photo-overlay');
-  if(!overlay){
-    overlay = document.createElement('div');
-    overlay.id = 'photo-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-    overlay.onclick = function(){overlay.style.display='none';};
-    var img = document.createElement('img');
-    img.id = 'photo-overlay-img';
-    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;';
-    overlay.appendChild(img);
-    document.body.appendChild(overlay);
-  }
-  document.getElementById('photo-overlay-img').src = src;
-  overlay.style.display = 'flex';
-}
-
+var openReqs = 0;
+var curBtn = null;
 var selStaff = '';
 var currentEditRow = null;
 var ping = null;
+var photoCache = {};
 var TITLES = {ov:'Overview',req:'Requests',guests:'Guests',sess:'Sessions & Access',msgs:'Message Guests',info:'Hotel Info',fac:'Facilities',local:'Local Guide',qr:'QR & Links',logs:'Activity Logs',set:'Settings'};
 
-// ── LOGIN ──
+function showPhoto(reqId){
+  var src=photoCache[reqId];
+  if(!src){var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');var req=lsReqs.find(function(r){return r.id===reqId;});if(req)src=req.photo||null;}
+  if(!src){toast('No photo available','err');return;}
+  var overlay=document.getElementById('photo-overlay');
+  if(!overlay){overlay=document.createElement('div');overlay.id='photo-overlay';overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';overlay.onclick=function(){overlay.style.display='none';};var img=document.createElement('img');img.id='photo-overlay-img';img.style.cssText='max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;';overlay.appendChild(img);document.body.appendChild(overlay);}
+  document.getElementById('photo-overlay-img').src=src;
+  overlay.style.display='flex';
+}
+
 function login(){
   var e=document.getElementById('le').value.trim();
   var p=document.getElementById('lp').value;
   var err=document.getElementById('lerr');
   if(e==='manager@hotel.com'&&p==='password123'){
     err.style.display='none';
-    document.getElementById('sl').classList.add('hide');
-    document.getElementById('sd').classList.add('on');
-    document.getElementById('sd').style.display='flex';
-    document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
-    ['agc','glc'].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
-    initPing();
-    logEvent('manager_login','Manager logged in','Manager','-');
-    loadData();
-    subscribeToAll();
+    sessionStorage.setItem('arivo_mgr_session',JSON.stringify({email:e,ts:Date.now()}));
+    enterDashboard();
   } else {
     err.style.display='block';
   }
 }
 document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
 
+function enterDashboard(){
+  document.getElementById('sl').classList.add('hide');
+  document.getElementById('sd').classList.add('on');
+  document.getElementById('sd').style.display='flex';
+  document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
+  ['agc','glc'].forEach(function(id){var el=document.getElementById(id);if(el){el.value=ts;el.min=ts;}});
+  initPing();
+  logEvent('manager_login','Manager logged in','Manager','-');
+  loadData();
+  subscribeToAll();
+}
+
 function logout(){
+  sessionStorage.removeItem('arivo_mgr_session');
   logEvent('manager_logout','Manager logged out','Manager','-');
   document.getElementById('sd').classList.remove('on');
   document.getElementById('sl').classList.remove('hide');
@@ -693,7 +605,6 @@ function logout(){
   document.getElementById('lp').value='';
 }
 
-// ── NAV ──
 function go(name,el){
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
   document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
@@ -709,138 +620,64 @@ function closeSidebar(){document.getElementById('sbar').classList.remove('open')
 
 function loadGuestList(){
   if(!db){setTimeout(loadGuestList,300);return;}
-  // Load rooms from Supabase first
   db.from('hotel_settings').select('rooms,logo_url,menu_url').eq('hotel_id',HOTEL_ID).single().then(function(rs){
     if(rs.data&&rs.data.rooms&&rs.data.rooms.length){
       var list=document.getElementById('roomlist');
-      if(list){
-        list.innerHTML='';
-        rs.data.rooms.forEach(function(room){
-          var row=document.createElement('div');row.className='irow';
-          row.innerHTML='<div class="irk">'+room+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">'+room+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';
-          list.appendChild(row);
-        });
-      }
-      var hloc=document.getElementById('hloc');
-      if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rs.data.rooms.length+' rooms \u00b7 '+city+', UK';}
+      if(list){list.innerHTML='';rs.data.rooms.forEach(function(room){var row=document.createElement('div');row.className='irow';row.innerHTML='<div class="irk">'+room+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">'+room+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';list.appendChild(row);});}
+      var hloc=document.getElementById('hloc');if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rs.data.rooms.length+' rooms \u00b7 '+city+', UK';}
     }
-    if(rs.data&&rs.data.logo_url){
-      var prev=document.getElementById('logo-preview');
-      if(prev) prev.innerHTML='<img src="'+rs.data.logo_url+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px">';
-    }
-    if(rs.data&&rs.data.menu_url){
-      var lbl=document.getElementById('menu-upload-label');
-      if(lbl) lbl.textContent='Menu uploaded \u2714 Tap to replace';
-    }
+    if(rs.data&&rs.data.logo_url){var prev=document.getElementById('logo-preview');if(prev)prev.innerHTML='<img src="'+rs.data.logo_url+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px">';}
+    if(rs.data&&rs.data.menu_url){var lbl=document.getElementById('menu-upload-label');if(lbl)lbl.textContent='Menu uploaded \u2714 Tap to replace';}
   });
   db.from('guests').select('*').eq('hotel_id',HOTEL_ID).eq('checked_out',false).order('registered_at',{ascending:false}).then(function(r){
     if(r.error||!r.data)return;
-    var glist=document.getElementById('glist');
-    var ovglist=document.getElementById('ov-guestlist');
-    if(r.data.length===0){glist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div>';return;}
+    var glist=document.getElementById('glist');var ovglist=document.getElementById('ov-guestlist');
+    if(r.data.length===0){if(glist)glist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div>';return;}
     var html='';
     r.data.forEach(function(g){
       var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">Room '+g.room+' &middot; Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.id+'\',\''+g.name+'\',\'Room '+g.room+'\')">💬</button></div>';
+      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">'+g.room+' \u00b7 Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.id+'\',\''+g.name+'\',\''+g.room+'\')">&#128172;</button></div>';
     });
-    glist.innerHTML=html;
-    ovglist.innerHTML=html;
+    if(glist)glist.innerHTML=html;
+    if(ovglist)ovglist.innerHTML=html;
     document.getElementById('sg').textContent=r.data.length;
-    // Populate sessions list
     var sesslist=document.getElementById('sesslist');
     if(sesslist){
-      if(r.data.length===0){
-        sesslist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No active sessions.</div>';
-      } else {
-        var shtml='';
-        r.data.forEach(function(g){
-          var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-          var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-          shtml+='<div class="srow"><div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+g.name+' \u2014 Room '+g.room+'</div><div class="ss">Checkout '+co+'</div></div><div class="sact">Active</div><button class="btn btn-r" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="killSess(\''+g.name+'\',\''+g.id+'\')">Kill</button></div>';
-        });
-        sesslist.innerHTML=shtml;
-      }
+      var shtml='';
+      r.data.forEach(function(g){var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';shtml+='<div class="srow"><div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+g.name+' \u2014 '+g.room+'</div><div class="ss">Checkout '+co+'</div></div><div class="sact">Active</div><button class="btn btn-r" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="killSess(\''+g.name+'\',\''+g.id+'\')">Kill</button></div>';});
+      sesslist.innerHTML=shtml||'<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No active sessions.</div>';
     }
-    // Repopulate message dropdown
     var sel=document.getElementById('msgto');
     sel.innerHTML='<option value="All guests" data-guest-id="">All guests (broadcast)</option>';
-    r.data.forEach(function(g){
-      var opt=document.createElement('option');
-      opt.value=g.name+' \u00b7 Room '+g.room;
-      opt.textContent=g.name+' \u00b7 Room '+g.room+' \u00b7 Out '+(g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC');
-      opt.dataset.guestId=g.id;
-      sel.appendChild(opt);
-    });
+    r.data.forEach(function(g){var opt=document.createElement('option');opt.value=g.name+' \u00b7 '+g.room;opt.textContent=g.name+' \u00b7 '+g.room+' \u00b7 Out '+(g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC');opt.dataset.guestId=g.id;sel.appendChild(opt);});
   });
 }
 
-
 function loadData(){
   if(!db){setTimeout(loadData,300);return;}
-  // Load guests
-  db.from('guests').select('*').eq('hotel_id',HOTEL_ID).eq('checked_out',false).order('registered_at',{ascending:false}).then(function(r){
-    if(r.error||!r.data)return;
-    var glist=document.getElementById('glist');
-    var ovglist=document.getElementById('ov-guestlist');
-    if(r.data.length===0){glist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div>';return;}
-    var html='';
-    r.data.forEach(function(g){
-      var ini=(g.name||'G').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-      var co=g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-      html+='<div class="grow"><div class="gav">'+ini+'</div><div class="gi"><div class="gn">'+g.name+'</div><div class="gs">Room '+g.room+' &middot; Out '+co+'</div></div><span class="pill in">Active</span><button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="openMsgM(\''+g.id+'\',\''+g.name+'\',\'Room '+g.room+'\')">💬</button></div>';
-    });
-    glist.innerHTML=html;
-    ovglist.innerHTML=html;
-    document.getElementById('sg').textContent=r.data.length;
-    // Populate message dropdown with real guests
-    var sel=document.getElementById('msgto');
-    sel.innerHTML='<option value="All guests" data-guest-id="">All guests (broadcast)</option>';
-    r.data.forEach(function(g){
-      var opt=document.createElement('option');
-      opt.value=g.name+' \u00b7 Room '+g.room;
-      opt.textContent=g.name+' \u00b7 Room '+g.room+' \u00b7 Out '+( g.checkout_date?new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC');
-      opt.dataset.guestId=g.id;
-      sel.appendChild(opt);
-    });
-  });
-
-  // Load open requests
+  loadGuestList();
   db.from('requests').select('*,guests(name,room)').eq('hotel_id',HOTEL_ID).in('status',['new','claimed']).order('created_at',{ascending:false}).then(function(r){
     if(r.error||!r.data)return;
     openReqs=r.data.length;updateCnts();
-    var list=document.getElementById('reqlist');
-    var ovlist=document.getElementById('ov-reqlist');
-    if(r.data.length===0){
-      list.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No open requests.</div>';
-      ovlist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No open requests.</div>';
-      return;
-    }
+    var list=document.getElementById('reqlist');var ovlist=document.getElementById('ov-reqlist');
+    if(r.data.length===0){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No open requests.</div>';ovlist.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No open requests.</div>';return;}
     var html='';
     r.data.forEach(function(req){
-      var gname=req.guests?req.guests.name:'Guest';
-      var groom=req.guests?req.guests.room:'?';
-      var dotcls=req.status==='claimed'?'cl':'nw';
-      var badgecls=req.status==='claimed'?'cl':'nw';
-      var badgetxt=req.status==='claimed'?'Claimed':'New';
+      var gname=req.guests?req.guests.name:'Guest';var groom=req.guests?req.guests.room:'?';
+      var dotcls=req.status==='claimed'?'cl':'nw';var badgecls=req.status==='claimed'?'cl':'nw';var badgetxt=req.status==='claimed'?'Claimed':'New';
       if(req.photo_url)photoCache[req.id]=req.photo_url;
-      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">📷 Photo</button>':'';
-      html+='<div class="row" id="req-'+req.id+'"><div class="dot '+dotcls+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+req.detail.slice(0,50)+'</div></div><div class="badge '+badgecls+'">'+badgetxt+'</div>';
+      var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">&#128247; Photo</button>':'';
+      html+='<div class="row" id="req-'+req.id+'"><div class="dot '+dotcls+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; '+groom+'</div><div class="rs">'+gname+' &middot; '+req.detail.slice(0,50)+'</div></div><div class="badge '+badgecls+'">'+badgetxt+'</div>';
       if(req.status==='new')html+='<button class="btn btn-s" onclick="claimReq(this)">Claim</button>';
       html+=photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
     });
     list.innerHTML=html;
-    // Overview shows first 3
-    var ovHtml=r.data.slice(0,3).map(function(req){
-      var gname=req.guests?req.guests.name:'Guest';
-      var groom=req.guests?req.guests.room:'?';
-      return '<div class="row"><div class="dot '+(req.status==='claimed'?'cl':'nw')+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+'</div></div><div class="badge '+(req.status==='claimed'?'cl':'nw')+'">'+(req.status==='claimed'?'Claimed':'New')+'</div><button class="btn btn-s" onclick="openETA(this)">Done</button></div>';
-    }).join('');
+    var ovHtml=r.data.slice(0,3).map(function(req){var gname=req.guests?req.guests.name:'Guest';var groom=req.guests?req.guests.room:'?';return '<div class="row"><div class="dot '+(req.status==='claimed'?'cl':'nw')+'"></div><div class="ri"><div class="rt">'+req.type+' &mdash; '+groom+'</div><div class="rs">'+gname+'</div></div><div class="badge '+(req.status==='claimed'?'cl':'nw')+'">'+(req.status==='claimed'?'Claimed':'New')+'</div><button class="btn btn-s" onclick="openETA(this)">Done</button></div>';}).join('');
     ovlist.innerHTML=ovHtml;
   });
 }
 
-// ── LOCALSTORAGE FALLBACK (same-browser testing) ──
 function loadGuestRequests(){
   var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
   var photos=JSON.parse(localStorage.getItem('arivo_photos')||'{}');
@@ -849,51 +686,39 @@ function loadGuestRequests(){
   requests.forEach(function(req){
     if(document.getElementById('req-'+req.id))return;
     var row=document.createElement('div');row.className='row';row.id='req-'+req.id;
-    if(req.photo)photoCache[req.id]=req.photo;
-    else if(photos[req.id])photoCache[req.id]=photos[req.id];
+    if(req.photo)photoCache[req.id]=req.photo;else if(photos[req.id])photoCache[req.id]=photos[req.id];
     var hasPhoto=req.photo||photos[req.id];
-    var photoTag=hasPhoto?'<span style="font-size:10px;background:var(--bdim);color:var(--blu);padding:2px 6px;border-radius:5px;margin-left:6px;">📷 Photo</span>':'';
-    row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+(req.room?' — Room '+req.room:'')+'</div><div class="rs">'+(req.guest||'Guest')+' · '+req.detail.slice(0,50)+photoTag+'</div></div><div class="badge nw">New</div>';
-    var cb=document.createElement('button');cb.className='btn btn-s';cb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';cb.textContent='Claim';
-    cb.onclick=function(){claimReq(cb);};
-    var db=document.createElement('button');db.className='btn btn-s';db.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';db.textContent='Done';
-    db.onclick=function(){openETA(db);};
-    row.appendChild(cb);row.appendChild(db);
-    if(req.photo){var vb=document.createElement('button');vb.className='btn btn-s';vb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';vb.textContent='📷';vb.onclick=function(){var w=window.open();w.document.write('<img src="'+req.photo+'" style="max-width:100%">');};row.appendChild(vb);}
-    list.insertBefore(row,list.firstChild);
-    openReqs++;updateCnts();
+    var photoTag=hasPhoto?'<span style="font-size:10px;background:var(--bdim);color:var(--blu);padding:2px 6px;border-radius:5px;margin-left:6px;">&#128247; Photo</span>':'';
+    row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+(req.room?' \u2014 '+req.room:'')+'</div><div class="rs">'+(req.guest||'Guest')+' \u00b7 '+req.detail.slice(0,50)+photoTag+'</div></div><div class="badge nw">New</div>';
+    var cb=document.createElement('button');cb.className='btn btn-s';cb.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';cb.textContent='Claim';cb.onclick=function(){claimReq(cb);};
+    var db2=document.createElement('button');db2.className='btn btn-s';db2.style.cssText='margin-left:4px;padding:5px 9px;font-size:11px';db2.textContent='Done';db2.onclick=function(){openETA(db2);};
+    row.appendChild(cb);row.appendChild(db2);
+    list.insertBefore(row,list.firstChild);openReqs++;updateCnts();
   });
 }
 
 function loadGuestMessages(){
   var msgs=JSON.parse(localStorage.getItem('arivo_guest_messages')||'[]');
   var unread=msgs.filter(function(m){return !m.read;});
-  if(unread.length) toast(unread.length+' new message'+(unread.length>1?'s':'')+' from guests','warn');
+  if(unread.length)toast(unread.length+' new message'+(unread.length>1?'s':'')+' from guests','warn');
 }
 
-// Poll localStorage every 3s for same-browser testing
 setInterval(function(){loadGuestRequests();loadGuestMessages();},3000);
 
-// ── SUPABASE: REAL-TIME ──
 function subscribeToAll(){
   if(!db){setTimeout(subscribeToAll,300);return;}
   db.channel('dashboard-live')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'requests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
       db.from('guests').select('name,room').eq('id',payload.new.guest_id).single().then(function(r){
-        var gname=r.data?r.data.name:'Guest';
-        var groom=r.data?r.data.room:'?';
+        var gname=r.data?r.data.name:'Guest';var groom=r.data?r.data.room:'?';
         var req=Object.assign({},payload.new,{guests:{name:gname,room:groom},photo_url:payload.new.photo_url||null});
-        addRequestRow(req);
-        ping&&ping();flashTab('New Request!');
-        notify('mgr','&#128718; New Request',req.type+' from Room '+groom,'Guest: '+gname);
-        logEvent('req_new','New request: '+req.type+' from Room '+groom,gname,groom);
+        addRequestRow(req);ping&&ping();flashTab('New Request!');
+        notify('mgr','&#128718; New Request',req.type+' from '+groom,'Guest: '+gname);
+        logEvent('req_new','New request: '+req.type+' from '+groom,gname,groom);
       });
     })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
-      if(payload.new.direction==='guest_to_hotel'){
-        toast(payload.new.sender_name+': '+payload.new.body.slice(0,40),'warn');
-        notify('mgr','&#128172; Guest Message',payload.new.body,payload.new.sender_name);
-      }
+      if(payload.new.direction==='guest_to_hotel'){toast(payload.new.sender_name+': '+payload.new.body.slice(0,40),'warn');notify('mgr','&#128172; Guest Message',payload.new.body,payload.new.sender_name);}
     })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'ratings',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
       if(payload.new.stars<=3){
@@ -904,17 +729,9 @@ function subscribeToAll(){
       }
       updateAvgRating();
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'guests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
-      loadGuestList(); // Only reload guests list when new guest registers
-    })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},function(payload){
-      if(payload.new.read&&!payload.old.read&&payload.new.direction==='hotel_to_guest'){
-        notify('mgr','&#10003; Read','Guest has read your message.','');
-      }
-    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'guests',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){loadGuestList();})
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},function(payload){if(payload.new.read&&!payload.old.read&&payload.new.direction==='hotel_to_guest'){notify('mgr','&#10003; Read','Guest has read your message.','');}})
     .subscribe();
-
-  // localStorage fallback for same-browser testing
   window.addEventListener('storage',function(e){
     if(e.key==='arivo_requests')loadGuestRequests();
     if(e.key==='arivo_rating'){
@@ -922,56 +739,43 @@ function subscribeToAll(){
       if(d.stars<=3){
         var p=document.getElementById('palert');if(p)p.classList.add('on');
         var p2=document.getElementById('palert-req');if(p2)p2.classList.add('on');
-        var pam=document.getElementById('pam');
-        var pam2=document.getElementById('pam-req');
+        var pam=document.getElementById('pam');var pam2=document.getElementById('pam-req');
         if(pam)pam.textContent='Guest in '+d.room+' rated '+d.stars+' star'+(d.stars>1?'s':'')+'. Please attend immediately.';
         if(pam2)pam2.textContent='Guest in '+d.room+' rated '+d.stars+' star'+(d.stars>1?'s':'')+'. Please attend immediately.';
         ping&&ping();flashTab('\u26a0\ufe0f Low Rating!');
-        notify('warn','\u2605 Low Rating','Room '+d.room+' rated '+d.stars+' stars.','Priority alert');
+        notify('warn','\u2605 Low Rating',d.room+' rated '+d.stars+' stars.','Priority alert');
       }
     }
-    if(e.key==='arivo_guest_messages'){
-      var msgs=JSON.parse(e.newValue||'[]');
-      if(msgs.length)toast('New message from '+msgs[0].from,'warn');
-    }
+    if(e.key==='arivo_guest_messages'){var msgs=JSON.parse(e.newValue||'[]');if(msgs.length)toast('New message from '+msgs[0].from,'warn');}
   });
 }
 
 function addRequestRow(req){
   if(document.getElementById('req-'+req.id))return;
-  var list=document.getElementById('reqlist');
-  var empty=list.querySelector('div[style]');if(empty)empty.remove();
+  var list=document.getElementById('reqlist');var empty=list.querySelector('div[style]');if(empty)empty.remove();
   var row=document.createElement('div');row.className='row';row.id='req-'+req.id;
-  var gname=req.guests?req.guests.name:'Guest';
-  var groom=req.guests?req.guests.room:'?';
+  var gname=req.guests?req.guests.name:'Guest';var groom=req.guests?req.guests.room:'?';
   if(req.photo_url)photoCache[req.id]=req.photo_url;
-  var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')">📷</button>':'';
-  row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+' &mdash; Room '+groom+'</div><div class="rs">'+gname+' &middot; '+(req.detail||'').slice(0,50)+'</div></div><div class="badge nw">New</div><button class="btn btn-s" onclick="claimReq(this)">Claim</button>'+photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button>';
-  list.insertBefore(row,list.firstChild);
-  openReqs++;updateCnts();
-  // Also add to overview
-  var ovlist=document.getElementById('ov-reqlist');
-  var ovempty=ovlist.querySelector('div[style]');if(ovempty)ovempty.remove();
-  var ovrow=row.cloneNode(true);ovrow.removeAttribute('id');
-  ovlist.insertBefore(ovrow,ovlist.firstChild);
+  var photoBtn=req.photo_url?'<button class="btn btn-s" onclick="showPhoto(\''+req.id+'\')" title="View photo">&#128247;</button>':'';
+  row.innerHTML='<div class="dot nw"></div><div class="ri"><div class="rt">'+req.type+' &mdash; '+groom+'</div><div class="rs">'+gname+' \u00b7 '+(req.detail||'').slice(0,50)+'</div></div><div class="badge nw">New</div><button class="btn btn-s" onclick="claimReq(this)">Claim</button>'+photoBtn+'<button class="btn btn-s" onclick="openETA(this)">Done</button>';
+  list.insertBefore(row,list.firstChild);openReqs++;updateCnts();
+  var ovlist=document.getElementById('ov-reqlist');var ovempty=ovlist.querySelector('div[style]');if(ovempty)ovempty.remove();
+  var ovrow=row.cloneNode(true);ovrow.removeAttribute('id');ovlist.insertBefore(ovrow,ovlist.firstChild);
 }
 
 function updateAvgRating(){
+  if(!db)return;
   db.from('ratings').select('stars').eq('hotel_id',HOTEL_ID).then(function(r){
     if(!r.data||!r.data.length)return;
-    var avg=(r.data.reduce(function(s,x){return s+x.stars;},0)/r.data.length).toFixed(1);
-    document.getElementById('savg').textContent=avg;
+    document.getElementById('savg').textContent=(r.data.reduce(function(s,x){return s+x.stars;},0)/r.data.length).toFixed(1);
   });
 }
 
-// ── NOTIFY GUEST ──
 function notifyGuest(type,text,reqId,status,staffName){
-  // localStorage fallback
-  var payload={type:type,text:text||null,reqId:reqId||null,status:status||null,staffName:staffName||null,ts:Date.now()};
-  localStorage.setItem('arivo_dashboard_to_guest',JSON.stringify(payload));
+  localStorage.setItem('arivo_dashboard_to_guest',JSON.stringify({type:type,text:text||null,reqId:reqId||null,status:status||null,staffName:staffName||null,ts:Date.now()}));
 }
 
-// ── REQUESTS ──
+// FIXED: claimReq no longer uses syncRequestRow - each request is independent
 function claimReq(btn){
   var row=btn.closest('.row');if(!row)return;
   var taskTitle=row.querySelector('.rt')?row.querySelector('.rt').textContent:'Request';
@@ -981,69 +785,60 @@ function claimReq(btn){
   btn.remove();
   var s=row.querySelector('.rs');if(s&&s.textContent.indexOf('Claimed')<0)s.textContent+=(' \u00b7 Claimed by you');
   toast('Request claimed');
-  syncRequestRow(row,'claim');
-  // Update Supabase
   var reqId=row.id.replace('req-','');
-  db.from('requests').update({status:'claimed',claimed_at:new Date().toISOString()}).eq('id',reqId).then(function(){});
-  // Notify guest via Supabase
-  db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:null,direction:'hotel_to_guest',sender_name:'Hotel Team',body:'We have received your request and are on it \u2014 '+taskTitle+'.'}).then(function(){});
+  if(db&&reqId){
+    db.from('requests').update({status:'claimed',claimed_at:new Date().toISOString()}).eq('id',reqId).then(function(){});
+    db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:null,direction:'hotel_to_guest',sender_name:'Hotel Team',body:'We have received your request and are on it \u2014 '+taskTitle+'.'}).then(function(){});
+  }
   notifyGuest('status',null,reqId,'claimed','Hotel Team');
   logEvent('req_claim','Request claimed: '+taskTitle,guestLine,'');
-  notify('guest','&#128172; Guest Notified','We are on it \u2014 '+taskTitle+'.',guestLine);
+  notify('mgr','&#128172; Guest Notified','We are on it \u2014 '+taskTitle+'.',guestLine);
 }
 
+// FIXED: markAll finds Done buttons by text content, not selector
 function markAll(){
-  document.querySelectorAll('#reqlist .row').forEach(function(row){
-    var db2=row.querySelector('.btn-s[onclick*="openETA"]');
-    if(db2)finalDone(row,db2,'Request','');
+  var rows=Array.from(document.querySelectorAll('#reqlist .row'));
+  rows.forEach(function(row){
+    var doneBtn=null;
+    row.querySelectorAll('.btn-s').forEach(function(b){if(b.textContent.trim()==='Done')doneBtn=b;});
+    if(doneBtn){
+      var taskTitle=row.querySelector('.rt')?row.querySelector('.rt').textContent:'Request';
+      var guestLine=row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+      finalDone(row,doneBtn,taskTitle,guestLine);
+    }
   });
+  toast('All requests marked done');
 }
 
-// ── ETA ──
 function openETA(btn){
-  curBtn=btn;
-  var row=btn.closest('.row');
+  curBtn=btn;var row=btn.closest('.row');
   document.getElementById('etalbl').textContent=row?row.querySelector('.rt').textContent:'Request';
-  renderEtaOpts();
-  document.getElementById('etapop').classList.add('on');
-  document.body.style.overflow='hidden';
+  renderEtaOpts();document.getElementById('etapop').classList.add('on');document.body.style.overflow='hidden';
 }
 function closeETA(){document.getElementById('etapop').classList.remove('on');document.body.style.overflow='';curBtn=null;}
 function pickStaff(chip){document.querySelectorAll('.schap').forEach(function(c){c.classList.remove('on');});chip.classList.add('on');selStaff=chip.textContent;}
 function getPresets(){return Array.from(document.querySelectorAll('.etarow input')).map(function(i){return parseInt(i.value);}).filter(Boolean);}
 function renderEtaOpts(){
   var opts=document.getElementById('etaopts');opts.innerHTML='';
-  getPresets().forEach(function(m){
-    var d=document.createElement('div');d.className='etaopt';d.textContent=m+' min';
-    d.onclick=function(){doETA(m);};opts.appendChild(d);
-  });
-  var d0=document.createElement('div');d0.className='etaopt';d0.textContent='Done now';
-  d0.onclick=function(){doETA(0);};opts.insertBefore(d0,opts.firstChild);
+  getPresets().forEach(function(m){var d=document.createElement('div');d.className='etaopt';d.textContent=m+' min';d.onclick=function(){doETA(m);};opts.appendChild(d);});
+  var d0=document.createElement('div');d0.className='etaopt';d0.textContent='Done now';d0.onclick=function(){doETA(0);};opts.insertBefore(d0,opts.firstChild);
 }
 function useCustom(){var v=parseInt(document.getElementById('etcm').value);if(v>0)doETA(v);}
 function doETA(mins){
   var btn=curBtn;closeETA();if(!btn)return;
-  var row=btn.closest('.row');
-  var taskTitle=row?row.querySelector('.rt').textContent:'Request';
-  var guestLine=row&&row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
+  var row=btn.closest('.row');var taskTitle=row?row.querySelector('.rt').textContent:'Request';var guestLine=row&&row.querySelector('.rs')?row.querySelector('.rs').textContent.split('\u00b7')[0].trim():'';
   if(mins===0){finalDone(row,btn,taskTitle,guestLine);return;}
   if(row){
-    row.querySelector('.dot').className='dot pr';
-    var b=row.querySelector('.badge');if(b){b.className='badge pr';b.textContent='In Progress';}
+    row.querySelector('.dot').className='dot pr';var b=row.querySelector('.badge');if(b){b.className='badge pr';b.textContent='In Progress';}
     var clm=row.querySelector('.btn-s');if(clm&&clm.textContent==='Claim')clm.remove();
-    var chip=document.createElement('span');chip.className='echip';chip.textContent='ETA '+mins+' min';
-    chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
-    var tid=setTimeout(function(){
-      if(row.querySelector('.dot.pr'))notify('mgr','&#9200; ETA Overdue',taskTitle+' is overdue.','');
-    },mins*60000);
+    var chip=document.createElement('span');chip.className='echip';chip.textContent='ETA '+mins+' min';chip.onclick=function(){adjustETA(chip);};row.insertBefore(chip,btn);
+    var tid=setTimeout(function(){if(row.querySelector('.dot.pr'))notify('mgr','&#9200; ETA Overdue',taskTitle+' is overdue.','');},mins*60000);
     row.dataset.tid=tid;
-    syncRequestRow(row,'progress');
   }
   if(selStaff)notify('mgr','&#9989; Assigned',''+taskTitle+' assigned to '+selStaff+'.',selStaff+' &middot; ETA '+mins+' min');
-  logEvent('req_eta','ETA set: '+mins+'min for '+taskTitle,'Manager',guestLine);
-  selStaff='';
+  logEvent('req_eta','ETA set: '+mins+'min for '+taskTitle,'Manager',guestLine);selStaff='';
 }
-function adjustETA(chip){var m=parseInt(prompt('New ETA in minutes?',10));if(m>0){chip.textContent='ETA '+m+' min';}}
+function adjustETA(chip){var m=parseInt(prompt('New ETA in minutes?',10));if(m>0)chip.textContent='ETA '+m+' min';}
 function finalDone(row,btn,taskTitle,guestLine){
   if(!taskTitle&&row)taskTitle=row.querySelector('.rt')?row.querySelector('.rt').textContent:'Request';
   if(!guestLine&&row&&row.querySelector('.rs'))guestLine=row.querySelector('.rs').textContent.split('\u00b7')[0].trim();
@@ -1051,10 +846,8 @@ function finalDone(row,btn,taskTitle,guestLine){
   if(row){row.querySelector('.dot').className='dot dn';var b=row.querySelector('.badge');if(b){b.className='badge dn';b.textContent='Done';}var c=row.querySelector('.echip');if(c)c.remove();}
   if(btn)btn.remove();
   openReqs=Math.max(0,openReqs-1);updateCnts();
-  if(row)syncRequestRow(row,'done');
-  // Update Supabase
   var reqId=row?row.id.replace('req-',''):null;
-  if(reqId){
+  if(reqId&&db){
     db.from('requests').update({status:'done',completed_at:new Date().toISOString()}).eq('id',reqId).then(function(){});
     db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:null,direction:'hotel_to_guest',sender_name:'Hotel Team',body:'Your request has been completed. Let us know if you need anything else.'}).then(function(){});
   }
@@ -1065,32 +858,6 @@ function finalDone(row,btn,taskTitle,guestLine){
   selStaff='';
 }
 
-// ── SYNC OVERVIEW <-> REQUESTS ──
-function syncRequestRow(sourceRow,action){
-  var title=sourceRow.querySelector('.rt')?sourceRow.querySelector('.rt').textContent:'';
-  if(!title)return;
-  function normalise(t){return t.toLowerCase().replace(/[\u2014\u2013-]/g,' ').replace(/[^a-z0-9 ]/g,' ').trim().split(/\s+/).slice(0,2).join(' ');}
-  var srcKey=normalise(title);
-  document.querySelectorAll('#reqlist .row, #ov-reqlist .row').forEach(function(row){
-    if(row===sourceRow)return;
-    var rt=row.querySelector('.rt');if(!rt)return;
-    if(normalise(rt.textContent)!==srcKey)return;
-    if(action==='claim'){
-      row.querySelector('.dot').className='dot cl';
-      var b=row.querySelector('.badge');if(b){b.className='badge cl';b.textContent='Claimed';}
-      row.querySelectorAll('.btn-s').forEach(function(b){if(b.textContent==='Claim')b.remove();});
-    } else if(action==='done'){
-      row.querySelector('.dot').className='dot dn';
-      var bd=row.querySelector('.badge');if(bd){bd.className='badge dn';bd.textContent='Done';}
-      var chip=row.querySelector('.echip');if(chip)chip.remove();
-      row.querySelectorAll('.btn-s').forEach(function(b){b.remove();});
-    } else if(action==='progress'){
-      row.querySelector('.dot').className='dot pr';
-      var bp=row.querySelector('.badge');if(bp){bp.className='badge pr';bp.textContent='In Progress';}
-    }
-  });
-}
-
 function updateCnts(){
   document.getElementById('sr').textContent=openReqs;
   document.getElementById('rbadge').textContent=openReqs;
@@ -1098,376 +865,123 @@ function updateCnts(){
   document.getElementById('rcntlbl').textContent=openReqs+' open';
 }
 
-// ── SEND MESSAGE ──
 function sendMsg(){
-  var sel=document.getElementById('msgto');
-  var b=document.getElementById('msgbody').value.trim();
+  var sel=document.getElementById('msgto');var b=document.getElementById('msgbody').value.trim();
   if(!b){toast('Type a message','err');return;}
-  var targetGuestId=sel.options[sel.selectedIndex].dataset.guestId||null;
-  var targetLabel=sel.value;
-  if(db) db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(r){
-    if(r.error)console.log('Msg error:',r.error.message);
-  });
+  var targetGuestId=sel.options[sel.selectedIndex].dataset.guestId||null;var targetLabel=sel.value;
+  if(db)db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(r){if(r.error)console.log('Msg error:',r.error.message);});
   logEvent('msg_sent','Manager sent message to '+targetLabel+': '+b.slice(0,60),'Manager','-');
-  toast('Message sent to: '+targetLabel);
-  document.getElementById('msgbody').value='';
-  notify('mgr','💬 Sent',b.slice(0,60),targetLabel);
+  toast('Message sent to: '+targetLabel);document.getElementById('msgbody').value='';
+  notify('mgr','&#128172; Sent',b.slice(0,60),targetLabel);
 }
 function sendMsgM(){
-  var b=document.getElementById('msgb2').value.trim();
-  var to=document.getElementById('msgto2').textContent;
+  var b=document.getElementById('msgb2').value.trim();var to=document.getElementById('msgto2').textContent;
   var targetGuestId=document.getElementById('mmsg').dataset.guestId||null;
   if(!b){toast('Type a message','err');return;}
-  if(db) db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(){});
-  closeM('mmsg');
-  toast('Message sent to '+to);
-  notify('mgr','💬 Sent',b.slice(0,60),to);
+  if(db)db.from('messages').insert({hotel_id:HOTEL_ID,guest_id:targetGuestId,direction:'hotel_to_guest',sender_name:'Hotel Team',body:b}).then(function(){});
+  closeM('mmsg');toast('Message sent to '+to);notify('mgr','&#128172; Sent',b.slice(0,60),to);
 }
 function openMsgM(guestId,name,room){document.getElementById('msgto2').textContent=name+' \u00b7 '+room;document.getElementById('msgb2').value='';document.getElementById('mmsg').dataset.guestId=guestId;openM('mmsg');}
-function loadTpl(t){
-  var tpls={checkout:'Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready. We hope you have had a wonderful stay!',welcome:'Welcome to The Maison! We hope your room is everything you hoped for. Please do not hesitate to reach out if you need anything at all.'};
-  document.getElementById('msgbody').value=tpls[t]||'';
-}
+function loadTpl(t){var tpls={checkout:'Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready. We hope you have had a wonderful stay!',welcome:'Welcome to The Maison! We hope your room is everything you hoped for. Please do not hesitate to reach out if you need anything at all.'};document.getElementById('msgbody').value=tpls[t]||'';}
 
-// ── GUEST MANAGEMENT ──
 function addGuest(){
-  var name=document.getElementById('agn').value.trim();
-  var room=document.getElementById('agr').value.trim();
-  var co=document.getElementById('agc').value;
+  var name=document.getElementById('agn').value.trim();var room=document.getElementById('agr').value.trim();var co=document.getElementById('agc').value;
   if(!name||!room){toast('Please fill in name and room','err');return;}
+  if(!db){toast('Not connected','err');return;}
   db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co||null,source:'manual'}).select().then(function(r){
     if(r.error){toast('Error adding guest','err');return;}
-    toast(name+' added');
-    closeM('mag');
-    loadData();
-    logEvent('guest_added','Guest manually added: '+name+', Room '+room,'Manager',room);
+    toast(name+' added');closeM('mag');loadGuestList();logEvent('guest_added','Guest manually added: '+name+', '+room,'Manager',room);
   });
 }
 
-// ── STAFF ──
-function editStaff(btn){
-  var row=btn.closest('.srow');if(!row)return;
-  currentEditRow=row;
-  var name=row.querySelector('.sn')?row.querySelector('.sn').textContent:'';
-  var roleStatus=row.querySelector('.ss')?row.querySelector('.ss').textContent:'';
-  var parts=roleStatus.split('\u00b7');
-  document.getElementById('edit-sfn').value=name;
-  var roleSelect=document.getElementById('edit-sfr');
-  for(var i=0;i<roleSelect.options.length;i++){if(roleSelect.options[i].value===(parts[0]||'').trim()){roleSelect.selectedIndex=i;break;}}
-  openM('medit-staff');
-}
-function saveStaffEdit(){
-  var name=document.getElementById('edit-sfn').value.trim();
-  var role=document.getElementById('edit-sfr').value;
-  var status=document.getElementById('edit-sfs').value;
-  if(!name){toast('Please enter a name','err');return;}
-  if(!currentEditRow)return;
-  var ini=name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-  currentEditRow.querySelector('.sav').textContent=ini;
-  currentEditRow.querySelector('.sn').textContent=name;
-  currentEditRow.querySelector('.ss').textContent=role+' \u00b7 '+status;
-  closeM('medit-staff');toast(name+' updated');currentEditRow=null;
-}
-function removeStaff(btn){
-  var row=btn.closest('.srow');if(!row)return;
-  var name=row.querySelector('.sn')?row.querySelector('.sn').textContent:'this staff member';
-  if(!confirm('Remove '+name+'? This cannot be undone.'))return;
-  revokeStaffAccess(name);row.remove();toast(name+' removed');
-  logEvent('staff_removed','Staff removed: '+name,'Manager','-');
-}
-function removeStaffById(){
-  if(!currentEditRow)return;
-  var name=currentEditRow.querySelector('.sn')?currentEditRow.querySelector('.sn').textContent:'this staff member';
-  if(!confirm('Remove '+name+'?'))return;
-  revokeStaffAccess(name);currentEditRow.remove();closeM('medit-staff');toast(name+' removed');currentEditRow=null;
-}
-function revokeStaffAccess(name){
-  var revoked=JSON.parse(localStorage.getItem('arivo_revoked_staff')||'[]');
-  if(revoked.indexOf(name)<0)revoked.push(name);
-  localStorage.setItem('arivo_revoked_staff',JSON.stringify(revoked));
-  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_revoked_staff',newValue:JSON.stringify(revoked)}));
-}
-function addStaff(){
-  var name=document.getElementById('sfn').value.trim();
-  var role=document.getElementById('sfr').value;
-  var email=document.getElementById('sfe').value.trim();
-  if(!name){toast('Please enter a name','err');return;}
-  var ini=name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-  var row=document.createElement('div');row.className='srow';
-  row.innerHTML='<div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+name+'</div><div class="ss">'+role+' \u00b7 Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div>';
-  document.getElementById('stafflist').appendChild(row);
-  closeM('mstaff');toast(name+' added as '+role);
-  document.getElementById('sfn').value='';document.getElementById('sfe').value='';
-}
+function editStaff(btn){var row=btn.closest('.srow');if(!row)return;currentEditRow=row;var name=row.querySelector('.sn')?row.querySelector('.sn').textContent:'';var roleStatus=row.querySelector('.ss')?row.querySelector('.ss').textContent:'';var parts=roleStatus.split('\u00b7');document.getElementById('edit-sfn').value=name;var roleSelect=document.getElementById('edit-sfr');for(var i=0;i<roleSelect.options.length;i++){if(roleSelect.options[i].value===(parts[0]||'').trim()){roleSelect.selectedIndex=i;break;}}openM('medit-staff');}
+function saveStaffEdit(){var name=document.getElementById('edit-sfn').value.trim();var role=document.getElementById('edit-sfr').value;var status=document.getElementById('edit-sfs').value;if(!name){toast('Please enter a name','err');return;}if(!currentEditRow)return;var ini=name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);currentEditRow.querySelector('.sav').textContent=ini;currentEditRow.querySelector('.sn').textContent=name;currentEditRow.querySelector('.ss').textContent=role+' \u00b7 '+status;closeM('medit-staff');toast(name+' updated');currentEditRow=null;}
+function removeStaff(btn){var row=btn.closest('.srow');if(!row)return;var name=row.querySelector('.sn')?row.querySelector('.sn').textContent:'this staff member';if(!confirm('Remove '+name+'? This cannot be undone.'))return;revokeStaffAccess(name);row.remove();toast(name+' removed');logEvent('staff_removed','Staff removed: '+name,'Manager','-');}
+function removeStaffById(){if(!currentEditRow)return;var name=currentEditRow.querySelector('.sn')?currentEditRow.querySelector('.sn').textContent:'this staff member';if(!confirm('Remove '+name+'?'))return;revokeStaffAccess(name);currentEditRow.remove();closeM('medit-staff');toast(name+' removed');currentEditRow=null;}
+function revokeStaffAccess(name){var revoked=JSON.parse(localStorage.getItem('arivo_revoked_staff')||'[]');if(revoked.indexOf(name)<0)revoked.push(name);localStorage.setItem('arivo_revoked_staff',JSON.stringify(revoked));window.dispatchEvent(new StorageEvent('storage',{key:'arivo_revoked_staff',newValue:JSON.stringify(revoked)}));}
+function addStaff(){var name=document.getElementById('sfn').value.trim();var role=document.getElementById('sfr').value;if(!name){toast('Please enter a name','err');return;}var ini=name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var row=document.createElement('div');row.className='srow';row.innerHTML='<div class="sav" style="background:var(--gdim);color:var(--gold)">'+ini+'</div><div class="sin"><div class="sn">'+name+'</div><div class="ss">'+role+' \u00b7 Active</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editStaff(this)">&#9999;</div><div class="icb del" onclick="removeStaff(this)">&#10005;</div></div>';document.getElementById('stafflist').appendChild(row);closeM('mstaff');toast(name+' added as '+role);document.getElementById('sfn').value='';document.getElementById('sfe').value='';}
 
-// ── SESSIONS ──
 function killSess(n,guestId){
   if(!confirm('Kill session for '+n+'? They will be signed out immediately.'))return;
   var payload=JSON.stringify({type:'kill',name:n,time:Date.now()});
-  localStorage.setItem('arivo_dashboard_to_guest',payload);
-  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_dashboard_to_guest',newValue:payload}));
-  // Mark as checked out in Supabase
-  if(db&&guestId) db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){loadGuestList();});
-  toast('Session killed for '+n);
-  logEvent('session_kill','Session killed: '+n,'Manager','-');
+  localStorage.setItem('arivo_dashboard_to_guest',payload);window.dispatchEvent(new StorageEvent('storage',{key:'arivo_dashboard_to_guest',newValue:payload}));
+  if(db&&guestId)db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){loadGuestList();});
+  toast('Session killed for '+n);logEvent('session_kill','Session killed: '+n,'Manager','-');
 }
-function genBypass(){
-  var name=document.getElementById('bpg').value.trim();
-  var room=document.getElementById('bpr').value.trim();
-  if(!name||!room){toast('Please fill in name and room','err');return;}
-  var code=Math.floor(1000+Math.random()*9000).toString();
-  document.getElementById('bypname').textContent=name+' \u00b7 Room '+room;
-  document.getElementById('bypcode').textContent=code;
-  document.getElementById('bypres').style.display='block';
-  logEvent('bypass_gen','Bypass code generated for '+name+', Room '+room,'Manager',room);
-}
+function genBypass(){var name=document.getElementById('bpg').value.trim();var room=document.getElementById('bpr').value.trim();if(!name||!room){toast('Please fill in name and room','err');return;}var code=Math.floor(1000+Math.random()*9000).toString();document.getElementById('bypname').textContent=name+' \u00b7 '+room;document.getElementById('bypcode').textContent=code;document.getElementById('bypres').style.display='block';logEvent('bypass_gen','Bypass code generated for '+name+', '+room,'Manager',room);}
 
-// ── HOTEL INFO ──
 var curSecId='';
 function openAR(secId,secName){curSecId=secId;document.getElementById('arsl').textContent=secName;document.getElementById('ark').value='';document.getElementById('arv').value='';openM('marow');}
-function addRow(){
-  var k=document.getElementById('ark').value.trim();
-  var v=document.getElementById('arv').value.trim();
-  if(!k||!v){toast('Fill in label and value','err');return;}
-  var sec=document.getElementById(curSecId);if(!sec)return;
-  var addBtn=sec.querySelector('.addrow');
-  var row=document.createElement('div');row.className='irow';
-  row.innerHTML='<div class="irk">'+k+'</div><div class="irv" contenteditable="true" onblur="toast(\'Saved\')">'+v+'</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';
-  sec.insertBefore(row,addBtn);closeM('marow');toast('Row added');
-}
+function addRow(){var k=document.getElementById('ark').value.trim();var v=document.getElementById('arv').value.trim();if(!k||!v){toast('Fill in label and value','err');return;}var sec=document.getElementById(curSecId);if(!sec)return;var addBtn=sec.querySelector('.addrow');var row=document.createElement('div');row.className='irow';row.innerHTML='<div class="irk">'+k+'</div><div class="irv" contenteditable="true" onblur="toast(\'Saved\')">'+v+'</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';sec.insertBefore(row,addBtn);closeM('marow');toast('Row added');}
 function delRow(btn){btn.closest('.irow').remove();toast('Row removed');}
-function addSec(){
-  var t=document.getElementById('nst').value.trim();
-  var i=document.getElementById('nsi').value.trim();
-  if(!t){toast('Enter a title','err');return;}
-  var id='sec-'+t.toLowerCase().replace(/\s+/g,'-');
-  var sec=document.createElement('div');sec.className='isec';sec.id=id;
-  sec.innerHTML='<div class="ish"><div class="ist"><div class="ith">'+(i||'&#128203;')+'</div>'+t+'</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR(\''+id+'\',\''+t+'\')">&#65291;</div><div class="icb del" onclick="delSec(\''+id+'\')">&#10005;</div></div></div><button class="addrow" onclick="openAR(\''+id+'\',\''+t+'\')">&#65291; Add row</button>';
-  document.getElementById('s-info').insertBefore(sec,document.getElementById('s-info').querySelector('.card'));
-  closeM('msec');toast('Section added');
-}
+function addSec(){var t=document.getElementById('nst').value.trim();var i=document.getElementById('nsi').value.trim();if(!t){toast('Enter a title','err');return;}var id='sec-'+t.toLowerCase().replace(/\s+/g,'-');var sec=document.createElement('div');sec.className='isec';sec.id=id;sec.innerHTML='<div class="ish"><div class="ist"><div class="ith">'+(i||'&#128203;')+'</div>'+t+'</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR(\''+id+'\',\''+t+'\')">&#65291;</div><div class="icb del" onclick="delSec(\''+id+'\')">&#10005;</div></div></div><button class="addrow" onclick="openAR(\''+id+'\',\''+t+'\')">&#65291; Add row</button>';document.getElementById('s-info').insertBefore(sec,document.getElementById('s-info').querySelector('.card'));closeM('msec');toast('Section added');}
 function delSec(id){document.getElementById(id).remove();toast('Section removed');}
-
-// ── FACILITIES / PLACES ──
-function addFac(){
-  var n=document.getElementById('afn').value.trim();
-  var d=document.getElementById('afd').value.trim();
-  var e=document.getElementById('afe').value.trim();
-  if(!n){toast('Enter facility name','err');return;}
-  var row=document.createElement('div');row.className='rrow';
-  row.innerHTML='<div class="rthumb">'+(e||'&#127968;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+d+'</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
-  document.getElementById('faclist').appendChild(row);closeM('mfac');toast('Facility added');
-  document.getElementById('afn').value='';document.getElementById('afd').value='';document.getElementById('afe').value='';
-}
-function addRec(){
-  var n=document.getElementById('arn').value.trim();
-  var c=document.getElementById('arc').value.trim();
-  var e=document.getElementById('are').value.trim();
-  if(!n){toast('Enter place name','err');return;}
-  var row=document.createElement('div');row.className='rrow';
-  row.innerHTML='<div class="rthumb">'+(e||'&#128205;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+c+'</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
-  document.getElementById('reclist').appendChild(row);closeM('mrec');toast('Place added');
-  document.getElementById('arn').value='';document.getElementById('arc').value='';document.getElementById('are').value='';
-}
+function addFac(){var n=document.getElementById('afn').value.trim();var d=document.getElementById('afd').value.trim();var e=document.getElementById('afe').value.trim();if(!n){toast('Enter facility name','err');return;}var row=document.createElement('div');row.className='rrow';row.innerHTML='<div class="rthumb">'+(e||'&#127968;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+d+'</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('faclist').appendChild(row);closeM('mfac');toast('Facility added');document.getElementById('afn').value='';document.getElementById('afd').value='';document.getElementById('afe').value='';}
+function addRec(){var n=document.getElementById('arn').value.trim();var c=document.getElementById('arc').value.trim();var e=document.getElementById('are').value.trim();if(!n){toast('Enter place name','err');return;}var row=document.createElement('div');row.className='rrow';row.innerHTML='<div class="rthumb">'+(e||'&#128205;')+'</div><div class="rinfo"><div class="rn">'+n+'</div><div class="rc">'+c+'</div><div class="rsrc staff">Staff pick</div></div><div style="display:flex;gap:5px"><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';document.getElementById('reclist').appendChild(row);closeM('mrec');toast('Place added');document.getElementById('arn').value='';document.getElementById('arc').value='';document.getElementById('are').value='';}
 function delRec(btn){btn.closest('.rrow').remove();toast('Removed');}
 
-// ── QR ──
-function genLink(){
-  var n=document.getElementById('gln').value.trim();
-  var r=document.getElementById('glr').value.trim();
-  var c=document.getElementById('glc').value;
-  if(!n||!r){toast('Fill in name and room','err');return;}
-  var url='https://myarivo.netlify.app/hotel-guest-app.html?name='+encodeURIComponent(n)+'&room='+encodeURIComponent(r)+(c?'&checkout='+c:'');
-  document.getElementById('glurl').textContent=url;
-  document.getElementById('glres').style.display='block';
-}
+function genLink(){var n=document.getElementById('gln').value.trim();var r=document.getElementById('glr').value.trim();var c=document.getElementById('glc').value;if(!n||!r){toast('Fill in name and room','err');return;}var url='https://myarivo.pages.dev/hotel-guest-app.html?name='+encodeURIComponent(n)+'&room='+encodeURIComponent(r)+(c?'&checkout='+c:'');document.getElementById('glurl').textContent=url;document.getElementById('glres').style.display='block';}
 
-// ── SIMULATE ──
-function simReq(){
-  var types=['Extra Towels','Room Cleaning','Late Checkout','Taxi Booking','Extra Pillows','Restaurant Reservation','Room Upgrade'];
-  var rooms=['3','5','7','9','11','14'];
-  var names=['Sarah Chen','David Park','Amara Osei','Marcus Webb','Alice Foster'];
-  var type=types[Math.floor(Math.random()*types.length)];
-  var room=rooms[Math.floor(Math.random()*rooms.length)];
-  var name=names[Math.floor(Math.random()*names.length)];
-  var fakeReq={id:'sim-'+Date.now(),type:type,detail:type,guests:{name:name,room:room},status:'new'};
-  addRequestRow(fakeReq);
-  ping&&ping();flashTab('New Request!');
-  notify('mgr','&#128718; New Request (Simulated)',type+' from Room '+room,'Guest: '+name);
-}
+function simReq(){var types=['Extra Towels','Room Cleaning','Late Checkout','Taxi Booking','Extra Pillows','Restaurant Reservation','Room Upgrade'];var rooms=['Room 3','Room 5','Room 7','Room 9','Room 11','Room 14'];var names=['Sarah Chen','David Park','Amara Osei','Marcus Webb','Alice Foster'];var type=types[Math.floor(Math.random()*types.length)];var room=rooms[Math.floor(Math.random()*rooms.length)];var name=names[Math.floor(Math.random()*names.length)];var fakeReq={id:'sim-'+Date.now(),type:type,detail:type,guests:{name:name,room:room},status:'new'};addRequestRow(fakeReq);ping&&ping();flashTab('New Request!');notify('mgr','&#128718; New Request (Simulated)',type+' from '+room,'Guest: '+name);}
 
-// ── CREDENTIALS ──
-function saveCreds(mode){
-  if(mode==='name'){
-    var n=document.getElementById('cname').value.trim();
-    var em=document.getElementById('cemail').value.trim();
-    if(!n){toast('Enter your name','err');return;}
-    document.getElementById('uname').textContent=n;
-    var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-    var ua=document.getElementById('uav');if(ua)ua.textContent=ini;
-    toast('Name and email updated');
-  } else {
-    var cur=document.getElementById('cpc').value;
-    var nw=document.getElementById('cpn').value;
-    var cf=document.getElementById('cpcf').value;
-    var err=document.getElementById('cperr');
-    if(!cur||!nw||!cf){toast('Fill in all password fields','err');return;}
-    if(nw.length<8){toast('Password must be 8+ characters','err');return;}
-    if(nw!==cf){err.style.display='block';return;}
-    err.style.display='none';
-    ['cpc','cpn','cpcf'].forEach(function(id){document.getElementById(id).value='';});
-    toast('Password updated');
-  }
-}
+function saveCreds(mode){if(mode==='name'){var n=document.getElementById('cname').value.trim();if(!n){toast('Enter your name','err');return;}document.getElementById('uname').textContent=n;var ini=n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);var ua=document.getElementById('uav');if(ua)ua.textContent=ini;toast('Name and email updated');}else{var cur=document.getElementById('cpc').value;var nw=document.getElementById('cpn').value;var cf=document.getElementById('cpcf').value;var err=document.getElementById('cperr');if(!cur||!nw||!cf){toast('Fill in all password fields','err');return;}if(nw.length<8){toast('Password must be 8+ characters','err');return;}if(nw!==cf){err.style.display='block';return;}err.style.display='none';['cpc','cpn','cpcf'].forEach(function(id){document.getElementById(id).value='';});toast('Password updated');}}
 
-// ── ETA OPTS ──
-function addEtaOpt(){
-  var row=document.createElement('div');row.className='fg etarow';row.style.cssText='display:flex;gap:8px;align-items:center';
-  row.innerHTML='<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">&#10005;</div>';
-  document.getElementById('etalist').appendChild(row);
-}
+function addEtaOpt(){var row=document.createElement('div');row.className='fg etarow';row.style.cssText='display:flex;gap:8px;align-items:center';row.innerHTML='<input class="fi" value="20" style="width:70px;text-align:center" type="number" min="1" max="240"><span style="font-size:13px;color:var(--tx2)">min</span><div class="icb del" onclick="rmETA(this)" style="margin-left:auto">&#10005;</div>';document.getElementById('etalist').appendChild(row);}
 function rmETA(btn){btn.closest('.etarow').remove();}
 function saveEtaOpts(){toast('ETA options saved');}
 
-// ── MODALS ──
 function openM(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
 function closeM(id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}
 
-// ── NOTIFICATIONS ──
-function notify(type,title,msg,sub){
-  var band=document.getElementById('nband');if(!band)return;
-  var b=document.createElement('div');b.className='nbanner '+type;
-  b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');
-  b.onclick=function(){dismissBanner(b);};
-  band.appendChild(b);
-  setTimeout(function(){dismissBanner(b);},5000);
-}
+function notify(type,title,msg,sub){var band=document.getElementById('nband');if(!band)return;var b=document.createElement('div');b.className='nbanner '+type;b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');b.onclick=function(){dismissBanner(b);};band.appendChild(b);setTimeout(function(){dismissBanner(b);},5000);}
 function dismissBanner(b){if(b&&b.parentNode){b.style.opacity='0';b.style.transform='translateX(20px)';b.style.transition='all .3s';setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);}}
 
-// ── TOAST ──
-function toast(msg,type){
-  var t=document.getElementById('toast');
-  t.className=type||'';
-  t.textContent=msg;t.classList.add('on');
-  setTimeout(function(){t.classList.remove('on');},2800);
-}
+function toast(msg,type){var t=document.getElementById('toast');t.className=type||'';t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800);}
 
-// ── FLASH TAB ──
 var origTitle='Arivo \u2014 Hotel Dashboard';
-function flashTab(msg){
-  var count=0;
-  var iv=setInterval(function(){
-    document.title=count%2===0?msg:origTitle;
-    count++;if(count>6){clearInterval(iv);document.title=origTitle;}
-  },600);
-}
+function flashTab(msg){var count=0;var iv=setInterval(function(){document.title=count%2===0?msg:origTitle;count++;if(count>6){clearInterval(iv);document.title=origTitle;}},600);}
 
-// ── PING (audio) ──
-function initPing(){
-  try{
-    var ctx=new(window.AudioContext||window.webkitAudioContext)();
-    ping=function(){
-      try{
-        var o=ctx.createOscillator();var g=ctx.createGain();
-        o.connect(g);g.connect(ctx.destination);
-        o.frequency.setValueAtTime(1046,ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(523,ctx.currentTime+0.3);
-        g.gain.setValueAtTime(0.3,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
-        o.start(ctx.currentTime);o.stop(ctx.currentTime+0.4);
-      }catch(e){}
-    };
-  }catch(e){}
-}
+function initPing(){try{var ctx=new(window.AudioContext||window.webkitAudioContext)();ping=function(){try{var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.setValueAtTime(1046,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(523,ctx.currentTime+0.3);g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);o.start(ctx.currentTime);o.stop(ctx.currentTime+0.4);}catch(e){}};;}catch(e){}}
 
-// ── LOGO & MENU UPLOAD ──
 function uploadLogo(input){
   if(!input.files||!input.files[0])return;
   var file=input.files[0];
-  var maxSize=2*1024*1024; // 2MB
-  if(file.size>maxSize){toast('Logo must be under 2MB. Your file is '+Math.round(file.size/1024/1024*10)/10+'MB','err');return;}
+  if(file.size>2*1024*1024){toast('Logo must be under 2MB. Your file is '+Math.round(file.size/1024/1024*10)/10+'MB','err');return;}
   if(!['image/jpeg','image/png','image/webp'].includes(file.type)){toast('Logo must be JPEG, PNG or WebP','err');return;}
   if(!db){toast('Not connected','err');return;}
   toast('Uploading logo...');
   var fileName='logo_'+HOTEL_ID+'.'+file.name.split('.').pop();
   db.storage.from('hotel-assets').upload(fileName,file,{upsert:true,contentType:file.type}).then(function(r){
     if(r.error){toast('Upload failed: '+r.error.message,'err');return;}
-    var urlResult=db.storage.from('hotel-assets').getPublicUrl(fileName);
-    var url=urlResult.data?urlResult.data.publicUrl:null;
-    if(url){
-      db.from('hotel_settings').update({logo_url:url}).eq('hotel_id',HOTEL_ID).then(function(){});
-      var prev=document.getElementById('logo-preview');
-      if(prev) prev.innerHTML='<img src="'+url+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px">';
-      toast('Logo uploaded');
-    }
+    var url=db.storage.from('hotel-assets').getPublicUrl(fileName).data.publicUrl;
+    if(url){db.from('hotel_settings').update({logo_url:url}).eq('hotel_id',HOTEL_ID).then(function(){});var prev=document.getElementById('logo-preview');if(prev)prev.innerHTML='<img src="'+url+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px">';toast('Logo uploaded');}
   });
 }
 
 function uploadMenu(input){
   if(!input.files||!input.files[0])return;
   var file=input.files[0];
-  var maxSize=20*1024*1024; // 20MB
-  if(file.size>maxSize){toast('Menu PDF must be under 20MB. Your file is '+Math.round(file.size/1024/1024*10)/10+'MB','err');return;}
+  if(file.size>20*1024*1024){toast('Menu PDF must be under 20MB. Your file is '+Math.round(file.size/1024/1024*10)/10+'MB','err');return;}
   if(file.type!=='application/pdf'){toast('Menu must be a PDF file','err');return;}
   if(!db){toast('Not connected','err');return;}
   toast('Uploading menu...');
   var fileName='menu_'+HOTEL_ID+'.pdf';
   db.storage.from('hotel-assets').upload(fileName,file,{upsert:true,contentType:'application/pdf'}).then(function(r){
     if(r.error){toast('Upload failed: '+r.error.message,'err');return;}
-    var urlResult=db.storage.from('hotel-assets').getPublicUrl(fileName);
-    var url=urlResult.data?urlResult.data.publicUrl:null;
-    if(url){
-      db.from('hotel_settings').update({menu_url:url}).eq('hotel_id',HOTEL_ID).then(function(){});
-      var lbl=document.getElementById('menu-upload-label');
-      if(lbl) lbl.textContent='Menu uploaded \u2714 Tap to replace';
-      toast('Menu uploaded \u2014 guests can now view it');
-    }
+    var url=db.storage.from('hotel-assets').getPublicUrl(fileName).data.publicUrl;
+    if(url){db.from('hotel_settings').update({menu_url:url}).eq('hotel_id',HOTEL_ID).then(function(){});var lbl=document.getElementById('menu-upload-label');if(lbl)lbl.textContent='Menu uploaded \u2714 Tap to replace';toast('Menu uploaded \u2014 guests can now view it');}
   });
 }
-
 
 function saveRooms(){
   var rooms=[];
-  document.querySelectorAll('#roomlist .irow').forEach(function(row){
-    var v=row.querySelector('.irv');
-    if(v&&v.textContent.trim()) rooms.push(String(v.textContent.trim()));
-  });
-  // Save to Supabase as plain JSON string to avoid DataCloneError
-  if(db){
-    db.from('hotel_settings').update({rooms:rooms,updated_at:new Date().toISOString()}).eq('hotel_id',HOTEL_ID).then(function(r){
-      if(r.error) console.log('Rooms save error:',r.error.message);
-    });
-  }
-  // Update room count in sidebar
-  var hloc=document.getElementById('hloc');
-  if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rooms.length+' rooms \u00b7 '+city+', UK';}
+  document.querySelectorAll('#roomlist .irow').forEach(function(row){var v=row.querySelector('.irv');if(v&&v.textContent.trim())rooms.push(String(v.textContent.trim()));});
+  if(db)db.from('hotel_settings').update({rooms:rooms,updated_at:new Date().toISOString()}).eq('hotel_id',HOTEL_ID).then(function(r){if(r.error)console.log('Rooms save error:',r.error.message);});
+  var hloc=document.getElementById('hloc');if(hloc){var city=document.getElementById('hotel-city')?document.getElementById('hotel-city').value:'Bath';hloc.textContent=rooms.length+' rooms \u00b7 '+city+', UK';}
   toast('Rooms saved');
 }
-
-function addRoom(){
-  var list=document.getElementById('roomlist');
-  var count=list.querySelectorAll('.irow').length+1;
-  var row=document.createElement('div');row.className='irow';
-  row.innerHTML='<div class="irk">Room '+count+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room '+count+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';
-  list.appendChild(row);
-  saveRooms();
-}
-
-function delRoomRow(btn){
-  var row=btn.closest('.irow');
-  var roomName=row.querySelector('.irv')?row.querySelector('.irv').textContent.trim():'';
-  // Check if room is currently occupied
-  var activeGuests=document.querySelectorAll('#glist .grow');
-  var occupied=false;
-  activeGuests.forEach(function(g){
-    if(g.querySelector('.gs')&&g.querySelector('.gs').textContent.indexOf(roomName)>=0) occupied=true;
-  });
-  if(occupied){toast('Cannot remove — room is currently occupied','err');return;}
-  row.remove();
-  saveRooms();
-}
-
-// Save rooms on initial load
+function addRoom(){var list=document.getElementById('roomlist');var count=list.querySelectorAll('.irow').length+1;var row=document.createElement('div');row.className='irow';row.innerHTML='<div class="irk">Room '+count+'</div><div class="irv" contenteditable="true" onblur="saveRooms()">Room '+count+'</div><div class="iract"><div class="icb del" onclick="delRoomRow(this)">&#10005;</div></div>';list.appendChild(row);saveRooms();}
+function delRoomRow(btn){var row=btn.closest('.irow');var roomName=row.querySelector('.irv')?row.querySelector('.irv').textContent.trim():'';var occupied=false;document.querySelectorAll('#glist .grow').forEach(function(g){if(g.querySelector('.gs')&&g.querySelector('.gs').textContent.indexOf(roomName)>=0)occupied=true;});if(occupied){toast('Cannot remove \u2014 room is currently occupied','err');return;}row.remove();saveRooms();}
 
 function saveHotelAddress(){
   var street=document.getElementById('hotel-street')?document.getElementById('hotel-street').value:'14 Brock Street';
@@ -1476,45 +990,27 @@ function saveHotelAddress(){
   var phone=document.getElementById('hotel-phone')?document.getElementById('hotel-phone').value:'+44 1225 000123';
   var hotelName=document.getElementById('hotel-name-input')?document.getElementById('hotel-name-input').value:(document.getElementById('hname')?document.getElementById('hname').textContent:'The Maison Collective');
   var address={name:hotelName,street:street,city:city,postcode:postcode,phone:phone};
-  // Save to Supabase so guest app can read it from any device
-  if(db){
-    db.from('hotel_settings').update({address:address,updated_at:new Date().toISOString()}).eq('hotel_id',HOTEL_ID).then(function(r){
-      if(r.error) console.log('Address save error:',r.error.message);
-    });
-  }
-  // Update Local Guide postcode label live
-  document.querySelectorAll('#s-local div').forEach(function(d){
-    if(d.textContent.indexOf('Arivo AI suggests')>=0) d.textContent='\u2728 Arivo AI suggests local spots based on postcode '+postcode+'.';
-  });
+  if(db)db.from('hotel_settings').update({address:address,updated_at:new Date().toISOString()}).eq('hotel_id',HOTEL_ID).then(function(r){if(r.error)console.log('Address save error:',r.error.message);});
+  var localLabel=document.getElementById('local-ai-label');
+  if(localLabel)localLabel.textContent='\u2728 Arivo AI suggests local spots based on postcode '+postcode+'.';
   toast('Address saved \u2014 AI will use new location');
 }
 
-// ── ACTIVITY LOGS ──
 function logEvent(action,detail,user,room){
   var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
   logs.push({ts:new Date().toISOString(),action:action,detail:detail,user:user||'Manager',room:room||'-',source:'dashboard'});
   localStorage.setItem('arivo_activity_log',JSON.stringify(logs));
-  // Write to Supabase
-  if(db) db.from('activity_log').insert({hotel_id:HOTEL_ID,action:action,detail:detail,user_name:user||'Manager',room:room||'-',source:'dashboard'}).then(function(){});
+  if(db)db.from('activity_log').insert({hotel_id:HOTEL_ID,action:action,detail:detail,user_name:user||'Manager',room:room||'-',source:'dashboard'}).then(function(){});
 }
 
 function renderLogReport(){
   var container=document.getElementById('log-entries');if(!container)return;
-  // Load from Supabase first, fallback to localStorage
+  if(!db){container.innerHTML='<div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">Not connected to database.</div>';return;}
   db.from('activity_log').select('*').eq('hotel_id',HOTEL_ID).order('created_at',{ascending:false}).limit(100).then(function(r){
-    var logs=[];
-    if(r.data&&r.data.length){
-      logs=r.data;
-    } else {
-      logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
-    }
+    var logs=r.data&&r.data.length?r.data:JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
     if(!logs.length){container.innerHTML='<div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">No activity logged yet.</div>';return;}
     var html='';
-    logs.forEach(function(log){
-      var d=new Date(log.created_at||log.ts);
-      var timeStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-      html+='<div class="log-row"><div class="log-time">'+timeStr+'</div><div class="log-tag">'+(log.action||'').replace(/_/g,' ')+'</div><div class="log-detail"><div class="log-detail-main">'+(log.detail||log.message||'')+'</div><div class="log-detail-sub">'+(log.user_name||log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+'</div></div></div>';
-    });
+    logs.forEach(function(log){var d=new Date(log.created_at||log.ts);var timeStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});html+='<div class="log-row"><div class="log-time">'+timeStr+'</div><div class="log-tag">'+(log.action||'').replace(/_/g,' ')+'</div><div class="log-detail"><div class="log-detail-main">'+(log.detail||log.message||'')+'</div><div class="log-detail-sub">'+(log.user_name||log.user||'')+(log.room&&log.room!=='-'?' \u00b7 Room '+log.room:'')+'</div></div></div>';});
     container.innerHTML=html;
   });
 }
@@ -1523,11 +1019,11 @@ function exportLogs(){
   var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
   if(!logs.length){toast('No logs to export','err');return;}
   var csv='Timestamp,Action,Detail,User,Room,Source\n';
-  logs.forEach(function(l){
-    csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
-  });
-  var blob=new Blob([csv],{type:'text/csv'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='arivo-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('Log exported');}
+  logs.forEach(function(l){csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';});
+  var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='arivo-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('Log exported');
+}
+
+document.getElementById('odate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 </script>
 </body>
 </html>
