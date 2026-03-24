@@ -1232,7 +1232,7 @@ function logEvent(action,detail,user,room){
   logs.push({ts:new Date().toISOString(),action:action,detail:detail,user:user||'Manager',room:room||'-',source:'dashboard'});
   localStorage.setItem('arivo_activity_log',JSON.stringify(logs));
   // Write to Supabase
-  db.from('activity_log').insert({hotel_id:HOTEL_ID,action:action,detail:detail,user_name:user||'Manager',room:room||'-',source:'dashboard'}).then(function(){});
+  if(db) db.from('activity_log').insert({hotel_id:HOTEL_ID,action:action,detail:detail,user_name:user||'Manager',room:room||'-',source:'dashboard'}).then(function(){});
 }
 
 function renderLogReport(){
