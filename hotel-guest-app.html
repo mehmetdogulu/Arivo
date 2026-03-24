@@ -620,7 +620,10 @@ function showTab(name,el){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('tab-'+name).classList.add('active');
   if(el)el.classList.add('active');
-  if(name==='messages')markMessagesRead();
+  if(name==='messages'){
+    markMessagesRead();
+    loadMessagesFromSupabase();
+  }
 }
 
 function markMessagesRead(){
@@ -753,6 +756,7 @@ function restoreSession(){
   }
   startCheckoutReminders(s.checkout);
   enterApp();
+  setTimeout(loadMessagesFromSupabase, 800); // give db time to init
   return true;
 }
 
@@ -801,15 +805,7 @@ function enterApp(){
       }
     });
     // Load messages from Supabase for this guest
-    if(guestId){
-      db.from('messages').select('*').eq('hotel_id',HOTEL_ID).or('guest_id.eq.'+guestId+',guest_id.is.null').eq('direction','hotel_to_guest').order('created_at',{ascending:false}).limit(30).then(function(r){
-        if(r.data&&r.data.length){
-          r.data.reverse().forEach(function(msg){
-            addMessageToTab({from:'Hotel Team',text:msg.body,time:msg.created_at,unread:false});
-          });
-        }
-      });
-    }
+    loadMessagesFromSupabase();
   }
   // Also load from localStorage
   loadMessagesFromStorage();
@@ -893,8 +889,35 @@ function showCheckoutBanner(msg){
 function showHotelMessage(msg){
   document.getElementById('nb-msg-text').textContent = msg;
   document.getElementById('notif-banner-overlay').classList.add('open');
-  // Add to messages tab and save to localStorage for persistence
-  addMessageToTab({from:'The Maison Team', text:msg, time:new Date().toISOString(), unread:true});
+  // Small delay to ensure message is committed before reloading
+  setTimeout(loadMessagesFromSupabase, 500);
+}
+
+function loadMessagesFromSupabase(){
+  if(!db) return;
+  var id = guestId;
+  if(!id){
+    // guestId not set yet — retry shortly
+    setTimeout(loadMessagesFromSupabase, 500);
+    return;
+  }
+  db.from('messages').select('id,body,created_at,sender_name,guest_id').eq('hotel_id',HOTEL_ID).or('guest_id.eq.'+id+',guest_id.is.null').eq('direction','hotel_to_guest').order('created_at',{ascending:true}).limit(50).then(function(r){
+    if(!r.data||!r.data.length) return;
+    var list=document.getElementById('hotel-messages-list');
+    if(!list) return;
+    // Clear existing to avoid duplicates then re-add all
+    list.innerHTML='';
+    r.data.forEach(function(msg){
+      var card=document.createElement('div');
+      card.className='msg-card';
+      card.dataset.msgId=msg.id;
+      var d=new Date(msg.created_at);
+      var timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      var dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      card.innerHTML='<div class="msg-card-from">'+(msg.sender_name||'Hotel Team')+'</div><div class="msg-card-text">'+msg.body+'</div><div class="msg-card-time">'+dateStr+', '+timeStr+'</div>';
+      list.appendChild(card);
+    });
+  });
 }
 
 function addMessageToTab(msgObj){
@@ -906,7 +929,6 @@ function addMessageToTab(msgObj){
   var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   card.innerHTML = '<div class="msg-card-from">'+(msgObj.from||'The Maison Team')+'</div><div class="msg-card-text">'+msgObj.text+'</div><div class="msg-card-time">'+timeStr+'</div>'+(msgObj.unread?'<div class="msg-card-unread"></div>':'');
   list.insertBefore(card, list.firstChild);
-  // Save to localStorage for persistence across page refreshes
   saveMessageToStorage(msgObj);
 }
 
