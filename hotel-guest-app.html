@@ -220,6 +220,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 
 /* MESSAGES FROM HOTEL */
 .msg-card{background:var(--forest);border-radius:16px;padding:16px;margin-bottom:12px;position:relative;}
+/* ── CHAT BUBBLES ── */
+.bubble-wrap{display:flex;flex-direction:column;gap:2px;}
+.bubble-wrap.hotel{align-items:flex-start;}
+.bubble-wrap.guest{align-items:flex-end;}
+.bubble{max-width:80%;padding:10px 14px;border-radius:18px;font-size:13px;line-height:1.4;}
+.bubble.hotel{background:var(--forest);color:var(--white);border-bottom-left-radius:4px;}
+.bubble.guest{background:var(--gold);color:var(--bg);border-bottom-right-radius:4px;}
+.bubble-meta{font-size:10px;color:var(--muted);padding:0 4px;margin-top:2px;}
+.bubble-sender{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold-light);margin-bottom:4px;padding:0 4px;}
 .msg-card-from{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);font-weight:500;margin-bottom:6px;}
 .msg-card-text{font-size:13px;color:var(--white);font-weight:300;line-height:1.6;}
 .msg-card-time{font-size:10px;color:rgba(255,255,255,0.35);margin-top:8px;}
@@ -271,11 +280,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 .nb-msg{font-size:14px;color:var(--charcoal);text-align:center;line-height:1.6;margin-bottom:20px;}
 .nb-close{width:100%;background:var(--forest);color:white;border:none;border-radius:12px;padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="console.log('Supabase CDN failed to load')"></script>
 <script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Suppress cross-origin "Script error" from CDN scripts — these are non-fatal
+window.onerror = function(msg, src, line, col, err) {
+  if (msg === 'Script error.' || msg === 'Script error') return true;
+  return false;
+};
+var db = null;
+try {
+  if (window.supabase) {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e) {
+  console.log('Supabase init failed:', e);
+}
+
 // Hotel ID — read from URL ?hotel= param, fallback to default for The Maison
 var _urlParams = new URLSearchParams(window.location.search);
 var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
@@ -481,25 +503,14 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
 
   <!-- MESSAGES TAB -->
   <div class="tc" id="tab-messages">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:300;">Messages from the hotel team</div>
-    <div class="msg-card" id="msg-checkout-reminder" style="display:none;">
-      <div class="msg-card-from">The Maison Team</div>
-      <div class="msg-card-text" id="msg-checkout-text">Your checkout is approaching. We hope you've had a wonderful stay!</div>
-      <div class="msg-card-time" id="msg-checkout-time"></div>
+    <div id="chat-thread" style="display:flex;flex-direction:column;gap:10px;padding-bottom:8px;min-height:200px;">
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;" id="chat-empty">No messages yet. Send us a message below.</div>
     </div>
-    <div class="msg-card">
-      <div class="msg-card-from">The Maison Team</div>
-      <div class="msg-card-text">Welcome to The Maison! We hope your room is perfect. If there is anything at all you need, please don't hesitate to ask through the app or dial 0 for reception.</div>
-      <div class="msg-card-time">Today, on arrival</div>
-      <div class="msg-card-unread"></div>
-    </div>
-    <div id="hotel-messages-list"></div>
-    <div style="text-align:center;padding:12px 0 6px;color:var(--muted);font-size:12px;font-weight:300;">More messages will appear here during your stay</div>
-    <!-- Send message to hotel -->
-    <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;">
-      <div style="font-size:11px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Send a message to the team</div>
-      <textarea id="guest-msg-input" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Geist',sans-serif;font-size:13px;color:var(--text);outline:none;resize:none;min-height:60px;" placeholder="e.g. Could we get extra towels for Room 7?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGuestMessage();}"></textarea>
-      <button onclick="sendGuestMessage()" style="margin-top:8px;width:100%;background:var(--gold);color:var(--bg);border:none;border-radius:10px;padding:11px;font-family:'Geist',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Send Message</button>
+    <div style="position:sticky;bottom:0;background:var(--bg);padding-top:10px;border-top:1px solid var(--border);margin-top:8px;">
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <textarea id="guest-msg-input" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:'Geist',sans-serif;font-size:13px;color:var(--text);outline:none;resize:none;min-height:42px;max-height:100px;" placeholder="Message the hotel team..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGuestMessage();}"></textarea>
+        <button onclick="sendGuestMessage()" style="width:42px;height:42px;background:var(--gold);color:var(--bg);border:none;border-radius:12px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">&#8593;</button>
+      </div>
     </div>
   </div>
 
@@ -602,6 +613,10 @@ function loadRoomDropdown(){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
+  // Retry Supabase init in case CDN was slow
+  if (!db) {
+    try { if (window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
+  }
   loadRoomDropdown();
   // Try to restore previous session first
   if(!restoreSession()){
@@ -906,7 +921,7 @@ function showCheckoutBanner(msg){
 function showHotelMessage(msg){
   document.getElementById('nb-msg-text').textContent = msg;
   document.getElementById('notif-banner-overlay').classList.add('open');
-  // Reload messages tab so it appears immediately
+  // Reload chat thread so new message appears
   setTimeout(loadMessagesFromSupabase, 600);
 }
 
@@ -917,48 +932,61 @@ function loadMessagesFromSupabase(){
     setTimeout(loadMessagesFromSupabase, 500);
     return;
   }
-  // Fetch messages addressed to this guest specifically
-  db.from('messages').select('id,body,created_at,sender_name,guest_id')
-    .eq('hotel_id',HOTEL_ID)
-    .eq('direction','hotel_to_guest')
-    .eq('guest_id', id)
-    .order('created_at',{ascending:true})
-    .limit(50)
-    .then(function(r1){
-      // Also fetch broadcast messages (guest_id is null)
-      db.from('messages').select('id,body,created_at,sender_name,guest_id')
-        .eq('hotel_id',HOTEL_ID)
-        .eq('direction','hotel_to_guest')
-        .is('guest_id', null)
-        .order('created_at',{ascending:true})
-        .limit(50)
-        .then(function(r2){
-          var msgs = [];
-          if(r1.data) msgs = msgs.concat(r1.data);
-          if(r2.data) msgs = msgs.concat(r2.data);
-          // Sort by created_at
-          msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
-          var list = document.getElementById('hotel-messages-list');
-          if(!list) return;
-          if(!msgs.length){
-            list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No messages yet.</div>';
-            return;
-          }
-          list.innerHTML = '';
-          msgs.forEach(function(msg){
-            var card = document.createElement('div');
-            card.className = 'msg-card';
-            card.dataset.msgId = msg.id;
-            var d = new Date(msg.created_at);
-            var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-            var dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-            card.innerHTML = '<div class="msg-card-from">'+(msg.sender_name||'Hotel Team')+'</div>'
-                           + '<div class="msg-card-text">'+msg.body+'</div>'
-                           + '<div class="msg-card-time">'+dateStr+', '+timeStr+'</div>';
-            list.appendChild(card);
-          });
-        });
-    });
+  // Fetch both directions: hotel→guest and guest→hotel for this guest
+  Promise.all([
+    db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('guest_id', id)
+      .order('created_at', {ascending: true})
+      .limit(100),
+    db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('direction', 'hotel_to_guest')
+      .is('guest_id', null)
+      .order('created_at', {ascending: true})
+      .limit(50)
+  ]).then(function(results){
+    var r1 = results[0]; var r2 = results[1];
+    var msgs = [];
+    if(r1.data) msgs = msgs.concat(r1.data);
+    if(r2.data) msgs = msgs.concat(r2.data);
+    // Deduplicate by id, sort by time
+    var seen = {}; msgs = msgs.filter(function(m){ if(seen[m.id]) return false; seen[m.id]=true; return true; });
+    msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+    renderChatThread(msgs);
+  });
+}
+
+function renderChatThread(msgs){
+  var thread = document.getElementById('chat-thread');
+  var empty  = document.getElementById('chat-empty');
+  if(!thread) return;
+  if(!msgs.length){
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  // Clear and rebuild
+  thread.innerHTML = '';
+  msgs.forEach(function(msg){
+    var isGuest = msg.direction === 'guest_to_hotel';
+    var wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap ' + (isGuest ? 'guest' : 'hotel');
+    var d = new Date(msg.created_at);
+    var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    var dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    if(!isGuest){
+      wrap.innerHTML = '<div class="bubble-sender">'+(msg.sender_name||'Hotel Team')+'</div>'
+                     + '<div class="bubble hotel">'+msg.body+'</div>'
+                     + '<div class="bubble-meta">'+dateStr+', '+timeStr+'</div>';
+    } else {
+      wrap.innerHTML = '<div class="bubble guest">'+msg.body+'</div>'
+                     + '<div class="bubble-meta" style="text-align:right">'+timeStr+'</div>';
+    }
+    thread.appendChild(wrap);
+  });
+  // Scroll to bottom
+  thread.scrollTop = thread.scrollHeight;
 }
 
 function addMessageToTab(msgObj){
@@ -1373,26 +1401,45 @@ function askAI(text){
 
 // ── TOAST ──
 function sendGuestMessage(){
-  var input=document.getElementById('guest-msg-input');
-  var txt=input?input.value.trim():'';
-  if(!txt)return;
-  // Show in guest's own messages list as sent
-  var list=document.getElementById('hotel-messages-list');
-  var card=document.createElement('div');
-  card.className='msg-card';
-  card.style.cssText='background:var(--gdim,rgba(201,168,76,.12));border-color:rgba(201,168,76,.3);';
-  card.innerHTML='<div class="msg-card-from" style="color:var(--gold)">You → Hotel Team</div>'+
-    '<div class="msg-card-text">'+txt+'</div>'+
-    '<div class="msg-card-time">Just now</div>';
-  list.prepend(card);
-  // Push to shared storage for dashboard to receive
+  var input = document.getElementById('guest-msg-input');
+  var txt = input ? input.value.trim() : '';
+  if(!txt) return;
+  input.value = '';
+  // Show optimistic bubble immediately
+  var thread = document.getElementById('chat-thread');
+  var empty  = document.getElementById('chat-empty');
+  if(empty) empty.style.display = 'none';
+  var wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap guest';
+  var now = new Date();
+  wrap.innerHTML = '<div class="bubble guest">'+txt+'</div>'
+                 + '<div class="bubble-meta" style="text-align:right">'+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</div>';
+  if(thread) { thread.appendChild(wrap); thread.scrollTop = thread.scrollHeight; }
+  // Push to Supabase
   pushGuestMessage(txt);
   logEvent('guest_message','Guest sent message: '+txt.slice(0,60),state.name,state.room);
-  input.value='';
   toast('Message sent to the hotel team');
 }
 
-function toast(msg){
+async function pushGuestMessage(text){
+  if(!db || !guestId){ 
+    // Retry once guestId is available
+    setTimeout(function(){ if(guestId) pushGuestMessage(text); }, 1000);
+    return;
+  }
+  try {
+    var r = await db.from('messages').insert({
+      hotel_id: HOTEL_ID,
+      guest_id: guestId,
+      direction: 'guest_to_hotel',
+      sender_name: state.name || 'Guest',
+      body: text
+    });
+    if(r.error) console.log('Message send error:', r.error.message);
+  } catch(e) {
+    console.log('Message send error:', e);
+  }
+}function toast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(function(){t.classList.remove('show');},2800);
@@ -1438,23 +1485,7 @@ function markRequestDoneInStorage(type){
   localStorage.setItem('arivo_requests',JSON.stringify(requests));
 }
 
-async function pushGuestMessage(text){
-  try {
-    await db.from('messages').insert({
-      hotel_id: HOTEL_ID,
-      guest_id: guestId,
-      direction: 'guest_to_hotel',
-      sender_name: guestName,
-      body: text
-    });
-  } catch(e) {
-    var msgs=JSON.parse(localStorage.getItem('arivo_guest_messages')||'[]');
-    msgs.unshift({id:'gm_'+Date.now(),from:guestName,room:guestRoom,text:text,time:new Date().toISOString(),read:false});
-    localStorage.setItem('arivo_guest_messages',JSON.stringify(msgs));
-  }
-}
-
-// Listen for real-time messages and session kills from dashboard
+async // Listen for real-time messages and session kills from dashboard
 function subscribeToUpdates(){
   if(!guestId) return;
   // Listen for messages addressed specifically to this guest
