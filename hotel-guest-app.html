@@ -548,10 +548,13 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
 <!-- HOTEL MESSAGE NOTIFICATION -->
 <div class="notif-banner-overlay" id="notif-banner-overlay">
   <div class="notif-banner-box">
-    <div class="nb-icon">&#127968;</div>
+    <div class="nb-icon">&#128172;</div>
     <div class="nb-from">Message from The Maison</div>
     <div class="nb-msg" id="nb-msg-text">We hope you are enjoying your stay!</div>
-    <button class="nb-close" onclick="dismissHotelMsg()">Got it</button>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="nb-close" style="flex:1" onclick="dismissHotelMsg()">Got it</button>
+      <button class="nb-close" style="flex:1;background:var(--gold);color:#fff;border-color:var(--gold)" onclick="viewInMessages()">View Messages</button>
+    </div>
   </div>
 </div>
 
@@ -889,8 +892,8 @@ function showCheckoutBanner(msg){
 function showHotelMessage(msg){
   document.getElementById('nb-msg-text').textContent = msg;
   document.getElementById('notif-banner-overlay').classList.add('open');
-  // Small delay to ensure message is committed before reloading
-  setTimeout(loadMessagesFromSupabase, 500);
+  // Reload messages tab so it appears immediately
+  setTimeout(loadMessagesFromSupabase, 600);
 }
 
 function loadMessagesFromSupabase(){
@@ -957,6 +960,23 @@ function loadMessagesFromStorage(){
 }
 function dismissHotelMsg(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
+  loadMessagesFromSupabase();
+}
+
+function viewInMessages(){
+  document.getElementById('notif-banner-overlay').classList.remove('open');
+  // Switch to messages tab
+  var msgTab = document.querySelector('.tab[onclick*="messages"]');
+  if(msgTab) msgTab.click();
+  else {
+    document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    var tabEl = document.getElementById('tab-messages');
+    if(tabEl) tabEl.classList.add('active');
+    var navEl = document.querySelector('[onclick*="showTab(\'messages"]');
+    if(navEl) navEl.classList.add('active');
+  }
+  loadMessagesFromSupabase();
 }
 
 // ── EDIT PROFILE ──
