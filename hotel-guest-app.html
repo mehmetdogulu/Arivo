@@ -982,10 +982,22 @@ function previewPhoto(input){
   if(input.files&&input.files[0]){
     var reader=new FileReader();
     reader.onload=function(e){
-      var prev=document.getElementById('photo-preview');
-      prev.src=e.target.result;
-      prev.style.display='block';
-      document.getElementById('photo-upload-area').style.display='none';
+      var img=new Image();
+      img.onload=function(){
+        var canvas=document.createElement('canvas');
+        var maxSize=800;
+        var w=img.width, h=img.height;
+        if(w>h){ if(w>maxSize){h=Math.round(h*maxSize/w);w=maxSize;} }
+        else { if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize;} }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        var compressed=canvas.toDataURL('image/jpeg',0.6);
+        var prev=document.getElementById('photo-preview');
+        prev.src=compressed;
+        prev.style.display='block';
+        document.getElementById('photo-upload-area').style.display='none';
+      };
+      img.src=e.target.result;
     };
     reader.readAsDataURL(input.files[0]);
   }
