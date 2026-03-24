@@ -621,7 +621,18 @@ function showTab(name,el){
   if(name==='local'){
     var city = hotelSettings.city || '';
     var postcode = hotelSettings.postcode || '';
-    if(postcode) loadLocalSuggestions(city, postcode);
+    if(postcode){
+      loadLocalSuggestions(city, postcode);
+    } else {
+      // hotelSettings not loaded yet - wait and retry
+      var tries = 0;
+      var wait = setInterval(function(){
+        tries++;
+        var pc = hotelSettings.postcode || '';
+        if(pc){ clearInterval(wait); loadLocalSuggestions(hotelSettings.city||'', pc); }
+        else if(tries > 10){ clearInterval(wait); }
+      }, 500);
+    }
   }
 }
 
@@ -909,27 +920,51 @@ function loadMessagesFromSupabase(){
   if(!db) return;
   var id = guestId;
   if(!id){
-    // guestId not set yet — retry shortly
     setTimeout(loadMessagesFromSupabase, 500);
     return;
   }
-  db.from('messages').select('id,body,created_at,sender_name,guest_id').eq('hotel_id',HOTEL_ID).or('guest_id.eq.'+id+',guest_id.is.null').eq('direction','hotel_to_guest').order('created_at',{ascending:true}).limit(50).then(function(r){
-    if(!r.data||!r.data.length) return;
-    var list=document.getElementById('hotel-messages-list');
-    if(!list) return;
-    // Clear existing to avoid duplicates then re-add all
-    list.innerHTML='';
-    r.data.forEach(function(msg){
-      var card=document.createElement('div');
-      card.className='msg-card';
-      card.dataset.msgId=msg.id;
-      var d=new Date(msg.created_at);
-      var timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-      var dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-      card.innerHTML='<div class="msg-card-from">'+(msg.sender_name||'Hotel Team')+'</div><div class="msg-card-text">'+msg.body+'</div><div class="msg-card-time">'+dateStr+', '+timeStr+'</div>';
-      list.appendChild(card);
+  // Fetch messages addressed to this guest specifically
+  db.from('messages').select('id,body,created_at,sender_name,guest_id')
+    .eq('hotel_id',HOTEL_ID)
+    .eq('direction','hotel_to_guest')
+    .eq('guest_id', id)
+    .order('created_at',{ascending:true})
+    .limit(50)
+    .then(function(r1){
+      // Also fetch broadcast messages (guest_id is null)
+      db.from('messages').select('id,body,created_at,sender_name,guest_id')
+        .eq('hotel_id',HOTEL_ID)
+        .eq('direction','hotel_to_guest')
+        .is('guest_id', null)
+        .order('created_at',{ascending:true})
+        .limit(50)
+        .then(function(r2){
+          var msgs = [];
+          if(r1.data) msgs = msgs.concat(r1.data);
+          if(r2.data) msgs = msgs.concat(r2.data);
+          // Sort by created_at
+          msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+          var list = document.getElementById('hotel-messages-list');
+          if(!list) return;
+          if(!msgs.length){
+            list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No messages yet.</div>';
+            return;
+          }
+          list.innerHTML = '';
+          msgs.forEach(function(msg){
+            var card = document.createElement('div');
+            card.className = 'msg-card';
+            card.dataset.msgId = msg.id;
+            var d = new Date(msg.created_at);
+            var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+            var dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            card.innerHTML = '<div class="msg-card-from">'+(msg.sender_name||'Hotel Team')+'</div>'
+                           + '<div class="msg-card-text">'+msg.body+'</div>'
+                           + '<div class="msg-card-time">'+dateStr+', '+timeStr+'</div>';
+            list.appendChild(card);
+          });
+        });
     });
-  });
 }
 
 function addMessageToTab(msgObj){
@@ -1048,25 +1083,22 @@ function rateStar(n){
   }, 400);
 }
 
-var _localLoaded = null; // cache by postcode so we don't re-call on every tab switch
+var _localLoaded = null;
 
 function loadLocalSuggestions(city, postcode) {
   var container = document.getElementById('local-suggestions-container');
   if (!container) return;
   var cacheKey = (postcode || 'default').trim().toUpperCase();
-  if (_localLoaded === cacheKey) return; // already loaded for this postcode
+  if (_localLoaded === cacheKey) return;
 
   container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Finding the best spots near ' + (city || postcode) + '...</div>';
 
-  var prompt = 'You are a knowledgeable local guide for a boutique hotel in ' + (city || '') + ', postcode ' + postcode + ', UK.\n\nGenerate a curated list of genuinely local recommendations near this postcode. Include:\n- 2 coffee/breakfast spots\n- 3 restaurants (mix of price ranges)\n- 2 bars or pubs\n- 2 useful nearby (pharmacy, transport, supermarket)\n- 2 culture or sights\n\nRespond ONLY with a valid JSON array. No markdown, no explanation, no backticks. Each item:\n{\n  "category": "Coffee & Breakfast" | "Restaurants" | "Bars" | "Useful Nearby" | "Culture & Sights",\n  "emoji": "one emoji",\n  "name": "Place name",\n  "description": "One sentence, specific and evocative",\n  "tags": ["e.g. 5 min walk", "e.g. Opens 7am"]\n}';
+  var prompt = 'You are a knowledgeable local guide for a boutique hotel in ' + (city||'') + ', postcode ' + postcode + ', UK. Generate a curated list of genuinely local recommendations near this postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. Respond ONLY with a valid JSON array. No markdown, no explanation, no backticks. Each item: {"category": "Coffee & Breakfast" | "Restaurants" | "Bars" | "Useful Nearby" | "Culture & Sights", "emoji": "one emoji", "name": "Place name", "description": "One sentence, specific and evocative", "tags": ["e.g. 5 min walk", "e.g. Opens 7am"]}';
 
+  // Match concierge call format exactly
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
@@ -1076,18 +1108,21 @@ function loadLocalSuggestions(city, postcode) {
   .then(function(res) { return res.json(); })
   .then(function(data) {
     var text = data.content && data.content[0] ? data.content[0].text : '';
-    // Strip any accidental markdown fences
     text = text.replace(/```json|```/g, '').trim();
+    // Find the JSON array even if there's preamble text
+    var start = text.indexOf('[');
+    var end = text.lastIndexOf(']');
+    if (start >= 0 && end > start) text = text.slice(start, end+1);
     var places;
     try { places = JSON.parse(text); } catch(e) {
-      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions. Ask our concierge instead &#10024;</div>';
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions right now. Ask our Concierge instead &#10024;</div>';
       return;
     }
     _localLoaded = cacheKey;
     renderLocalSuggestions(places, city || postcode);
   })
   .catch(function() {
-    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions. Ask our concierge instead &#10024;</div>';
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions right now. Ask our Concierge instead &#10024;</div>';
   });
 }
 
