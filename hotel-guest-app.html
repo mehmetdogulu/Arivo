@@ -995,68 +995,63 @@ function logEvent(action,detail,user,room){
 
 var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
 document.getElementById('reg-checkout').value=ts;document.getElementById('reg-checkout').min=ts;
-// ── THE LOCAL GUIDE ENGINE ──
+<div class="hotel-messages-list" id="local-guide-list">
+  </div>
 
-// 1. This is your "Database" of suggestions for the demo
-const DEMO_LOCATIONS = {
-  "default": [
-    { name: "The Wolseley", cat: "Dining", desc: "Iconic European café-restaurant." },
-    { name: "Berry Bros & Rudd", cat: "Wine", desc: "Britain's oldest wine merchant." }
+// ── THE DEMO DATA ──
+const GUIDE_DATABASE = {
+  "SW1A": [ // London St James
+    { name: "The Wolseley", desc: "Iconic European café-restaurant.", cat: "Dining" },
+    { name: "Berry Bros & Rudd", desc: "Britain's oldest wine merchant.", cat: "Wine" }
   ],
-  "SW1A": [
-    { name: "Buckingham Palace", cat: "Sights", desc: "The Royal residence." },
-    { name: "The Ritz London", cat: "Dining", desc: "World-famous afternoon tea." }
-  ],
-  "W1J": [
-    { name: "Green Park", cat: "Nature", desc: "Perfect for a morning stroll." },
-    { name: "White Cube", cat: "Art", desc: "Contemporary art gallery." }
+  "W1U": [ // London Marylebone
+    { name: "Chiltern Firehouse", desc: "Celebrity hotspot and brasserie.", cat: "Dining" },
+    { name: "Daunt Books", desc: "Famous Edwardian bookshop.", cat: "Shopping" }
   ]
 };
 
-async function updateLocalGuideUI() {
+async function syncLocalGuide() {
   if (typeof db === 'undefined') return;
-  
-  // Get the latest postcode from Supabase
+
+  // 1. Get the latest postcode from your Hotel Dashboard
   const { data: hotel } = await db.from('hotels').select('postcode').eq('id', HOTEL_ID).single();
-  
+
   if (hotel && hotel.postcode) {
-    // Update the Header Title
-    const title = document.querySelector('.section-title');
-    if (title) title.innerText = "Local Guide • " + hotel.postcode;
+    const listContainer = document.getElementById('local-guide-list');
+    if (!listContainer) return;
 
-    // Find the list container
-    const container = document.getElementById('hotel-messages-list'); // Or your specific guide ID
-    if (!container) return;
+    // 2. Pick the correct data based on the postcode
+    const areaCode = hotel.postcode.substring(0, 4).toUpperCase();
+    const places = GUIDE_DATABASE[areaCode] || GUIDE_DATABASE["SW1A"];
 
-    // Pick which list to show based on the first few letters of the postcode
-    const prefix = hotel.postcode.substring(0, 4).toUpperCase();
-    const suggestions = DEMO_LOCATIONS[prefix] || DEMO_LOCATIONS["default"];
-
-    // Clear the old list and put the new ones in
-    container.innerHTML = ''; 
-    suggestions.forEach(place => {
+    // 3. Clear the old list and draw the new one
+    listContainer.innerHTML = ''; 
+    places.forEach(item => {
       const card = document.createElement('div');
-      card.className = 'msg-card'; // Uses your existing styling
+      card.className = 'msg-card'; 
       card.innerHTML = `
         <div class="msg-card-body">
-          <div class="msg-card-from">${place.name} <span style="color:var(--gold); font-size:10px;">${place.cat}</span></div>
-          <div class="msg-card-text">${place.desc}</div>
+          <div class="msg-card-from">${item.name} <span style="color:var(--gold); font-size:10px;">${item.cat}</span></div>
+          <div class="msg-card-text">${item.desc}</div>
         </div>
       `;
-      container.appendChild(card);
+      listContainer.appendChild(card);
     });
-    console.log("Guide updated for: " + hotel.postcode);
+
+    // 4. Update the title on the screen
+    const sectionTitle = document.querySelector('.section-title');
+    if (sectionTitle) sectionTitle.innerText = "Local Guide • " + hotel.postcode;
   }
 }
 
-// Watch for the Save button in your Hotel Dashboard
-db.channel('geo-sync-final').on('postgres_changes', 
+// Watch for changes in real-time
+db.channel('geo-watcher').on('postgres_changes', 
   { event: 'UPDATE', schema: 'public', table: 'hotels', filter: 'id=eq.'+HOTEL_ID }, 
-  function() { updateLocalGuideUI(); }
+  () => syncLocalGuide()
 ).subscribe();
 
-// Run once when page loads
-updateLocalGuideUI();
+// Run once on load
+syncLocalGuide();
 
 </script>
 </body>
