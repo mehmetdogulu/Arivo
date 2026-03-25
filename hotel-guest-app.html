@@ -995,6 +995,45 @@ function logEvent(action,detail,user,room){
 
 var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
 document.getElementById('reg-checkout').value=ts;document.getElementById('reg-checkout').min=ts;
+// --- AUTO-REFRESH LOCAL GUIDE ---
+async function refreshLocalGuide() {
+  if (typeof db === 'undefined') return;
+  
+  // 1. Get the new postcode from the database
+  const { data: hotel } = await db.from('hotels').select('postcode').eq('id', HOTEL_ID).single();
+  
+  if (hotel && hotel.postcode) {
+    state.hotelPostcode = hotel.postcode;
+    
+    // 2. Update the Title on the screen
+    const titles = document.querySelectorAll('h2, .section-title');
+    titles.forEach(t => {
+      if (t.innerText.includes('Local')) {
+        t.innerText = 'Local Guide • ' + hotel.postcode;
+      }
+    });
+
+    // 3. TRIGGER THE SUGGESTIONS (The Missing Link)
+    // This tells the app to clear the old list and find new places
+    if (typeof renderLocalPicks === 'function') {
+        renderLocalPicks(hotel.postcode); 
+    } else if (typeof loadLocalData === 'function') {
+        loadLocalData();
+    }
+    
+    console.log("Suggestions refreshed for: " + hotel.postcode);
+  }
+}
+
+// Watch for the Admin clicking 'Save' in the Dashboard
+db.channel('geo-sync').on('postgres_changes', 
+  { event: 'UPDATE', schema: 'public', table: 'hotels', filter: 'id=eq.'+HOTEL_ID }, 
+  function(payload) { if(payload.new.postcode) refreshLocalGuide(); }
+).subscribe();
+
+// Run once on startup
+refreshLocalGuide();
+
 </script>
 </body>
 </html>
