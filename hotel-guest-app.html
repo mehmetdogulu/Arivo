@@ -1019,6 +1019,29 @@ db.channel('location-watch').on('postgres_changes',
 
 // Run it immediately
 syncLocation();
+// --- STEP 2: LIVE LOCATION WATCHER ---
+// This part listens to your Database and updates the Guest App the second you click 'Save' in the Dashboard
+if (typeof db !== 'undefined' && db !== null) {
+  db.channel('live-location-sync')
+    .on('postgres_changes', { 
+      event: 'UPDATE', 
+      schema: 'public', 
+      table: 'hotels', 
+      filter: 'id=eq.' + HOTEL_ID 
+    }, function(payload) {
+      if (payload.new && payload.new.postcode) {
+        console.log("Postcode change detected: " + payload.new.postcode);
+        
+        // This runs your Step 1 function again to update the UI
+        if (typeof syncLocation === 'function') {
+          syncLocation();
+        } else if (typeof syncHotelLocation === 'function') {
+          syncHotelLocation();
+        }
+      }
+    })
+    .subscribe();
+}
 
 </script>
 </body>
