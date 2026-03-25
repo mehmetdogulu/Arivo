@@ -240,7 +240,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
 <!-- SCREEN 1: CONSENT -->
 <div class="screen consent-screen active" id="screen-consent">
   <div class="consent-top">
-    <div class="hotel-eyebrow">The Maison Collective &middot; Bath</div>
+    <div class="hotel-eyebrow"><span id="consent-hotel-name">Your Hotel</span></div>
     <div class="hotel-name-lg">Welcome to<br>your <em>stay</em></div>
     <div class="hotel-loc">Before we begin, a moment of your time</div>
   </div>
@@ -363,7 +363,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
   </div>
   <!-- LOCAL TAB -->
   <div class="tc" id="tab-local">
-    <div class="ai-banner" id="local-ai-label">&#10024; Powered by Arivo AI &bull; Suggestions based on your hotel's location in Bath BA1 2LW</div>
+    <div class="ai-banner" id="local-ai-label">&#10024; Powered by Arivo AI &bull; Loading local suggestions...</div>
     <div id="local-suggestions-container"><div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Loading local suggestions...</div></div>
   </div>
   <!-- REQUESTS TAB -->
@@ -523,8 +523,21 @@ function showTab(name,el){
   if(name==='local'){
     var city=hotelSettings.city||'';
     var postcode=hotelSettings.postcode||'';
-    if(postcode){loadLocalSuggestions(city,postcode);}
-    else{var tries=0;var wait=setInterval(function(){tries++;var pc=hotelSettings.postcode||'';if(pc){clearInterval(wait);loadLocalSuggestions(hotelSettings.city||'',pc);}else if(tries>10){clearInterval(wait);}},500);}
+    if(postcode){
+      _localLoaded=null;
+      loadLocalSuggestions(city,postcode);
+    } else {
+      var tries=0;
+      var wait=setInterval(function(){
+        tries++;
+        var pc=hotelSettings.postcode||'';
+        if(pc){clearInterval(wait);_localLoaded=null;loadLocalSuggestions(hotelSettings.city||'',pc);}
+        else if(tries>20){clearInterval(wait);
+          var c=document.getElementById('local-suggestions-container');
+          if(c)c.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Hotel address not configured. Please contact reception.</div>';
+        }
+      },500);
+    }
   }
 }
 
@@ -660,13 +673,27 @@ function lookupGuestByName(name){
 function enterApp(){
   showScreen('screen-app');
   if(db){
-    db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info').eq('hotel_id',HOTEL_ID).single().then(function(r){
+    db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info,rooms').eq('hotel_id',HOTEL_ID).single().then(function(r){
       if(r.data){
         if(r.data.address){
           hotelSettings=r.data.address;
+          var city=r.data.address.city||'';
+          var pc=r.data.address.postcode||'';
+          var hotelName=r.data.address.name||'Your Hotel';
+          // Update AI banner
           var aiLabel=document.querySelector('.ai-banner');
-          if(aiLabel&&r.data.address.postcode){var city=r.data.address.city||'';var pc=r.data.address.postcode;aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
-          if(r.data.address.postcode) setTimeout(function(){ loadLocalSuggestions(r.data.address.city||'',r.data.address.postcode); }, 1000);
+          if(aiLabel&&pc){aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
+          // Update hotel name on consent screen dynamically
+          var consentName=document.getElementById('consent-hotel-name');
+          if(consentName)consentName.textContent=hotelName+(city?' \u00b7 '+city:'');
+          // Update app header hotel label
+          var hotelLbl=document.querySelector('.app-hotel-lbl');
+          if(hotelLbl)hotelLbl.textContent=hotelName;
+          // Trigger local suggestions now that we have real postcode
+          if(pc){
+            _localLoaded=null; // always refresh when settings load
+            loadLocalSuggestions(city,pc);
+          }
         }
         if(r.data.logo_url){var logoEl=document.getElementById('hotel-logo-display');if(logoEl)logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';}
         if(r.data.menu_url){var menuBtn=document.querySelector('.menu-btn-wrap');if(menuBtn)menuBtn.onclick=function(){window.open(r.data.menu_url,'_blank');};}
@@ -924,7 +951,7 @@ function sendCustom(){var txt=document.getElementById('customReq').value.trim();
 async function sendChat(){
   var input=document.getElementById('chatInput');var msg=input.value.trim();if(!msg)return;
   input.value='';addMsg(msg,'user');chatHistory.push({role:'user',content:msg});var typing=addMsg('Thinking...','typing');
-  var hotelName=hotelSettings.name||'The Maison Collective';var hotelStreet=hotelSettings.street||'14 Brock Street';var hotelCity=hotelSettings.city||'Bath';var hotelPostcode=hotelSettings.postcode||'BA1 2LW';var hotelPhone=hotelSettings.phone||'+44 1225 000123';
+  var hotelName=hotelSettings.name||'The Maison Collective';var hotelStreet=hotelSettings.street||'';var hotelCity=hotelSettings.city||'';var hotelPostcode=hotelSettings.postcode||'';var hotelPhone=hotelSettings.phone||'reception';
   var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. Be warm and concise. 2-4 sentences max.';
   try{
     var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});
