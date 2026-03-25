@@ -995,6 +995,31 @@ function logEvent(action,detail,user,room){
 
 var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
 document.getElementById('reg-checkout').value=ts;document.getElementById('reg-checkout').min=ts;
+// --- SMART LOCATION SYNC ---
+async function syncLocation() {
+  if (!db) return;
+  const { data: hotel } = await db.from('hotels').select('postcode').eq('id', HOTEL_ID).single();
+  if (hotel && hotel.postcode) {
+    // This finds the "Local Guide" title in your app and adds the postcode
+    const title = document.querySelector('.section-title');
+    if (title && title.innerText.includes('Local')) {
+       title.innerText = 'Local Guide Near ' + hotel.postcode;
+    }
+    // This updates the "state" so the app knows where you are
+    state.hotelPostcode = hotel.postcode;
+    console.log("App is now centered on: " + hotel.postcode);
+  }
+}
+
+// Automatically update if the Admin changes the address in the dashboard
+db.channel('location-watch').on('postgres_changes', 
+  { event: 'UPDATE', schema: 'public', table: 'hotels', filter: 'id=eq.'+HOTEL_ID }, 
+  function(payload) { if(payload.new.postcode) syncLocation(); }
+).subscribe();
+
+// Run it immediately
+syncLocation();
+
 </script>
 </body>
 </html>
