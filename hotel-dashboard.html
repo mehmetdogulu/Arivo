@@ -568,7 +568,7 @@ var TITLES = {ov:'Overview',req:'Requests',guests:'Guests',sess:'Sessions & Acce
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
   try { if (window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
-  var saved = sessionStorage.getItem('arivo_mgr_session');
+  var saved = sessionStorage.getItem('arivo_mgr_session') || localStorage.getItem('arivo_mgr_session');
   if (saved) {
     try { var s = JSON.parse(saved); if (s.email) { enterDashboard(); return; } } catch(e) {}
   }
@@ -582,6 +582,7 @@ function login() {
   if (e === 'manager@hotel.com' && p === 'password123') {
     document.getElementById('lerr').style.display = 'none';
     sessionStorage.setItem('arivo_mgr_session', JSON.stringify({email: e, ts: Date.now()}));
+    localStorage.setItem('arivo_mgr_session', JSON.stringify({email: e, ts: Date.now()}));
     enterDashboard();
   } else {
     document.getElementById('lerr').style.display = 'block';
@@ -755,6 +756,31 @@ function loadRequests() {
     .in('status', ['new','claimed','in_progress']).order('created_at', {ascending: false}).then(function(r) {
     if (r.error || !r.data) return;
     renderRequests(r.data);
+    // Check for overdue requests and schedule notifications
+    var now = new Date();
+    r.data.forEach(function(req) {
+      if (req.due_at && req.status === 'in_progress') {
+        var due = new Date(req.due_at);
+        var msLeft = due.getTime() - now.getTime();
+        var gname = req.guests ? req.guests.name : 'Guest';
+        var groom = req.guests ? req.guests.room : '?';
+        if (msLeft < 0) {
+          // Already overdue — notify immediately
+          notify('warn', '\u23f0 Overdue', req.type + ' \u2014 ' + groom, 'Please follow up with staff', 15000);
+          bellPlay();
+        } else {
+          // Not yet overdue — schedule notification
+          setTimeout(function() {
+            if (db) db.from('requests').select('status').eq('id', req.id).single().then(function(rr) {
+              if (rr.data && rr.data.status === 'in_progress') {
+                notify('warn', '\u23f0 ETA Overdue', req.type + ' \u2014 ' + groom + ' has not been completed.', gname, 15000);
+                bellPlay();
+              }
+            });
+          }, msLeft);
+        }
+      }
+    });
   });
 }
 
@@ -959,8 +985,11 @@ function doETA(mins) {
     return;
   }
 
-  // Update Supabase status to in_progress — reload both lists to keep overview in sync
-  if (db && reqId) db.from('requests').update({status:'in_progress'}).eq('id', reqId).then(function(){ loadRequests(); });
+  // Update Supabase status to in_progress with due_at timestamp
+  if (db && reqId) {
+    var dueAt = new Date(Date.now() + mins * 60000).toISOString();
+    db.from('requests').update({status:'in_progress', due_at: dueAt}).eq('id', reqId).then(function(){ loadRequests(); });
+  }
   // Set ETA — update row UI and send ETA message to guest
   if (row) {
     row.querySelector('.dot').className = 'dot pr';
@@ -972,7 +1001,13 @@ function doETA(mins) {
     chip.textContent = 'ETA ' + mins + ' min' + (selStaff ? ' \u2014 ' + selStaff : '');
     chip.onclick = function() { var m = parseInt(prompt('New ETA in minutes?', 10)); if (m > 0) chip.textContent = 'ETA ' + m + ' min'; };
     row.insertBefore(chip, btn);
-    setTimeout(function() { if (row.querySelector('.dot.pr')) notify('mgr', '&#9200; ETA Overdue', taskTitle + ' is overdue.', ''); }, mins * 60000);
+    // Overdue timer - notify manager after ETA expires
+    setTimeout(function() {
+      if (row.querySelector('.dot.pr')) {
+        notify('warn', '\u23f0 ETA Overdue', taskTitle + ' has not been completed.', 'Please follow up with staff', 15000);
+        bellPlay();
+      }
+    }, mins * 60000);
   }
   // Send ETA message to specific guest
   if (db && reqId) {
