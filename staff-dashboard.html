@@ -328,7 +328,8 @@ var STAFF = {
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
   try { if (window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
-  var saved = sessionStorage.getItem('arivo_staff_session');
+  // Try sessionStorage first, fall back to localStorage for mobile refresh
+  var saved = sessionStorage.getItem('arivo_staff_session') || localStorage.getItem('arivo_staff_session');
   if (saved) {
     try {
       var s = JSON.parse(saved);
@@ -338,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } catch(e) {}
     sessionStorage.removeItem('arivo_staff_session');
+    localStorage.removeItem('arivo_staff_session');
   }
 });
 document.getElementById('l-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
@@ -368,6 +370,7 @@ function doLogin() {
     }
     err.style.display = 'none';
     sessionStorage.setItem('arivo_staff_session', JSON.stringify({email:email, ts:Date.now()}));
+    localStorage.setItem('arivo_staff_session', JSON.stringify({email:email, ts:Date.now()}));
     enterStaffApp(s);
   } else {
     err.style.display = 'block';
@@ -410,6 +413,30 @@ function loadTasks() {
     .then(function(r) {
       if (r.error) { console.log('loadTasks error:', r.error.message); return; }
       renderTasks(r.data || []);
+      // Check for overdue tasks and notify staff
+      var now = new Date();
+      (r.data || []).forEach(function(req) {
+        if (req.due_at && req.status === 'in_progress') {
+          var due = new Date(req.due_at);
+          var msLeft = due.getTime() - now.getTime();
+          var groom = req.guests ? req.guests.room : '?';
+          if (msLeft < 0) {
+            // Already overdue
+            showNotif('\u23f0 Overdue Task', req.type + ' \u2014 ' + groom + ' is overdue!');
+            playPing();
+          } else {
+            // Schedule for when it becomes overdue
+            setTimeout(function() {
+              if (db) db.from('requests').select('status').eq('id', req.id).single().then(function(rr) {
+                if (rr.data && rr.data.status === 'in_progress') {
+                  showNotif('\u23f0 Overdue Task', req.type + ' \u2014 ' + groom + ' is overdue!');
+                  playPing();
+                }
+              });
+            }, msLeft);
+          }
+        }
+      });
     });
 }
 
