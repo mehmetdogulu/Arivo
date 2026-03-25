@@ -816,10 +816,16 @@ async function loadLocalSuggestions(city,postcode){
   var prompt='You are a knowledgeable local guide for a boutique hotel in '+(city||'')+', postcode '+postcode+', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item must have these exact keys: {"category": "Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights", "emoji": "one emoji", "name": "real place name", "description": "one sentence", "tags": ["tag1", "tag2"]}';
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();var text=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'';
+    var data=await res.json();
+    console.log('Local suggestions API response status:', res.status);
+    console.log('Local suggestions API data:', JSON.stringify(data).slice(0,200));
+    var text=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'';
     var start=text.indexOf('[');var end=text.lastIndexOf(']');if(start<0||end<start)throw new Error('No JSON array');
     var places=JSON.parse(text.slice(start,end+1));_localLoaded=cacheKey;renderLocalSuggestions(places,city||postcode);
-  }catch(e){console.log('Local suggestions error:',e);container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions right now. Ask our Concierge instead &#10024;</div>';}
+  }catch(e){
+    console.log('Local suggestions error:', e.message || e);
+    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions right now. Ask our Concierge instead &#10024;<br><small style="color:red;">'+( e.message||'Unknown error')+'</small></div>';
+  }
 }
 
 function renderLocalSuggestions(places,cityName){
@@ -918,7 +924,7 @@ async function sendChat(){
   var input=document.getElementById('chatInput');var msg=input.value.trim();if(!msg)return;
   input.value='';addMsg(msg,'user');chatHistory.push({role:'user',content:msg});var typing=addMsg('Thinking...','typing');
   var hotelName=hotelSettings.name||'The Maison Collective';var hotelStreet=hotelSettings.street||'14 Brock Street';var hotelCity=hotelSettings.city||'Bath';var hotelPostcode=hotelSettings.postcode||'BA1 2LW';var hotelPhone=hotelSettings.phone||'+44 1225 000123';
-  var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. Nearby: Fold Coffee (5 min), The Larder (8 min), Osteria Filo (12 min, Italian), The Hearth (6 min, British), The Star Inn (7 min, pub), Boots Pharmacy (4 min), Bath Spa Station (12 min). Be warm and concise. 2-4 sentences max.';
+  var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. Be warm and concise. 2-4 sentences max.';
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});
     var data=await res.json();var reply=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'Sorry, I could not get a response. Try messaging us on WhatsApp!';
