@@ -327,7 +327,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
     <div class="tab" onclick="showTab('facilities',this)"><span class="tab-ico">&#127796;</span>Facilities</div>
     <div class="tab" onclick="showTab('local',this)"><span class="tab-ico">&#128205;</span>Local</div>
     <div class="tab" onclick="showTab('requests',this)"><span class="tab-ico">&#128718;</span>Requests</div>
-    <div class="tab" onclick="showTab('messages',this)" id="tab-messages" style="position:relative;"><span class="tab-ico">&#128172;</span>Messages<span id="msg-badge"></span></div>
+    <div class="tab" onclick="showTab('messages',this)" id="nav-tab-messages" style="position:relative;"><span class="tab-ico">&#128172;</span>Messages<span id="msg-badge"></span></div>
     <div class="tab" onclick="showTab('concierge',this)"><span class="tab-ico">&#10024;</span>Concierge</div>
   </div>
   <!-- HOTEL TAB -->
@@ -664,7 +664,7 @@ function enterApp(){
           hotelSettings=r.data.address;
           var aiLabel=document.querySelector('.ai-banner');
           if(aiLabel&&r.data.address.postcode){var city=r.data.address.city||'';var pc=r.data.address.postcode;aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
-          if(r.data.address.postcode)loadLocalSuggestions(r.data.address.city||'',r.data.address.postcode);
+          if(r.data.address.postcode) setTimeout(function(){ loadLocalSuggestions(r.data.address.city||'',r.data.address.postcode); }, 1000);
         }
         if(r.data.logo_url){var logoEl=document.getElementById('hotel-logo-display');if(logoEl)logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';}
         if(r.data.menu_url){var menuBtn=document.querySelector('.menu-btn-wrap');if(menuBtn)menuBtn.onclick=function(){window.open(r.data.menu_url,'_blank');};}
@@ -713,7 +713,7 @@ function showHotelMessage(msg){
   if(_activeTab==='messages')setTimeout(loadMessagesFromSupabase,400);
 }
 function dismissHotelMsg(){document.getElementById('notif-banner-overlay').classList.remove('open');setTimeout(loadMessagesFromSupabase,300);}
-function viewInMessages(){document.getElementById('notif-banner-overlay').classList.remove('open');clearMsgBadge();showTab('messages',document.getElementById('tab-messages'));}
+function viewInMessages(){document.getElementById('notif-banner-overlay').classList.remove('open');clearMsgBadge();showTab('messages',document.getElementById('nav-tab-messages'));}
 
 function loadMessagesFromSupabase(){
   if(!db)return;
