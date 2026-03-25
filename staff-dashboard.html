@@ -12,6 +12,7 @@
 :root{
   --bg:#F5F0E8;--surface:#FDFCF9;--surface2:#EDE6D6;
   --border:#C8BDA8;--border2:#B8A88A;
+  --card:#FDFCF9;--bor:#C8BDA8;--tx:#1A1A1A;--muted:#7A7060;
   --gold:#B8933F;--gold-dim:rgba(184,147,63,0.12);--gold-border:rgba(184,147,63,0.28);
   --green:#16A34A;--green-dim:rgba(22,163,74,0.1);--green-border:rgba(22,163,74,0.25);
   --red:#DC2626;--red-dim:rgba(220,38,38,0.1);
@@ -59,7 +60,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
 
 /* TAB BAR */
 .tab-bar{display:flex;background:var(--forest);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;}
-.tab{flex:1;padding:12px 8px;text-align:center;font-size:10px;font-weight:500;color:rgba(255,255,255,0.55);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;touch-action:manipulation;}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:10px;font-weight:500;color:rgba(255,255,255,0.75);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;touch-action:manipulation;}
 .tab-ico{font-size:18px;line-height:1;}
 .tab.active{color:#FDFCF9;border-bottom-color:var(--gold);}
 .tab-badge{background:var(--red);color:white;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;min-width:14px;text-align:center;display:inline-block;}
