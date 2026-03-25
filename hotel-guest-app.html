@@ -995,44 +995,68 @@ function logEvent(action,detail,user,room){
 
 var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
 document.getElementById('reg-checkout').value=ts;document.getElementById('reg-checkout').min=ts;
-// --- AUTO-REFRESH LOCAL GUIDE ---
-async function refreshLocalGuide() {
+// ── THE LOCAL GUIDE ENGINE ──
+
+// 1. This is your "Database" of suggestions for the demo
+const DEMO_LOCATIONS = {
+  "default": [
+    { name: "The Wolseley", cat: "Dining", desc: "Iconic European café-restaurant." },
+    { name: "Berry Bros & Rudd", cat: "Wine", desc: "Britain's oldest wine merchant." }
+  ],
+  "SW1A": [
+    { name: "Buckingham Palace", cat: "Sights", desc: "The Royal residence." },
+    { name: "The Ritz London", cat: "Dining", desc: "World-famous afternoon tea." }
+  ],
+  "W1J": [
+    { name: "Green Park", cat: "Nature", desc: "Perfect for a morning stroll." },
+    { name: "White Cube", cat: "Art", desc: "Contemporary art gallery." }
+  ]
+};
+
+async function updateLocalGuideUI() {
   if (typeof db === 'undefined') return;
   
-  // 1. Get the new postcode from the database
+  // Get the latest postcode from Supabase
   const { data: hotel } = await db.from('hotels').select('postcode').eq('id', HOTEL_ID).single();
   
   if (hotel && hotel.postcode) {
-    state.hotelPostcode = hotel.postcode;
-    
-    // 2. Update the Title on the screen
-    const titles = document.querySelectorAll('h2, .section-title');
-    titles.forEach(t => {
-      if (t.innerText.includes('Local')) {
-        t.innerText = 'Local Guide • ' + hotel.postcode;
-      }
-    });
+    // Update the Header Title
+    const title = document.querySelector('.section-title');
+    if (title) title.innerText = "Local Guide • " + hotel.postcode;
 
-    // 3. TRIGGER THE SUGGESTIONS (The Missing Link)
-    // This tells the app to clear the old list and find new places
-    if (typeof renderLocalPicks === 'function') {
-        renderLocalPicks(hotel.postcode); 
-    } else if (typeof loadLocalData === 'function') {
-        loadLocalData();
-    }
-    
-    console.log("Suggestions refreshed for: " + hotel.postcode);
+    // Find the list container
+    const container = document.getElementById('hotel-messages-list'); // Or your specific guide ID
+    if (!container) return;
+
+    // Pick which list to show based on the first few letters of the postcode
+    const prefix = hotel.postcode.substring(0, 4).toUpperCase();
+    const suggestions = DEMO_LOCATIONS[prefix] || DEMO_LOCATIONS["default"];
+
+    // Clear the old list and put the new ones in
+    container.innerHTML = ''; 
+    suggestions.forEach(place => {
+      const card = document.createElement('div');
+      card.className = 'msg-card'; // Uses your existing styling
+      card.innerHTML = `
+        <div class="msg-card-body">
+          <div class="msg-card-from">${place.name} <span style="color:var(--gold); font-size:10px;">${place.cat}</span></div>
+          <div class="msg-card-text">${place.desc}</div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+    console.log("Guide updated for: " + hotel.postcode);
   }
 }
 
-// Watch for the Admin clicking 'Save' in the Dashboard
-db.channel('geo-sync').on('postgres_changes', 
+// Watch for the Save button in your Hotel Dashboard
+db.channel('geo-sync-final').on('postgres_changes', 
   { event: 'UPDATE', schema: 'public', table: 'hotels', filter: 'id=eq.'+HOTEL_ID }, 
-  function(payload) { if(payload.new.postcode) refreshLocalGuide(); }
+  function() { updateLocalGuideUI(); }
 ).subscribe();
 
-// Run once on startup
-refreshLocalGuide();
+// Run once when page loads
+updateLocalGuideUI();
 
 </script>
 </body>
