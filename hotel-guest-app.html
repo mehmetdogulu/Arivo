@@ -590,7 +590,7 @@ function loadRoomDropdown(){
       opt.value=room;
       var isOccupied=occupied.indexOf(room)>=0;
       opt.textContent=room+(isOccupied?' (occupied)':'');
-      opt.disabled=isOccupied;
+      // Do NOT disable - guest may be returning to their own room
       sel.appendChild(opt);
     });
   }
@@ -701,12 +701,11 @@ function submitReg(){
           state.registering=false;
         });
       } else {
-        // RULE 3: Same room + different name + not checked out = block
-        var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room;});
+        // RULE 3: Same room + different name + not checked out = warn but allow
+        var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room && g.name.toLowerCase()!==name.toLowerCase();});
         if(sameRoom.length>0){
-          toast('Room '+room+' is already occupied. Please check your room number or contact reception.');
-          state.registering=false;
-          return;
+          toast('Room '+room+' may already be occupied. If this is your room, please continue.');
+          // Still allow registration after warning
         }
         // New guest — create record
         db.from('guests').insert({
