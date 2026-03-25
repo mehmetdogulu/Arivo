@@ -752,15 +752,12 @@ function restoreSession(){
   if(!s.name||!s.room||!s.checkout) return false;
   // Check checkout hasn't passed
   var co = new Date(s.checkout);
-  co.setHours(12,0,0,0); // grace until noon
-  if(new Date() > co){
-    sessionStorage.removeItem('arivo_session');
-    return false;
-  }
+  co.setHours(12,0,0,0);
+  if(new Date() > co){ sessionStorage.removeItem('arivo_session'); return false; }
   // Restore state
   state.name=s.name; state.room=s.room; state.checkout=s.checkout;
-  guestId=s.guestId||null;
-  setGuestContext(s.name,s.room);
+  guestId = s.guestId || null;
+  setGuestContext(s.name, s.room);
   var d=new Date(s.checkout);
   var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   var fn=s.name.split(' ')[0];
@@ -771,17 +768,30 @@ function restoreSession(){
   document.getElementById('app-room').textContent=s.room;
   document.getElementById('app-co').textContent='Out '+fmt;
   document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
-  if(!guestId&&db){
-    // Re-fetch guestId from Supabase
-    db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).eq('checked_out',false).single().then(function(r){
-      if(r.data){guestId=r.data.id;subscribeToUpdates();}
-    });
-  } else if(guestId){
-    subscribeToUpdates();
-  }
   startCheckoutReminders(s.checkout);
   enterApp();
-  setTimeout(loadMessagesFromSupabase, 800); // give db time to init
+  // Always re-fetch guestId from Supabase to ensure it's correct
+  // then load messages and subscribe
+  function initAfterDb() {
+    if(!db) { setTimeout(initAfterDb, 300); return; }
+    db.from('guests').select('id')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('name', s.name)
+      .eq('room', s.room)
+      .eq('checked_out', false)
+      .single()
+      .then(function(r){
+        if(r.data && r.data.id) {
+          guestId = r.data.id;
+          // Update sessionStorage with correct guestId
+          s.guestId = guestId;
+          sessionStorage.setItem('arivo_session', JSON.stringify(s));
+          subscribeToUpdates();
+        }
+        loadMessagesFromSupabase();
+      });
+  }
+  initAfterDb();
   return true;
 }
 
@@ -927,34 +937,53 @@ function showHotelMessage(msg){
 
 function loadMessagesFromSupabase(){
   if(!db) return;
-  var id = guestId;
-  if(!id){
-    setTimeout(loadMessagesFromSupabase, 500);
-    return;
+  
+  function fetchAndRender(id) {
+    Promise.all([
+      // All messages for this guest (both directions)
+      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+        .eq('hotel_id', HOTEL_ID)
+        .eq('guest_id', id)
+        .order('created_at', {ascending: true})
+        .limit(100),
+      // Broadcast messages (hotel to all guests)
+      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+        .eq('hotel_id', HOTEL_ID)
+        .eq('direction', 'hotel_to_guest')
+        .is('guest_id', null)
+        .order('created_at', {ascending: true})
+        .limit(50)
+    ]).then(function(results){
+      var msgs = [];
+      if(results[0].data) msgs = msgs.concat(results[0].data);
+      if(results[1].data) msgs = msgs.concat(results[1].data);
+      var seen = {};
+      msgs = msgs.filter(function(m){ if(seen[m.id]) return false; seen[m.id]=true; return true; });
+      msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+      renderChatThread(msgs);
+    });
   }
-  // Fetch both directions: hotel→guest and guest→hotel for this guest
-  Promise.all([
-    db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+
+  if(guestId) {
+    fetchAndRender(guestId);
+  } else if(state.name && state.room) {
+    // Look up guestId from name+room, then fetch
+    db.from('guests').select('id')
       .eq('hotel_id', HOTEL_ID)
-      .eq('guest_id', id)
-      .order('created_at', {ascending: true})
-      .limit(100),
-    db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
-      .eq('hotel_id', HOTEL_ID)
-      .eq('direction', 'hotel_to_guest')
-      .is('guest_id', null)
-      .order('created_at', {ascending: true})
-      .limit(50)
-  ]).then(function(results){
-    var r1 = results[0]; var r2 = results[1];
-    var msgs = [];
-    if(r1.data) msgs = msgs.concat(r1.data);
-    if(r2.data) msgs = msgs.concat(r2.data);
-    // Deduplicate by id, sort by time
-    var seen = {}; msgs = msgs.filter(function(m){ if(seen[m.id]) return false; seen[m.id]=true; return true; });
-    msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
-    renderChatThread(msgs);
-  });
+      .eq('name', state.name)
+      .eq('room', state.room)
+      .eq('checked_out', false)
+      .single()
+      .then(function(r){
+        if(r.data) {
+          guestId = r.data.id;
+          fetchAndRender(r.data.id);
+        }
+      });
+  } else {
+    // guestId not ready yet — retry
+    setTimeout(loadMessagesFromSupabase, 500);
+  }
 }
 
 function renderChatThread(msgs){
@@ -1422,11 +1451,14 @@ function sendGuestMessage(){
 }
 
 async function pushGuestMessage(text){
-  if(!db || !guestId){ 
-    // Retry once guestId is available
-    setTimeout(function(){ if(guestId) pushGuestMessage(text); }, 1000);
-    return;
+  // Wait for guestId to be available (up to 5 seconds)
+  var attempts = 0;
+  while (!guestId && attempts < 10) {
+    await new Promise(function(r){ setTimeout(r, 500); });
+    attempts++;
   }
+  if(!db){ console.log('No db connection'); return; }
+  if(!guestId){ console.log('No guestId after waiting'); return; }
   try {
     var r = await db.from('messages').insert({
       hotel_id: HOTEL_ID,
@@ -1436,6 +1468,7 @@ async function pushGuestMessage(text){
       body: text
     });
     if(r.error) console.log('Message send error:', r.error.message);
+    else setTimeout(loadMessagesFromSupabase, 500); // reload thread to confirm
   } catch(e) {
     console.log('Message send error:', e);
   }
