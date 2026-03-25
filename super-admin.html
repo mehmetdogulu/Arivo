@@ -7,29 +7,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#080B10;
-  --surface:#0E1219;
-  --surface2:#141820;
-  --surface3:#1A2030;
-  --border:#1E2535;
-  --border2:#252D40;
-  --gold:#C9A84C;
-  --gold-dim:rgba(201,168,76,0.12);
-  --gold-border:rgba(201,168,76,0.25);
-  --green:#3DD68C;
-  --green-dim:rgba(61,214,140,0.08);
-  --red:#F87171;
-  --red-dim:rgba(248,113,113,0.08);
-  --amber:#FBB040;
-  --amber-dim:rgba(251,176,64,0.08);
-  --blue:#60A5FA;
-  --blue-dim:rgba(96,165,250,0.08);
-  --purple:#A78BFA;
-  --purple-dim:rgba(167,139,250,0.08);
-  --text:#E8EAF0;
-  --text2:#7A8099;
-  --text3:#3D4560;
-  --white:#FFFFFF;
+  --bg:#F5F0E8;
+  --surface:#FDFCF9;
+  --surface2:#EDE6D6;
+  --surface3:#E4DBC8;
+  --border:#C8BDA8;
+  --border2:#B8A88A;
+  --gold:#B8933F;
+  --gold-dim:rgba(184,147,63,0.12);
+  --gold-border:rgba(184,147,63,0.25);
+  --green:#16A34A;
+  --green-dim:rgba(22,163,74,0.08);
+  --red:#DC2626;
+  --red-dim:rgba(220,38,38,0.08);
+  --amber:#D97706;
+  --amber-dim:rgba(217,119,6,0.08);
+  --blue:#2563EB;
+  --blue-dim:rgba(37,99,235,0.08);
+  --purple:#7C3AED;
+  --purple-dim:rgba(124,58,237,0.08);
+  --text:#1A1A1A;
+  --text2:#7A7060;
+  --text3:#A89880;
+  --white:#FDFCF9;
+  --forest:#1E3A2F;
+  --forest-mid:#2C5040;
+  --cream:#F5F0E8;
+  --cream-dark:#EDE6D6;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -43,7 +47,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 
 .login-wrap{width:100%;max-width:380px;padding:20px;}
 .login-brand{margin-bottom:40px;}
-.login-logo{font-family:'Instrument Serif',serif;font-size:32px;color:var(--white);letter-spacing:-1px;}
+.login-logo{font-family:'Instrument Serif',serif;font-size:32px;color:var(--forest);letter-spacing:-1px;}
 .login-logo em{font-style:italic;color:var(--gold);}
 .login-badge{display:inline-block;background:var(--red-dim);border:1px solid rgba(248,113,113,0.2);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-top:8px;}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;}
@@ -54,7 +58,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 .lf input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;font-family:'Geist',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
 .lf input:focus{border-color:var(--gold);}
 .lf input::placeholder{color:var(--text3);}
-.login-btn{width:100%;background:var(--gold);color:#080B10;border:none;border-radius:9px;padding:13px;font-family:'Geist',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:0.3px;}
+.login-btn{width:100%;background:var(--gold);color:#1E3A2F;border:none;border-radius:9px;padding:13px;font-family:'Geist',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:0.3px;}
 .login-btn:hover{background:#D4B060;}
 .login-err{font-size:12px;color:var(--red);margin-top:10px;text-align:center;display:none;}
 .login-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:14px;}
@@ -67,7 +71,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 /* ── SIDEBAR ── */
 .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:300;transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
 .sb-brand{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
-.sb-logo{font-family:'Instrument Serif',serif;font-size:22px;color:var(--white);letter-spacing:-0.5px;}
+.sb-logo{font-family:'Instrument Serif',serif;font-size:22px;color:var(--forest);letter-spacing:-0.5px;}
 .sb-logo em{font-style:italic;color:var(--gold);}
 .sb-badge{display:inline-block;background:var(--red-dim);border:1px solid rgba(248,113,113,0.2);border-radius:5px;padding:2px 8px;font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
 .sb-admin-chip{margin:14px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;}
@@ -80,8 +84,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 .ni.active{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border);}
 .ni-ico{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
 .ni-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;}
-.ni-badge.amber{background:var(--amber);color:#080B10;}
-.ni-badge.green{background:var(--green);color:#080B10;}
+.ni-badge.amber{background:var(--amber);color:#1E3A2F;}
+.ni-badge.green{background:var(--green);color:#1E3A2F;}
 .sb-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);}
 .logout-btn{width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:'Geist',sans-serif;font-size:12px;color:var(--text3);cursor:pointer;transition:all 0.15s;}
 .logout-btn:hover{border-color:var(--red);color:var(--red);}
@@ -94,7 +98,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 .tb-title{font-family:'Instrument Serif',serif;font-size:18px;color:var(--white);}
 .tb-right{display:flex;align-items:center;gap:8px;}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:9px;padding:8px 14px;font-family:'Geist',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
-.btn-g{background:var(--gold);color:#080B10;}
+.btn-g{background:var(--gold);color:#1E3A2F;}
 .btn-g:hover{background:#D4B060;}
 .btn-s{background:var(--surface2);color:var(--text2);border:1px solid var(--border);font-weight:500;}
 .btn-s:hover{border-color:var(--border2);color:var(--text);}
@@ -255,23 +259,23 @@ function loadHotelLogs(){
   var container = document.getElementById('admin-log-entries');
   if(!container) return;
   if(!logs.length){
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:#5C6080;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#7A7060;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
     return;
   }
   container.innerHTML = '';
   logs.forEach(function(log){
     var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #2A2D3A;font-size:12px;';
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #EDE6D6;font-size:12px;';
     var d = new Date(log.ts);
     var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    var srcColors = {'guest_app':'#C9A84C','staff_app':'#60A5FA','dashboard':'#3DD68C'};
-    var srcColor = srcColors[log.source] || '#9094A8';
+    var srcColors = {'guest_app':'#B8933F','staff_app':'#2563EB','dashboard':'#16A34A'};
+    var srcColor = srcColors[log.source] || '#7A7060';
     row.innerHTML =
-      '<div style="flex-shrink:0;width:90px;color:#5C6080;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;width:90px;color:#7A7060;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
       '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
       '<div style="flex:1;min-width:0;">'+
-        '<div style="color:#F0F0F5;font-weight:500;">'+log.detail+'</div>'+
-        '<div style="color:#5C6080;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
+        '<div style="color:#1A1A1A;font-weight:500;">'+log.detail+'</div>'+
+        '<div style="color:#7A7060;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
       '</div>';
     container.appendChild(row);
   });
@@ -302,7 +306,7 @@ function exportAdminLogs(){
 .overlay.open{display:block;}
 #toast{position:fixed;bottom:24px;right:24px;background:#22C55E;color:white;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
 #toast.show{opacity:1;}
-#toast.warn{background:var(--amber);color:#080B10;}
+#toast.warn{background:var(--amber);color:#1E3A2F;}
 #toast.err{background:var(--red);}
 .notif{display:inline-block;width:6px;height:6px;background:var(--red);border-radius:50%;margin-left:5px;vertical-align:middle;box-shadow:0 0 4px var(--red);}
 </style>
@@ -812,22 +816,40 @@ function doLogin(){
   var err=document.getElementById('l-err');
   if(email==='admin@arivo.app' && pass==='admin2026'){
     err.style.display='none';
-    document.getElementById('screen-login').classList.remove('active');
-    var dash=document.getElementById('screen-dash');
-    dash.classList.add('active');
-    dash.style.animation='fadeUp 0.35s ease';
-    var now=new Date();
-    var el=document.getElementById('overview-date');
-    if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    renderHotels();
-    renderRevChart();
+    sessionStorage.setItem('arivo_admin_session',JSON.stringify({email:email,ts:Date.now()}));
+    enterAdmin();
   } else {
     err.style.display='block';
   }
 }
+
+function enterAdmin(){
+  document.getElementById('screen-login').classList.remove('active');
+  var dash=document.getElementById('screen-dash');
+  dash.classList.add('active');
+  dash.style.animation='fadeUp 0.35s ease';
+  var now=new Date();
+  var el=document.getElementById('overview-date');
+  if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  renderHotels();
+  renderRevChart();
+}
+
 document.getElementById('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
+document.addEventListener('DOMContentLoaded',function(){
+  var saved=sessionStorage.getItem('arivo_admin_session');
+  if(saved){
+    try{
+      var s=JSON.parse(saved);
+      if(s.email==='admin@arivo.app'){enterAdmin();return;}
+    }catch(e){}
+    sessionStorage.removeItem('arivo_admin_session');
+  }
+});
+
 function doLogout(){
+  sessionStorage.removeItem('arivo_admin_session');
   document.getElementById('screen-dash').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('l-email').value='';
