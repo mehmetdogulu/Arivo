@@ -995,54 +995,6 @@ function logEvent(action,detail,user,room){
 
 var tm=new Date();tm.setDate(tm.getDate()+1);var ts=tm.toISOString().split('T')[0];
 document.getElementById('reg-checkout').value=ts;document.getElementById('reg-checkout').min=ts;
-// --- SMART LOCATION SYNC ---
-async function syncLocation() {
-  if (!db) return;
-  const { data: hotel } = await db.from('hotels').select('postcode').eq('id', HOTEL_ID).single();
-  if (hotel && hotel.postcode) {
-    // This finds the "Local Guide" title in your app and adds the postcode
-    const title = document.querySelector('.section-title');
-    if (title && title.innerText.includes('Local')) {
-       title.innerText = 'Local Guide Near ' + hotel.postcode;
-    }
-    // This updates the "state" so the app knows where you are
-    state.hotelPostcode = hotel.postcode;
-    console.log("App is now centered on: " + hotel.postcode);
-  }
-}
-
-// Automatically update if the Admin changes the address in the dashboard
-db.channel('location-watch').on('postgres_changes', 
-  { event: 'UPDATE', schema: 'public', table: 'hotels', filter: 'id=eq.'+HOTEL_ID }, 
-  function(payload) { if(payload.new.postcode) syncLocation(); }
-).subscribe();
-
-// Run it immediately
-syncLocation();
-// --- STEP 2: LIVE LOCATION WATCHER ---
-// This part listens to your Database and updates the Guest App the second you click 'Save' in the Dashboard
-if (typeof db !== 'undefined' && db !== null) {
-  db.channel('live-location-sync')
-    .on('postgres_changes', { 
-      event: 'UPDATE', 
-      schema: 'public', 
-      table: 'hotels', 
-      filter: 'id=eq.' + HOTEL_ID 
-    }, function(payload) {
-      if (payload.new && payload.new.postcode) {
-        console.log("Postcode change detected: " + payload.new.postcode);
-        
-        // This runs your Step 1 function again to update the UI
-        if (typeof syncLocation === 'function') {
-          syncLocation();
-        } else if (typeof syncHotelLocation === 'function') {
-          syncHotelLocation();
-        }
-      }
-    })
-    .subscribe();
-}
-
 </script>
 </body>
 </html>
