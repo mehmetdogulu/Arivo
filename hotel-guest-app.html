@@ -122,7 +122,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 /* TABS */
 .tab-nav{display:flex;background:var(--white);border-bottom:1px solid var(--cream-dark);position:sticky;top:0;z-index:50;box-shadow:0 2px 10px var(--shadow);flex-shrink:0;overflow-x:auto;}
 .tab-nav::-webkit-scrollbar{height:0;}
-.tab{flex-shrink:0;padding:10px 10px;text-align:center;font-size:9px;font-weight:500;position:relative;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;min-width:60px;}
+.tab{flex-shrink:0;padding:10px 10px;text-align:center;font-size:9px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;min-width:60px;}
 .tab-ico{font-size:16px;}
 .tab.active{color:var(--forest);border-bottom-color:var(--gold);}
 .tc{display:none;padding:16px 14px 100px;flex:1;-webkit-overflow-scrolling:touch;}
@@ -400,17 +400,16 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
     <div class="tab" onclick="showTab('facilities',this)"><span class="tab-ico">&#127796;</span>Facilities</div>
     <div class="tab" onclick="showTab('local',this)"><span class="tab-ico">&#128205;</span>Local</div>
     <div class="tab" onclick="showTab('requests',this)"><span class="tab-ico">&#128718;</span>Requests</div>
-    <div class="tab" onclick="showTab('messages',this)" id="tab-messages"><span class="tab-ico">&#128172;</span>Messages<span id="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:var(--red,#F87171);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;"></span></div>
+    <div class="tab" onclick="showTab('messages',this)" id="tab-messages"><span class="tab-ico">&#128172;</span>Messages</div>
     <div class="tab" onclick="showTab('concierge',this)"><span class="tab-ico">&#10024;</span>Concierge</div>
   </div>
 
   <!-- HOTEL TAB -->
   <div class="tc active" id="tab-hotel">
-    <div id="hotel-info-sections">
-      <!-- Populated dynamically from hotel_settings.hotel_info -->
-      <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128246;</div><div class="ic-ttl">WiFi</div></div><div class="ir"><span class="ir-lbl">Network</span><span class="ir-val" id="wifi-network">Loading...</span></div><div class="ir"><span class="ir-lbl">Password</span><span class="wifi-p" id="wifi-password">Loading...</span></div></div>
-      <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128336;</div><div class="ic-ttl">Key Times</div></div><div class="ir"><span class="ir-lbl">Check-out</span><span class="ir-val" id="info-checkout">Loading...</span></div><div class="ir"><span class="ir-lbl">Breakfast</span><span class="ir-val" id="info-breakfast">Loading...</span></div></div>
-    </div>
+    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128246;</div><div class="ic-ttl">WiFi</div></div><div class="ir"><span class="ir-lbl">Network</span><span class="ir-val">TheMaison_Guest</span></div><div class="ir"><span class="ir-lbl">Password</span><span class="wifi-p">maison2026</span></div></div>
+    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128336;</div><div class="ic-ttl">Key Times</div></div><div class="ir"><span class="ir-lbl">Check-out</span><span class="ir-val">11:00 AM</span></div><div class="ir"><span class="ir-lbl">Late checkout</span><span class="ir-val">On request (until 1pm)</span></div><div class="ir"><span class="ir-lbl">Breakfast</span><span class="ir-val">8:00 - 10:00 AM</span></div><div class="ir"><span class="ir-lbl">Bar</span><span class="ir-val">5:00 PM - Midnight</span></div></div>
+    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128203;</div><div class="ic-ttl">House Rules</div></div><div class="ir"><span class="ir-lbl">Quiet hours</span><span class="ir-val">10 PM - 8 AM</span></div><div class="ir"><span class="ir-lbl">Smoking</span><span class="ir-val">Garden terrace only</span></div><div class="ir"><span class="ir-lbl">Pets</span><span class="ir-val">Welcome</span></div><div class="ir"><span class="ir-lbl">Parking</span><span class="ir-val">Private car park, free</span></div></div>
+    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128222;</div><div class="ic-ttl">Contact</div></div><div class="ir"><span class="ir-lbl">Reception</span><span class="ir-val"><a href="tel:0" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.3);">Dial 0</a></span></div><div class="ir"><span class="ir-lbl">Emergency</span><span class="ir-val"><a href="tel:+442079460123" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.3);">+44 20 7946 0123</a></span></div></div>
     <!-- PDF Menu -->
     <div class="menu-btn-wrap" onclick="toast('Opening menu PDF...')">
       <div class="menu-ico">&#128196;</div>
@@ -590,7 +589,7 @@ function loadRoomDropdown(){
       opt.value=room;
       var isOccupied=occupied.indexOf(room)>=0;
       opt.textContent=room+(isOccupied?' (occupied)':'');
-      // Do NOT disable - guest may be returning to their own room
+      opt.disabled=isOccupied;
       sel.appendChild(opt);
     });
   }
@@ -626,15 +625,13 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 function showTab(name,el){
-  _activeTab = name;
   document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('tab-'+name).classList.add('active');
   if(el)el.classList.add('active');
   if(name==='messages'){
-    clearMsgBadge();
     markMessagesRead();
-    loadMessages();
+    loadMessagesFromSupabase();
   }
   if(name==='local'){
     var city = hotelSettings.city || '';
@@ -642,6 +639,7 @@ function showTab(name,el){
     if(postcode){
       loadLocalSuggestions(city, postcode);
     } else {
+      // hotelSettings not loaded yet - wait and retry
       var tries = 0;
       var wait = setInterval(function(){
         tries++;
@@ -697,15 +695,16 @@ function submitReg(){
         var existingId=sameGuest[0].id;
         db.from('guests').update({checkout_date:co,registered_at:new Date().toISOString()}).eq('id',existingId).then(function(){
           guestId=existingId;
-          subscribeToMessages();
+          subscribeToUpdates();
           state.registering=false;
         });
       } else {
-        // RULE 3: Same room + different name + not checked out = warn but allow
-        var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room && g.name.toLowerCase()!==name.toLowerCase();});
+        // RULE 3: Same room + different name + not checked out = block
+        var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room;});
         if(sameRoom.length>0){
-          toast('Room '+room+' may already be occupied. If this is your room, please continue.');
-          // Still allow registration after warning
+          toast('Room '+room+' is already occupied. Please check your room number or contact reception.');
+          state.registering=false;
+          return;
         }
         // New guest — create record
         db.from('guests').insert({
@@ -713,7 +712,7 @@ function submitReg(){
         }).select().then(function(result){
           if(result.data&&result.data[0]){
             guestId=result.data[0].id;
-            subscribeToMessages();
+            subscribeToUpdates();
             // Update session with real guestId
             var sess=JSON.parse(sessionStorage.getItem('arivo_session')||'{}');
             if(sess.name) { sess.guestId=guestId; sessionStorage.setItem('arivo_session',JSON.stringify(sess)); }
@@ -787,9 +786,9 @@ function restoreSession(){
           // Update sessionStorage with correct guestId
           s.guestId = guestId;
           sessionStorage.setItem('arivo_session', JSON.stringify(s));
-          subscribeToMessages();
+          subscribeToUpdates();
         }
-        loadMessages();
+        loadMessagesFromSupabase();
       });
   }
   initAfterDb();
@@ -825,35 +824,32 @@ function lookupGuestByName(name){
 
 function enterApp(){
   showScreen('screen-app');
+  // Load hotel settings from Supabase (address, logo, menu, hotel_info)
   if(db){
     db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info').eq('hotel_id',HOTEL_ID).single().then(function(r){
       if(r.data){
-        // Address / hotelSettings
         if(r.data.address){
-          hotelSettings = r.data.address;
-          var aiLabel = document.querySelector('.ai-banner');
-          if(aiLabel && r.data.address.postcode){
-            var city = r.data.address.city || '';
-            var pc   = r.data.address.postcode;
-            aiLabel.textContent = '\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in ' + city + ' ' + pc;
+          hotelSettings=r.data.address;
+          var aiLabel=document.querySelector('.ai-banner');
+          if(aiLabel&&r.data.address.postcode){
+            var city=r.data.address.city||'';
+            var pc=r.data.address.postcode;
+            aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;
           }
           if(r.data.address.postcode) loadLocalSuggestions(r.data.address.city||'', r.data.address.postcode);
         }
-        // Logo
         if(r.data.logo_url){
-          var logoEl = document.getElementById('hotel-logo-display');
-          if(logoEl) logoEl.innerHTML = '<img src="' + r.data.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';
+          var logoEl=document.getElementById('hotel-logo-display');
+          if(logoEl) logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';
         }
-        // Menu PDF
         if(r.data.menu_url){
-          var menuBtn = document.querySelector('.menu-btn-wrap');
-          if(menuBtn) menuBtn.onclick = function(){ window.open(r.data.menu_url, '_blank'); };
+          var menuBtn=document.querySelector('.menu-btn-wrap');
+          if(menuBtn) menuBtn.onclick=function(){window.open(r.data.menu_url,'_blank');};
         }
-        // Hotel info sections (WiFi, Key Times, etc.)
-        if(r.data.hotel_info) renderHotelInfoTab(r.data.hotel_info);
       }
     });
-    loadMessages();
+    // Load messages — retry until guestId is available
+    loadMessagesFromSupabase();
     setTimeout(checkIfAlreadyRated, 1000);
   }
   var lastCheckout = localStorage.getItem('arivo_last_checkout');
@@ -862,37 +858,6 @@ function enterApp(){
     localStorage.removeItem('arivo_guest_inbox');
   }
   localStorage.setItem('arivo_last_checkout', state.checkout);
-}
-
-function renderHotelInfoTab(hotelInfo){
-  var container = document.getElementById('hotel-info-sections');
-  if(!container || !hotelInfo) return;
-  var secIcons = {'sec-wifi':'&#128246;','sec-times':'&#128336;','sec-rules':'&#128203;','sec-contact':'&#128222;'};
-  var html = '';
-  Object.keys(hotelInfo).forEach(function(secId){
-    var sec = hotelInfo[secId];
-    if(!sec || !sec.rows || !sec.rows.length) return;
-    var ico = secIcons[secId] || '&#128196;';
-    html += '<div class="ic"><div class="ic-hdr"><div class="ic-ico">' + ico + '</div><div class="ic-ttl">' + sec.title + '</div></div>';
-    sec.rows.forEach(function(row){
-      html += '<div class="ir"><span class="ir-lbl">' + row.k + '</span><span class="ir-val">' + row.v + '</span></div>';
-    });
-    html += '</div>';
-    // Also store WiFi values for concierge
-    if(secId === 'sec-wifi'){
-      sec.rows.forEach(function(row){
-        if(row.k.toLowerCase().includes('network') || row.k.toLowerCase().includes('name')) hotelSettings.wifiNetwork = row.v;
-        if(row.k.toLowerCase().includes('password')) hotelSettings.wifiPassword = row.v;
-      });
-    }
-    if(secId === 'sec-times'){
-      sec.rows.forEach(function(row){
-        if(row.k.toLowerCase().includes('check')) hotelSettings.checkout = row.v;
-        if(row.k.toLowerCase().includes('breakfast')) hotelSettings.breakfast = row.v;
-      });
-    }
-  });
-  container.innerHTML = html;
 }
 
 // ── BYPASS CODE ──
@@ -963,119 +928,282 @@ function showCheckoutBanner(msg){
 }
 
 // ── HOTEL MESSAGES ──
-
-
-
-// ── TOAST ──
-function toast(msg, type){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2800);
-}
-
-// ── MESSAGE BADGE ──
-function incrementMsgBadge(){
-  if(_activeTab==='messages') return;
-  _unreadCount++;
-  var b=document.getElementById('msg-badge');
-  if(b){b.textContent=_unreadCount;b.style.display='inline-block';}
-}
-function clearMsgBadge(){
-  _unreadCount=0;
-  var b=document.getElementById('msg-badge');
-  if(b){b.style.display='none';b.textContent='';}
-}
-
-// ── HOTEL MESSAGE BANNER ──
 function showHotelMessage(msg){
-  var el=document.getElementById('nb-msg-text');
-  if(el) el.textContent=msg;
-  var overlay=document.getElementById('notif-banner-overlay');
-  if(overlay) overlay.classList.add('open');
-  if(_activeTab==='messages') setTimeout(loadMessages, 400);
+  document.getElementById('nb-msg-text').textContent = msg;
+  document.getElementById('notif-banner-overlay').classList.add('open');
+  // Reload chat thread so new message appears
+  setTimeout(loadMessagesFromSupabase, 600);
+}
+
+function loadMessagesFromSupabase(){
+  if(!db) return;
+  
+  function fetchAndRender(id) {
+    Promise.all([
+      // All messages for this guest (both directions)
+      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+        .eq('hotel_id', HOTEL_ID)
+        .eq('guest_id', id)
+        .order('created_at', {ascending: true})
+        .limit(100),
+      // Broadcast messages (hotel to all guests)
+      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+        .eq('hotel_id', HOTEL_ID)
+        .eq('direction', 'hotel_to_guest')
+        .is('guest_id', null)
+        .order('created_at', {ascending: true})
+        .limit(50)
+    ]).then(function(results){
+      var msgs = [];
+      if(results[0].data) msgs = msgs.concat(results[0].data);
+      if(results[1].data) msgs = msgs.concat(results[1].data);
+      var seen = {};
+      msgs = msgs.filter(function(m){ if(seen[m.id]) return false; seen[m.id]=true; return true; });
+      msgs.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+      renderChatThread(msgs);
+    });
+  }
+
+  if(guestId) {
+    fetchAndRender(guestId);
+  } else if(state.name && state.room) {
+    // Look up guestId from name+room, then fetch
+    db.from('guests').select('id')
+      .eq('hotel_id', HOTEL_ID)
+      .eq('name', state.name)
+      .eq('room', state.room)
+      .eq('checked_out', false)
+      .single()
+      .then(function(r){
+        if(r.data) {
+          guestId = r.data.id;
+          fetchAndRender(r.data.id);
+        }
+      });
+  } else {
+    // guestId not ready yet — retry
+    setTimeout(loadMessagesFromSupabase, 500);
+  }
+}
+
+function renderChatThread(msgs){
+  var thread = document.getElementById('chat-thread');
+  var empty  = document.getElementById('chat-empty');
+  if(!thread) return;
+  if(!msgs.length){
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  // Clear and rebuild
+  thread.innerHTML = '';
+  msgs.forEach(function(msg){
+    var isGuest = msg.direction === 'guest_to_hotel';
+    var wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap ' + (isGuest ? 'guest' : 'hotel');
+    var d = new Date(msg.created_at);
+    var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    var dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    if(!isGuest){
+      wrap.innerHTML = '<div class="bubble-sender">'+(msg.sender_name||'Hotel Team')+'</div>'
+                     + '<div class="bubble hotel">'+msg.body+'</div>'
+                     + '<div class="bubble-meta">'+dateStr+', '+timeStr+'</div>';
+    } else {
+      wrap.innerHTML = '<div class="bubble guest">'+msg.body+'</div>'
+                     + '<div class="bubble-meta" style="text-align:right">'+timeStr+'</div>';
+    }
+    thread.appendChild(wrap);
+  });
+  // Scroll to bottom
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function addMessageToTab(msgObj){
+  var list = document.getElementById('hotel-messages-list');
+  if(!list) return;
+  var card = document.createElement('div');
+  card.className = 'msg-card';
+  var d = new Date(msgObj.time);
+  var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  card.innerHTML = '<div class="msg-card-from">'+(msgObj.from||'The Maison Team')+'</div><div class="msg-card-text">'+msgObj.text+'</div><div class="msg-card-time">'+timeStr+'</div>'+(msgObj.unread?'<div class="msg-card-unread"></div>':'');
+  list.insertBefore(card, list.firstChild);
+  saveMessageToStorage(msgObj);
+}
+
+function saveMessageToStorage(msgObj){
+  var msgs = JSON.parse(localStorage.getItem('arivo_guest_inbox')||'[]');
+  msgs.unshift(msgObj);
+  // Keep last 50 messages only
+  if(msgs.length > 50) msgs = msgs.slice(0,50);
+  localStorage.setItem('arivo_guest_inbox', JSON.stringify(msgs));
+}
+
+function loadMessagesFromStorage(){
+  var msgs = JSON.parse(localStorage.getItem('arivo_guest_inbox')||'[]');
+  if(!msgs.length) return;
+  var list = document.getElementById('hotel-messages-list');
+  if(!list) return;
+  // Add in reverse order (oldest first, since we prepend)
+  msgs.slice().reverse().forEach(function(msgObj){
+    var card = document.createElement('div');
+    card.className = 'msg-card';
+    var d = new Date(msgObj.time);
+    var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    card.innerHTML = '<div class="msg-card-from">'+(msgObj.from||'The Maison Team')+'</div><div class="msg-card-text">'+msgObj.text+'</div><div class="msg-card-time">'+timeStr+'</div>';
+    list.insertBefore(card, list.firstChild);
+  });
 }
 function dismissHotelMsg(){
-  var overlay=document.getElementById('notif-banner-overlay');
-  if(overlay) overlay.classList.remove('open');
-  setTimeout(loadMessages, 300);
+  document.getElementById('notif-banner-overlay').classList.remove('open');
+  // Silently reload so message appears if guest checks tab later
+  setTimeout(loadMessagesFromSupabase, 300);
 }
+
 function viewInMessages(){
-  var overlay=document.getElementById('notif-banner-overlay');
-  if(overlay) overlay.classList.remove('open');
-  clearMsgBadge();
+  document.getElementById('notif-banner-overlay').classList.remove('open');
+  // Use showTab directly - same as tapping the Messages tab
   showTab('messages', document.getElementById('tab-messages'));
+}
+
+// ── EDIT PROFILE ──
+function openEdit(){
+  document.getElementById('edit-name').value=state.name||'';
+  document.getElementById('edit-room').value=state.room||'';
+  document.getElementById('edit-co').value='';
+  document.getElementById('modal-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeEdit(){
+  document.getElementById('modal-ov').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeEditIfBg(e){if(e.target===document.getElementById('modal-ov'))closeEdit();}
+function submitEdit(){
+  var nn=document.getElementById('edit-name').value.trim();
+  var nr=document.getElementById('edit-room').value.trim();
+  var nc=document.getElementById('edit-co').value;
+  var changes=[];
+  if(nn&&nn!==state.name)changes.push('name');
+  if(nr&&nr!==state.room)changes.push('room');
+  if(nc)changes.push('checkout');
+  if(changes.length===0){toast('No changes detected');return;}
+  state.pending={name:nn||state.name,room:nr||state.room,checkout:nc||state.checkout};
+  document.getElementById('pending-chip').style.display='inline-flex';
+  closeEdit();
+  toast('Change requested - awaiting hotel confirmation');
+  setTimeout(function(){applyEdit();},5000);
+}
+function applyEdit(){
+  if(!state.pending)return;
+  state.name=state.pending.name;state.room=state.pending.room;
+  if(state.pending.checkout)state.checkout=state.pending.checkout;
+  var fn=state.name.split(' ')[0];
+  var d=state.checkout?new Date(state.checkout).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
+  document.getElementById('app-name').textContent=fn;
+  document.getElementById('app-room').textContent=state.room;
+  document.getElementById('app-co').textContent='Out '+d;
+  document.getElementById('pending-chip').style.display='none';
+  toast('Profile updated - confirmed by hotel');
+  delete state.pending;
 }
 
 // ── STAR RATING ──
 function rateStar(n){
-  if(sessionStorage.getItem('arivo_rated')) return;
-  var stars=document.querySelectorAll('.star');
-  stars.forEach(function(s,i){s.classList.toggle('active',i<n);});
+  if(sessionStorage.getItem('arivo_rated')) return; // one rating per stay
+  var stars = document.querySelectorAll('.star');
+  stars.forEach(function(s,i){s.classList.toggle('active', i<n);});
   setTimeout(function(){
     sessionStorage.setItem('arivo_rated','1');
     document.getElementById('feedback-sent').style.display='block';
     document.getElementById('stars').style.display='none';
     logEvent('guest_rating','Guest rated stay: '+n+' star'+(n>1?'s':''),state.name,state.room);
-    var rd={stars:n,room:state.room||'-',guest:state.name||'Guest',time:new Date().toISOString()};
-    localStorage.setItem('arivo_rating',JSON.stringify(rd));
-    if(db) db.from('ratings').insert({hotel_id:HOTEL_ID,guest_id:guestId,stars:n,priority_alert:n<=3}).then(function(){});
-    toast(n<=3?'We are so sorry. A manager will contact you shortly.':'Thank you for your feedback!');
-  },400);
+    var ratingData = {stars:n, room:state.room||'-', guest:state.name||'Guest', time:new Date().toISOString()};
+    localStorage.setItem('arivo_rating', JSON.stringify(ratingData));
+    window.dispatchEvent(new StorageEvent('storage',{key:'arivo_rating',newValue:JSON.stringify(ratingData)}));
+    if(db) db.from('ratings').insert({
+      hotel_id: HOTEL_ID,
+      guest_id: guestId,
+      stars: n,
+      priority_alert: n <= 3
+    }).then(function(r){ if(r.error) console.log('Rating error:',r.error.message); });
+    if(n<=3){
+      toast('We are so sorry to hear that. A manager will contact you shortly.');
+    } else {
+      toast('Thank you for your feedback!');
+    }
+  }, 400);
 }
 
-// ── PUSH REQUEST ──
-function pushRequest(type, detail, photoData){
-  var lsReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-  var reqId='req_'+Date.now();
-  lsReqs.unshift({id:reqId,type:type,detail:detail,guest:state.name,room:state.room,time:new Date().toISOString(),status:'new'});
-  if(lsReqs.length>100) lsReqs=lsReqs.slice(0,100);
-  localStorage.setItem('arivo_requests',JSON.stringify(lsReqs));
-  window.dispatchEvent(new StorageEvent('storage',{key:'arivo_requests',newValue:JSON.stringify(lsReqs)}));
-  if(!db||!guestId){ setTimeout(function(){if(guestId)pushRequest(type,detail,photoData);},1000); return; }
-  db.from('requests').insert({
-    hotel_id:HOTEL_ID, guest_id:guestId, type:type, detail:detail,
-    photo_url:(photoData&&photoData.startsWith('http'))?photoData:null, status:'new'
-  }).then(function(r){if(r.error) console.log('Request error:',r.error.message);});
-}
-
-// ── LOCAL SUGGESTIONS ──
 var _localLoaded = null;
-async function loadLocalSuggestions(city, postcode){
-  var container=document.getElementById('local-suggestions-container');
-  if(!container) return;
-  var cacheKey=(postcode||'default').trim().toUpperCase();
-  if(_localLoaded===cacheKey) return;
-  container.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Finding the best spots near '+(city||postcode)+'...</div>';
-  var prompt='You are a knowledgeable local guide for a boutique hotel in '+(city||'')+', postcode '+postcode+', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item: {"category":"Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights","emoji":"one emoji","name":"real place name","description":"one sentence","tags":["tag1","tag2"]}';
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var text=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'';
-    var start=text.indexOf('['); var end=text.lastIndexOf(']');
-    if(start<0||end<start) throw new Error('No JSON');
-    var places=JSON.parse(text.slice(start,end+1));
-    _localLoaded=cacheKey;
-    // Render places grouped by category
-    var catOrder=['Coffee & Breakfast','Restaurants','Bars','Useful Nearby','Culture & Sights'];
-    var catEmojis={'Coffee & Breakfast':'&#9749;','Restaurants':'&#127869;','Bars':'&#127867;','Useful Nearby':'&#127973;','Culture & Sights':'&#127963;'};
-    var cats={};
-    places.forEach(function(p){if(!cats[p.category])cats[p.category]=[];cats[p.category].push(p);});
-    var h='';
-    catOrder.forEach(function(cat){
-      if(!cats[cat]||!cats[cat].length) return;
-      h+='<div class="rc-lbl">'+(catEmojis[cat]||'')+' '+cat.toUpperCase()+'</div>';
-      cats[cat].forEach(function(p){
-        var url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.name+' '+(city||postcode));
-        var tags=(p.tags||[]).map(function(t){return '<span class="rc-tag">'+t+'</span>';}).join('');
-        h+='<div class="rc"><div class="rc-thumb">'+(p.emoji||'&#128205;')+'</div><div><div class="rc-n"><a href="'+url+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">'+p.name+' &#8599;</a></div><div class="rc-d">'+p.description+'</div><div class="rc-tags">'+tags+'<span class="rc-tag ai">&#10024; Arivo AI</span></div></div></div>';
-      });
+
+async function loadLocalSuggestions(city, postcode) {
+  var container = document.getElementById('local-suggestions-container');
+  if (!container) return;
+  var cacheKey = (postcode || 'default').trim().toUpperCase();
+  if (_localLoaded === cacheKey) return;
+
+  container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Finding the best spots near ' + (city || postcode) + '...</div>';
+
+  var prompt = 'You are a knowledgeable local guide for a boutique hotel in ' + (city||'') + ', postcode ' + postcode + ', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item must have these exact keys: {"category": "Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights", "emoji": "one emoji", "name": "real place name", "description": "one sentence", "tags": ["tag1", "tag2"]}';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{role: 'user', content: prompt}]
+      })
     });
-    container.innerHTML=h;
-  }catch(e){
-    console.log('Local suggestions error:',e);
-    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions. Ask our Concierge instead &#10024;</div>';
+    var data = await res.json();
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+    // Extract JSON array even if there's surrounding text
+    var start = text.indexOf('[');
+    var end = text.lastIndexOf(']');
+    if (start < 0 || end < start) throw new Error('No JSON array in response');
+    var places = JSON.parse(text.slice(start, end + 1));
+    _localLoaded = cacheKey;
+    renderLocalSuggestions(places, city || postcode);
+  } catch(e) {
+    console.log('Local suggestions error:', e);
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;">Could not load suggestions right now. Ask our Concierge instead &#10024;</div>';
   }
 }
+
+function renderLocalSuggestions(places, cityName) {
+  var container = document.getElementById('local-suggestions-container');
+  if (!container) return;
+
+  // Group by category
+  var cats = {};
+  var catOrder = ['Coffee & Breakfast','Restaurants','Bars','Useful Nearby','Culture & Sights'];
+  var catEmojis = {'Coffee & Breakfast':'&#9749;','Restaurants':'&#127869;','Bars':'&#127867;','Useful Nearby':'&#127973;','Culture & Sights':'&#127963;'};
+  places.forEach(function(p) {
+    if (!cats[p.category]) cats[p.category] = [];
+    cats[p.category].push(p);
+  });
+
+  var html = '';
+  catOrder.forEach(function(cat) {
+    if (!cats[cat] || !cats[cat].length) return;
+    html += '<div class="rc-lbl">' + (catEmojis[cat] || '') + ' ' + cat.toUpperCase() + '</div>';
+    cats[cat].forEach(function(p) {
+      var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.name + ' ' + cityName);
+      var tags = (p.tags || []).map(function(t) { return '<span class="rc-tag">' + t + '</span>'; }).join('');
+      html += '<div class="rc">'
+            + '<div class="rc-thumb">' + (p.emoji || '&#128205;') + '</div>'
+            + '<div>'
+            + '<div class="rc-n"><a href="' + mapsUrl + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">' + p.name + ' &#8599;</a></div>'
+            + '<div class="rc-d">' + p.description + '</div>'
+            + '<div class="rc-tags">' + tags + '<span class="rc-tag ai">&#10024; Arivo AI</span></div>'
+            + '</div></div>';
+    });
+  });
+
+  container.innerHTML = html;
+}
+
 
 function checkIfAlreadyRated(){
   if(sessionStorage.getItem('arivo_rated')){
@@ -1268,32 +1396,25 @@ async function sendChat(){
   addMsg(msg,'user');
   chatHistory.push({role:'user',content:msg});
   var typing=addMsg('Thinking...','typing');
-  // Use dynamic hotel data from hotelSettings (loaded from Supabase)
-  var hotelName     = hotelSettings.name     || 'The hotel';
-  var hotelStreet   = hotelSettings.street   || '';
-  var hotelCity     = hotelSettings.city     || '';
-  var hotelPostcode = hotelSettings.postcode || '';
-  var hotelPhone    = hotelSettings.phone    || '';
-  var wifiNetwork   = hotelSettings.wifiNetwork  || '';
-  var wifiPassword  = hotelSettings.wifiPassword || '';
-  var checkoutTime  = hotelSettings.checkout || '';
-  var breakfastTime = hotelSettings.breakfast|| '';
-  var wifiLine  = (wifiNetwork && wifiPassword) ? 'WiFi: '+wifiNetwork+' / '+wifiPassword+'. ' : '';
-  var timesLine = (checkoutTime ? 'Checkout: '+checkoutTime+'. ' : '') + (breakfastTime ? 'Breakfast: '+breakfastTime+'. ' : '');
-  var locationLine = hotelStreet ? 'at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK' : 'in '+hotelCity+' '+hotelPostcode;
-  var sys = 'You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel '+locationLine+'.'
-          + (hotelPhone ? ' Phone: '+hotelPhone+'.' : '')
-          + ' Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'.'
-          + ' Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services.'
-          + ' '+wifiLine+timesLine
-          + ' Be warm and concise. 2-4 sentences max.';
+  // Read hotel address from Supabase (loaded on enterApp)
+  var hotelName = hotelSettings.name || 'The Maison Collective';
+  var hotelStreet = hotelSettings.street || '14 Brock Street';
+  var hotelCity = hotelSettings.city || 'Bath';
+  var hotelPostcode = hotelSettings.postcode || 'BA1 2LW';
+  var hotelPhone = hotelSettings.phone || '+44 1225 000123';
+  var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. '+
+    'Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. '+
+    'Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. '+
+    'Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. '+
+    'Nearby: Fold Coffee (5 min), The Larder (8 min), Osteria Filo (12 min, Italian), The Hearth (6 min, British), The Star Inn (7 min, pub), Boots Pharmacy (4 min), Bath Spa Station (12 min). '+
+    'Be warm and concise. 2-4 sentences max.';
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});
     var data=await res.json();
-    var reply=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'Sorry, I could not get a response. Try messaging us instead!';
+    var reply=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'Sorry, I could not get a response. Try messaging us on WhatsApp!';
     typing.remove();addMsg(reply,'ai');
     chatHistory.push({role:'assistant',content:reply});
-  }catch(e){typing.remove();addMsg('Sorry, I am having a moment! Try messaging us directly instead.','ai');}
+  }catch(e){typing.remove();addMsg('Sorry, I am having a moment! Try messaging us on WhatsApp instead.','ai');}
 }
 function addMsg(text,role){
   var msgs=document.getElementById('chatMsgs');
@@ -1308,165 +1429,157 @@ function askAI(text){
 }
 
 // ── TOAST ──
-// ── MESSAGING ──────────────────────────────────────────────
-// Simple, single-responsibility functions. No retries, no localStorage fallback.
-// Supabase is the single source of truth.
-
-function loadMessages() {
-  if (!db || !guestId) return;
-  var thread = document.getElementById('chat-thread');
-  var empty  = document.getElementById('chat-empty');
-  if (!thread) return;
-
-  db.from('messages')
-    .select('id, body, direction, sender_name, created_at, guest_id')
-    .eq('hotel_id', HOTEL_ID)
-    .or('guest_id.eq.' + guestId + ',guest_id.is.null')
-    .order('created_at', { ascending: true })
-    .limit(100)
-    .then(function(r) {
-      if (r.error) { console.log('loadMessages error:', r.error.message); return; }
-      var msgs = (r.data || []).filter(function(m) {
-        // Include: messages addressed to this guest, guest's own messages, broadcasts
-        return m.direction === 'hotel_to_guest' || m.direction === 'guest_to_hotel';
-      });
-      if (!msgs.length) {
-        if (empty) empty.style.display = 'block';
-        thread.innerHTML = '';
-        thread.appendChild(empty || document.createElement('div'));
-        return;
-      }
-      if (empty) empty.style.display = 'none';
-      thread.innerHTML = '';
-      msgs.forEach(function(msg) {
-        var isGuest = msg.direction === 'guest_to_hotel';
-        var wrap = document.createElement('div');
-        wrap.className = 'bubble-wrap ' + (isGuest ? 'guest' : 'hotel');
-        var d = new Date(msg.created_at);
-        var t = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        var dt = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        if (isGuest) {
-          wrap.innerHTML = '<div class="bubble guest">' + escHtml(msg.body) + '</div>'
-                         + '<div class="bubble-meta" style="text-align:right">' + t + '</div>';
-        } else {
-          wrap.innerHTML = '<div class="bubble-sender">' + escHtml(msg.sender_name || 'Hotel Team') + '</div>'
-                         + '<div class="bubble hotel">' + escHtml(msg.body) + '</div>'
-                         + '<div class="bubble-meta">' + dt + ', ' + t + '</div>';
-        }
-        thread.appendChild(wrap);
-      });
-      thread.scrollTop = thread.scrollHeight;
-    });
-}
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function sendGuestMessage() {
+function sendGuestMessage(){
   var input = document.getElementById('guest-msg-input');
   var txt = input ? input.value.trim() : '';
-  if (!txt) return;
-  if (!db) { toast('Not connected - please refresh'); return; }
-  if (!guestId) { toast('Session not ready - please wait a moment'); return; }
+  if(!txt) return;
   input.value = '';
-
-  // Optimistic bubble
+  // Show optimistic bubble immediately
   var thread = document.getElementById('chat-thread');
   var empty  = document.getElementById('chat-empty');
-  if (empty) empty.style.display = 'none';
+  if(empty) empty.style.display = 'none';
   var wrap = document.createElement('div');
   wrap.className = 'bubble-wrap guest';
   var now = new Date();
-  wrap.innerHTML = '<div class="bubble guest">' + escHtml(txt) + '</div>'
-                 + '<div class="bubble-meta" style="text-align:right">'
-                 + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-                 + '</div>';
-  if (thread) { thread.appendChild(wrap); thread.scrollTop = thread.scrollHeight; }
+  wrap.innerHTML = '<div class="bubble guest">'+txt+'</div>'
+                 + '<div class="bubble-meta" style="text-align:right">'+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</div>';
+  if(thread) { thread.appendChild(wrap); thread.scrollTop = thread.scrollHeight; }
+  // Push to Supabase
+  pushGuestMessage(txt);
+  logEvent('guest_message','Guest sent message: '+txt.slice(0,60),state.name,state.room);
+  toast('Message sent to the hotel team');
+}
 
-  // Insert to Supabase
-  db.from('messages').insert({
-    hotel_id:    HOTEL_ID,
-    guest_id:    guestId,
-    direction:   'guest_to_hotel',
-    sender_name: state.name || 'Guest',
-    body:        txt
-  }).then(function(r) {
-    if (r.error) {
-      console.log('Send error:', r.error.message);
-      toast('Failed to send - please try again');
-    } else {
-      logEvent('guest_message', 'Guest sent: ' + txt.slice(0, 60), state.name, state.room);
-    }
+async function pushGuestMessage(text){
+  // Wait for guestId to be available (up to 5 seconds)
+  var attempts = 0;
+  while (!guestId && attempts < 10) {
+    await new Promise(function(r){ setTimeout(r, 500); });
+    attempts++;
+  }
+  if(!db){ console.log('No db connection'); return; }
+  if(!guestId){ console.log('No guestId after waiting'); return; }
+  try {
+    var r = await db.from('messages').insert({
+      hotel_id: HOTEL_ID,
+      guest_id: guestId,
+      direction: 'guest_to_hotel',
+      sender_name: state.name || 'Guest',
+      body: text
+    });
+    if(r.error) console.log('Message send error:', r.error.message);
+    else setTimeout(loadMessagesFromSupabase, 500); // reload thread to confirm
+  } catch(e) {
+    console.log('Message send error:', e);
+  }
+}function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+
+
+// ── SUPABASE REAL-TIME CONNECTION ──
+var guestName='Guest';
+var guestRoom='';
+var guestId=null;
+
+function setGuestContext(name,room){guestName=name;guestRoom=room;}
+
+async function pushRequest(type, detail, photoData){
+  // Track in localStorage for Rule 13 duplicate check
+  var lsReqs = JSON.parse(localStorage.getItem('arivo_requests') || '[]');
+  var reqId = 'req_' + Date.now();
+  lsReqs.unshift({id:reqId, type:type, detail:detail, guest:state.name, room:state.room, time:new Date().toISOString(), status:'new'});
+  if(lsReqs.length > 100) lsReqs = lsReqs.slice(0, 100);
+  localStorage.setItem('arivo_requests', JSON.stringify(lsReqs));
+  // Fire storage event so same-browser dashboard picks it up
+  window.dispatchEvent(new StorageEvent('storage', {key:'arivo_requests', newValue:JSON.stringify(lsReqs)}));
+
+  if(!db){ console.log('db not ready - request saved to localStorage only'); return; }
+  if(!guestId){ console.log('guestId not set - retrying in 1s'); setTimeout(function(){ pushRequest(type, detail, photoData); }, 1000); return; }
+
+  // Insert to Supabase - photo is already uploaded separately as a URL
+  db.from('requests').insert({
+    hotel_id: HOTEL_ID,
+    guest_id: guestId,
+    type: type,
+    detail: detail,
+    photo_url: (photoData && photoData.startsWith('http')) ? photoData : null,
+    status: 'new'
+  }).then(function(r){
+    if(r.error) console.log('Request insert error:', r.error.message);
   });
 }
 
-function subscribeToMessages() {
-  if (!db || !guestId) return;
+function markRequestDoneInStorage(type){
+  var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  requests.forEach(function(r){if(r.type===type&&r.room===guestRoom&&r.status!=='done')r.status='done';});
+  localStorage.setItem('arivo_requests',JSON.stringify(requests));
+}
 
-  // Direct messages to this guest
-  db.channel('msg-direct-' + guestId)
+async // Listen for real-time messages and session kills from dashboard
+function subscribeToUpdates(){
+  if(!guestId) return;
+  // Listen for messages addressed specifically to this guest
+  db.channel('guest-messages-'+guestId)
     .on('postgres_changes', {
-      event:  'INSERT',
+      event: 'INSERT',
       schema: 'public',
-      table:  'messages',
-      filter: 'guest_id=eq.' + guestId
-    }, function(payload) {
-      if (payload.new.direction === 'hotel_to_guest') {
+      table: 'messages',
+      filter: 'guest_id=eq.'+guestId
+    }, function(payload){
+      if(payload.new.direction === 'hotel_to_guest'){
         showHotelMessage(payload.new.body);
-        incrementMsgBadge();
-        if (_activeTab === 'messages') loadMessages();
       }
     })
     .subscribe();
 
-  // Broadcast messages (guest_id IS NULL)
-  db.channel('msg-broadcast-' + HOTEL_ID)
+  // Listen for broadcast messages (guest_id is null = sent to all guests)
+  db.channel('guest-broadcast-'+HOTEL_ID)
     .on('postgres_changes', {
-      event:  'INSERT',
+      event: 'INSERT',
       schema: 'public',
-      table:  'messages',
-      filter: 'hotel_id=eq.' + HOTEL_ID
-    }, function(payload) {
-      if (payload.new.direction === 'hotel_to_guest' && !payload.new.guest_id) {
+      table: 'messages',
+      filter: 'hotel_id=eq.'+HOTEL_ID
+    }, function(payload){
+      if(payload.new.direction === 'hotel_to_guest' && !payload.new.guest_id){
         showHotelMessage(payload.new.body);
-        incrementMsgBadge();
-        if (_activeTab === 'messages') loadMessages();
       }
     })
     .subscribe();
 
-  // Session kills
-  db.channel('session-' + guestId)
+  // Listen for session kills
+  db.channel('guest-sessions-'+guestId)
     .on('postgres_changes', {
-      event:  'UPDATE',
+      event: 'UPDATE',
       schema: 'public',
-      table:  'sessions',
-      filter: 'guest_id=eq.' + guestId
-    }, function(payload) {
-      if (payload.new.killed) expireGuestSession();
+      table: 'sessions',
+      filter: 'guest_id=eq.'+guestId
+    }, function(payload){
+      if(payload.new.killed) expireGuestSession();
     })
     .subscribe();
 
-  // Request status updates
-  db.channel('requests-' + guestId)
+  // Listen for request status updates for this guest only
+  db.channel('guest-requests-'+guestId)
     .on('postgres_changes', {
-      event:  'UPDATE',
+      event: 'UPDATE',
       schema: 'public',
-      table:  'requests',
-      filter: 'guest_id=eq.' + guestId
-    }, function(payload) {
+      table: 'requests',
+      filter: 'guest_id=eq.'+guestId
+    }, function(payload){
       updateRequestStatus(payload.new.id, payload.new.status, null);
     })
     .subscribe();
 }
 
-// localStorage fallback for same-browser testing
-window.addEventListener('storage', function(e) {
-  if (e.key === 'arivo_dashboard_to_guest') {
-    var data = JSON.parse(e.newValue || '{}');
-    if (data.type === 'message' && data.text) showHotelMessage(data.text);
-    if (data.type === 'kill') expireGuestSession();
+// Fallback localStorage listener for same-browser testing
+window.addEventListener('storage',function(e){
+  if(e.key==='arivo_dashboard_to_guest'){
+    var data=JSON.parse(e.newValue||'{}');
+    if(data.type==='message'&&data.text) showHotelMessage(data.text);
+    if(data.type==='kill') expireGuestSession();
   }
 });
 
