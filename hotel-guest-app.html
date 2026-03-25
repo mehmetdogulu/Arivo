@@ -583,7 +583,7 @@ function submitReg(){
           if(result.data&&result.data[0]){
             guestId=result.data[0].id;subscribeToUpdates();
             var sess=JSON.parse(sessionStorage.getItem('arivo_session')||'{}');
-            if(sess.name){sess.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(sess));}
+            if(sess.name){sess.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(sess));localStorage.setItem('arivo_session',JSON.stringify(sess));}
           }
           state.registering=false;
         });
@@ -603,18 +603,20 @@ function submitReg(){
   startCheckoutReminders(co);
   logEvent('guest_register','Guest registered: '+name+', Room '+room+', Checkout '+co,name,room);
   sessionStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
+  localStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
   showScreen('screen-welcome');
 }
 
 var hotelSettings={};
 
 function restoreSession(){
-  var saved=sessionStorage.getItem('arivo_session');
+  // Try sessionStorage first, fall back to localStorage for mobile refresh
+  var saved = sessionStorage.getItem('arivo_session') || localStorage.getItem('arivo_session');
   if(!saved)return false;
   var s=JSON.parse(saved);
   if(!s.name||!s.room||!s.checkout)return false;
   var co=new Date(s.checkout);co.setHours(12,0,0,0);
-  if(new Date()>co){sessionStorage.removeItem('arivo_session');return false;}
+  if(new Date()>co){sessionStorage.removeItem('arivo_session');localStorage.removeItem('arivo_session');return false;}
   state.name=s.name;state.room=s.room;state.checkout=s.checkout;
   guestId=s.guestId||null;
   setGuestContext(s.name,s.room);
@@ -633,7 +635,7 @@ function restoreSession(){
   function initAfterDb(){
     if(!db){setTimeout(initAfterDb,300);return;}
     db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).eq('checked_out',false).single().then(function(r){
-      if(r.data&&r.data.id){guestId=r.data.id;s.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(s));subscribeToUpdates();}
+      if(r.data&&r.data.id){guestId=r.data.id;s.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(s));localStorage.setItem('arivo_session',JSON.stringify(s));subscribeToUpdates();}
       loadMessagesFromSupabase();
     });
   }
