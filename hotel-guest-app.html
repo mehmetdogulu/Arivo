@@ -981,8 +981,11 @@ function updateRequestStatus(reqId,status,staffName){
   var statusText=status==='claimed'?'Your request has been received and staff are on it':status==='done'?'Your request has been completed \u2014 let us know if you need anything else':'Update on your request: '+status;
   addMessageToTab({from:staffName||'Hotel Team',text:statusText,time:new Date().toISOString(),unread:true});
   if(status==='done'&&reqId){
-    var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');requests.forEach(function(r){if(r.id===reqId)r.status='done';});localStorage.setItem('arivo_requests',JSON.stringify(requests));
-    document.querySelectorAll('.rq-btn.dupl').forEach(function(btn){if(btn.dataset.label&&reqId){btn.classList.remove('dupl','sent');btn.querySelector('.rq-ico').textContent=btn.dataset.originalIco||'\u2713';btn.querySelector('.rq-lbl2').textContent=btn.dataset.label;}});
+    // Mark as done in localStorage but do NOT re-enable the button
+    // Buttons stay locked until midnight (daily reset handles this)
+    var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+    requests.forEach(function(r){if(r.id===reqId)r.status='done';});
+    localStorage.setItem('arivo_requests',JSON.stringify(requests));
   }
 }
 
