@@ -756,6 +756,17 @@ function renderChatThread(msgs){
     thread.appendChild(wrap);
   });
   thread.scrollTop=thread.scrollHeight;
+  scrollToLatestMessage();
+}
+
+function scrollToLatestMessage(){
+  var thread = document.getElementById('chat-thread');
+  if(!thread) return;
+  // Scroll the page so the bottom of the thread is visible
+  setTimeout(function(){
+    var lastBubble = thread.lastElementChild;
+    if(lastBubble) lastBubble.scrollIntoView({behavior:'smooth', block:'end'});
+  }, 100);
 }
 
 function addMessageToTab(msgObj){
@@ -764,7 +775,7 @@ function addMessageToTab(msgObj){
   var wrap=document.createElement('div');wrap.className='bubble-wrap hotel';
   var d=new Date(msgObj.time);var timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   wrap.innerHTML='<div class="bubble-sender">'+(msgObj.from||'Hotel Team')+'</div><div class="bubble hotel">'+msgObj.text+'</div><div class="bubble-meta">'+timeStr+'</div>';
-  thread.appendChild(wrap);thread.scrollTop=thread.scrollHeight;
+  thread.appendChild(wrap);thread.scrollTop=thread.scrollHeight;scrollToLatestMessage();
 }
 
 function openEdit(){document.getElementById('edit-name').value=state.name||'';document.getElementById('edit-room').value=state.room||'';document.getElementById('edit-co').value='';document.getElementById('modal-ov').classList.add('open');document.body.style.overflow='hidden';}
@@ -843,7 +854,8 @@ function handleReq(btn){
   if(type==='once'){
     if(btn.classList.contains('sent')||btn.classList.contains('dupl'))return;
     var existingReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-    var alreadyOpen=existingReqs.some(function(r){return r.type===label&&r.status!=='done'&&r.room===state.room;});
+    var today=new Date().toDateString();
+    var alreadyOpen=existingReqs.some(function(r){return r.type===label&&r.status!=='done'&&r.room===state.room&&new Date(r.time).toDateString()===today;});
     if(alreadyOpen){toast(label+' is already being handled by the team');return;}
     btn.classList.add('sent');btn.querySelector('.rq-ico').textContent='\u2713';btn.querySelector('.rq-lbl2').textContent='On its way!';
     pushRequest(label,availMsg||label,null);toast(label+' sent to the team');
@@ -923,7 +935,7 @@ function sendGuestMessage(){
   var thread=document.getElementById('chat-thread');var empty=document.getElementById('chat-empty');if(empty)empty.style.display='none';
   var wrap=document.createElement('div');wrap.className='bubble-wrap guest';var now=new Date();
   wrap.innerHTML='<div class="bubble guest">'+txt+'</div><div class="bubble-meta" style="text-align:right">'+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</div>';
-  if(thread){thread.appendChild(wrap);thread.scrollTop=thread.scrollHeight;}
+  if(thread){thread.appendChild(wrap);thread.scrollTop=thread.scrollHeight;scrollToLatestMessage();}
   pushGuestMessage(txt);logEvent('guest_message','Guest sent message: '+txt.slice(0,60),state.name,state.room);toast('Message sent to the hotel team');
 }
 
