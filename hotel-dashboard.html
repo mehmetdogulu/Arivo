@@ -1139,20 +1139,17 @@ function subscribeToAll() {
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:'hotel_id=eq.' + HOTEL_ID}, function(payload) {
       if (payload.new.direction === 'guest_to_hotel') {
         toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
-        notify('mgr', '&#128172; Guest Message', payload.new.body, payload.new.sender_name);
+        notify('mgr', '&#128172; New Message from Guest', payload.new.body, payload.new.sender_name, 15000);
         incrementMsgAlert();
-        showGuestMessageAlert(payload.new.guest_id, payload.new.sender_name, payload.new.body);
+        bellPlay();
       }
     })
     .subscribe();
 }
 
 function showGuestMessageAlert(guestId, guestName, body) {
-  // Open the quick-reply modal pre-filled
-  if(guestId && guestName) {
-    openMsgM(guestId, guestName, '');
-    document.getElementById('msgb2').placeholder = 'Reply to: "' + body.slice(0,50) + '"';
-  }
+  // Don't auto-open modal - manager sees badge + notification banner
+  // They can click Message Guests to reply
 }
 
 var _guestMsgCount = 0;
@@ -1474,7 +1471,14 @@ function openM(id)  { document.getElementById(id).classList.add('on');    docume
 function closeM(id) { document.getElementById(id).classList.remove('on'); document.body.style.overflow = ''; }
 
 // ── NOTIFICATIONS ──
-function notify(type, title, msg, sub) { var band=document.getElementById('nband');if(!band)return;var b=document.createElement('div');b.className='nbanner '+type;b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');b.onclick=function(){dismissBanner(b);};band.appendChild(b);setTimeout(function(){dismissBanner(b);},5000); }
+function notify(type, title, msg, sub, duration) {
+  var band=document.getElementById('nband');if(!band)return;
+  var b=document.createElement('div');b.className='nbanner '+type;
+  b.innerHTML='<div class="nbt">'+title+'</div><div class="nbm">'+msg+'</div>'+(sub?'<div class="nbs">'+sub+'</div>':'');
+  b.onclick=function(){dismissBanner(b);};
+  band.appendChild(b);
+  setTimeout(function(){dismissBanner(b);},(duration||5000));
+}
 function dismissBanner(b) { if(b&&b.parentNode){b.style.opacity='0';b.style.transform='translateX(20px)';b.style.transition='all .3s';setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);} }
 function toast(msg, type) { var t=document.getElementById('toast');t.className=type||'';t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800); }
 var origTitle = 'Arivo \u2014 Hotel Dashboard';
