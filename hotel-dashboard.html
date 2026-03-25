@@ -263,7 +263,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="ni" onclick="go('req',this)"><span class="ni-ic">&#128718;</span>Requests<span class="nbadge" id="rbadge">0</span></div>
       <div class="ni" onclick="go('guests',this)"><span class="ni-ic">&#128100;</span>Guests</div>
       <div class="ni" onclick="go('sess',this)"><span class="ni-ic">&#128275;</span>Sessions &amp; Access</div>
-      <div class="ni" onclick="go('msgs',this)"><span class="ni-ic">&#128172;</span>Message Guests</div>
+      <div class="ni" onclick="go('msgs',this);clearMsgAlert()"><span class="ni-ic">&#128172;</span>Message Guests<span id="guest-msg-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;"></span></div>
       <div class="nlbl">Content</div>
       <div class="ni" onclick="go('info',this)"><span class="ni-ic">&#127968;</span>Hotel Info</div>
       <div class="ni" onclick="go('fac',this)"><span class="ni-ic">&#127796;</span>Facilities</div>
@@ -1140,7 +1140,7 @@ function subscribeToAll() {
       if (payload.new.direction === 'guest_to_hotel') {
         toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
         notify('mgr', '&#128172; Guest Message', payload.new.body, payload.new.sender_name);
-        // Show reply button in notification
+        incrementMsgAlert();
         showGuestMessageAlert(payload.new.guest_id, payload.new.sender_name, payload.new.body);
       }
     })
@@ -1153,6 +1153,18 @@ function showGuestMessageAlert(guestId, guestName, body) {
     openMsgM(guestId, guestName, '');
     document.getElementById('msgb2').placeholder = 'Reply to: "' + body.slice(0,50) + '"';
   }
+}
+
+var _guestMsgCount = 0;
+function incrementMsgAlert(){
+  _guestMsgCount++;
+  var badge = document.getElementById('guest-msg-badge');
+  if(badge){ badge.textContent = _guestMsgCount; badge.style.display = 'inline'; }
+}
+function clearMsgAlert(){
+  _guestMsgCount = 0;
+  var badge = document.getElementById('guest-msg-badge');
+  if(badge){ badge.style.display = 'none'; badge.textContent = ''; }
 }
 
 // ── MESSAGING ──
