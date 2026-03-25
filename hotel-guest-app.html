@@ -122,7 +122,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 /* TABS */
 .tab-nav{display:flex;background:var(--white);border-bottom:1px solid var(--cream-dark);position:sticky;top:0;z-index:50;box-shadow:0 2px 10px var(--shadow);flex-shrink:0;overflow-x:auto;}
 .tab-nav::-webkit-scrollbar{height:0;}
-.tab{flex-shrink:0;padding:10px 10px;text-align:center;font-size:9px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;min-width:60px;}
+.tab{flex-shrink:0;padding:10px 10px;text-align:center;font-size:9px;font-weight:500;position:relative;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;min-width:60px;}
 .tab-ico{font-size:16px;}
 .tab.active{color:var(--forest);border-bottom-color:var(--gold);}
 .tc{display:none;padding:16px 14px 100px;flex:1;-webkit-overflow-scrolling:touch;}
@@ -400,7 +400,7 @@ var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001'
     <div class="tab" onclick="showTab('facilities',this)"><span class="tab-ico">&#127796;</span>Facilities</div>
     <div class="tab" onclick="showTab('local',this)"><span class="tab-ico">&#128205;</span>Local</div>
     <div class="tab" onclick="showTab('requests',this)"><span class="tab-ico">&#128718;</span>Requests</div>
-    <div class="tab" onclick="showTab('messages',this)" id="tab-messages"><span class="tab-ico">&#128172;</span>Messages</div>
+    <div class="tab" onclick="showTab('messages',this)" id="tab-messages"><span class="tab-ico">&#128172;</span>Messages<span id="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:var(--red,#F87171);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;"></span></div>
     <div class="tab" onclick="showTab('concierge',this)"><span class="tab-ico">&#10024;</span>Concierge</div>
   </div>
 
@@ -625,11 +625,13 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 function showTab(name,el){
+  _activeTab = name;
   document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('tab-'+name).classList.add('active');
   if(el)el.classList.add('active');
   if(name==='messages'){
+    clearMsgBadge();
     markMessagesRead();
     loadMessagesFromSupabase();
   }
@@ -639,7 +641,6 @@ function showTab(name,el){
     if(postcode){
       loadLocalSuggestions(city, postcode);
     } else {
-      // hotelSettings not loaded yet - wait and retry
       var tries = 0;
       var wait = setInterval(function(){
         tries++;
@@ -931,8 +932,8 @@ function showCheckoutBanner(msg){
 function showHotelMessage(msg){
   document.getElementById('nb-msg-text').textContent = msg;
   document.getElementById('notif-banner-overlay').classList.add('open');
-  // Reload chat thread so new message appears
-  setTimeout(loadMessagesFromSupabase, 600);
+  // If already on messages tab, reload thread immediately
+  if(_activeTab === 'messages') setTimeout(loadMessagesFromSupabase, 400);
 }
 
 function loadMessagesFromSupabase(){
@@ -1055,13 +1056,14 @@ function loadMessagesFromStorage(){
 }
 function dismissHotelMsg(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
-  // Silently reload so message appears if guest checks tab later
+  // Badge stays visible so guest knows to check Messages tab
+  // Silently pre-load messages in background
   setTimeout(loadMessagesFromSupabase, 300);
 }
 
 function viewInMessages(){
   document.getElementById('notif-banner-overlay').classList.remove('open');
-  // Use showTab directly - same as tapping the Messages tab
+  clearMsgBadge();
   showTab('messages', document.getElementById('tab-messages'));
 }
 
@@ -1518,56 +1520,80 @@ function markRequestDoneInStorage(type){
   localStorage.setItem('arivo_requests',JSON.stringify(requests));
 }
 
-async // Listen for real-time messages and session kills from dashboard
+// Listen for real-time messages and session kills from dashboard
+var _unreadCount = 0;
+var _activeTab = 'hotel'; // track which tab is currently visible
+
+function incrementMsgBadge() {
+  if (_activeTab === 'messages') return; // already on messages tab, no badge needed
+  _unreadCount++;
+  var badge = document.getElementById('msg-badge');
+  if (badge) { badge.textContent = _unreadCount; badge.style.display = 'inline-block'; }
+}
+
+function clearMsgBadge() {
+  _unreadCount = 0;
+  var badge = document.getElementById('msg-badge');
+  if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+}
+
 function subscribeToUpdates(){
-  if(!guestId) return;
-  // Listen for messages addressed specifically to this guest
-  db.channel('guest-messages-'+guestId)
+  if(!guestId || !db) return; // guard: never subscribe without confirmed guestId
+
+  // ── 1. Messages addressed specifically to this guest ──
+  db.channel('guest-messages-' + guestId)
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
       table: 'messages',
-      filter: 'guest_id=eq.'+guestId
+      filter: 'guest_id=eq.' + guestId
     }, function(payload){
       if(payload.new.direction === 'hotel_to_guest'){
         showHotelMessage(payload.new.body);
+        incrementMsgBadge();
+        // Reload chat thread if on messages tab
+        if(_activeTab === 'messages') loadMessagesFromSupabase();
       }
     })
     .subscribe();
 
-  // Listen for broadcast messages (guest_id is null = sent to all guests)
-  db.channel('guest-broadcast-'+HOTEL_ID)
+  // ── 2. Broadcast messages (hotel_to_guest with no specific guest) ──
+  // Filter: hotel_id match only — direction check done in handler
+  db.channel('guest-broadcast-' + HOTEL_ID)
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
       table: 'messages',
-      filter: 'hotel_id=eq.'+HOTEL_ID
+      filter: 'hotel_id=eq.' + HOTEL_ID
     }, function(payload){
+      // Only act on broadcast hotel→guest messages (null guest_id = sent to all)
       if(payload.new.direction === 'hotel_to_guest' && !payload.new.guest_id){
         showHotelMessage(payload.new.body);
+        incrementMsgBadge();
+        if(_activeTab === 'messages') loadMessagesFromSupabase();
       }
     })
     .subscribe();
 
-  // Listen for session kills
-  db.channel('guest-sessions-'+guestId)
+  // ── 3. Session kills ──
+  db.channel('guest-sessions-' + guestId)
     .on('postgres_changes', {
       event: 'UPDATE',
       schema: 'public',
       table: 'sessions',
-      filter: 'guest_id=eq.'+guestId
+      filter: 'guest_id=eq.' + guestId
     }, function(payload){
       if(payload.new.killed) expireGuestSession();
     })
     .subscribe();
 
-  // Listen for request status updates for this guest only
-  db.channel('guest-requests-'+guestId)
+  // ── 4. Request status updates ──
+  db.channel('guest-requests-' + guestId)
     .on('postgres_changes', {
       event: 'UPDATE',
       schema: 'public',
       table: 'requests',
-      filter: 'guest_id=eq.'+guestId
+      filter: 'guest_id=eq.' + guestId
     }, function(payload){
       updateRequestStatus(payload.new.id, payload.new.status, null);
     })
