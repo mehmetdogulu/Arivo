@@ -639,43 +639,81 @@ function restoreSession(){
   if(!saved)return false;
   var s=JSON.parse(saved);
   if(!s.name||!s.room||!s.checkout)return false;
-  // Use hotel checkout time + 1hr grace, fallback to 1pm
-  var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) ? hotelSettings.checkoutTime : '13:00';
-  var ctParts = checkoutTimeStr.split(':');
-  var ctHour = (parseInt(ctParts[0]) || 11) + 1; // +1hr grace
-  var ctMin = parseInt(ctParts[1]) || 0;
-  var co=new Date(s.checkout);co.setHours(ctHour,ctMin,0,0);
-  if(new Date()>co){sessionStorage.removeItem('arivo_session');localStorage.removeItem('arivo_session');return false;}
+
+  // Quick client-side date check with conservative 1pm fallback
+  // (hotel checkout time will be confirmed via Supabase below)
+  var co=new Date(s.checkout);co.setHours(13,0,0,0);
+  if(new Date()>co){
+    sessionStorage.removeItem('arivo_session');
+    localStorage.removeItem('arivo_session');
+    return false;
+  }
+
   state.name=s.name;state.room=s.room;state.checkout=s.checkout;
   guestId=s.guestId||null;
-  setGuestContext(s.name,s.room);
-  var d=new Date(s.checkout);
-  var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  var fn=s.name.split(' ')[0];
-  document.getElementById('w-name').textContent=fn;
-  document.getElementById('w-room').textContent=s.room;
-  document.getElementById('w-co').textContent='Checkout '+fmt;
-  document.getElementById('app-name').textContent=fn;
-  document.getElementById('app-room').textContent=s.room;
-  document.getElementById('app-co').textContent='Out '+fmt;
-  document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
-  startCheckoutReminders(s.checkout);
-  enterApp();
-  function initAfterDb(){
-    if(!db){setTimeout(initAfterDb,300);return;}
-    db.from('guests').select('id,checked_out').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).single().then(function(r){
-      if(r.data&&r.data.checked_out===true){
-        // Guest has been checked out by hotel - expire session
+
+  // Verify with Supabase BEFORE showing the app
+  // This is the authoritative check - checks checked_out flag and gets real checkout date
+  function verifyThenEnter(){
+    if(!db){setTimeout(verifyThenEnter,300);return;}
+    db.from('guests').select('id,checked_out,checkout_date').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).single().then(function(r){
+      if(!r.data){
+        // Guest not found in DB - clear session
+        sessionStorage.removeItem('arivo_session');
+        localStorage.removeItem('arivo_session');
+        return;
+      }
+      if(r.data.checked_out===true){
+        // Hotel has checked this guest out
         sessionStorage.removeItem('arivo_session');
         localStorage.removeItem('arivo_session');
         expireGuestSession();
         return;
       }
-      if(r.data&&r.data.id){guestId=r.data.id;s.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(s));localStorage.setItem('arivo_session',JSON.stringify(s));subscribeToUpdates();}
-      loadMessagesFromSupabase();
+      // Check actual checkout date from DB
+      if(r.data.checkout_date){
+        var dbDate=r.data.checkout_date.split('T')[0];
+        var dbCo=new Date(dbDate);dbCo.setHours(13,0,0,0);
+        if(new Date()>dbCo){
+          sessionStorage.removeItem('arivo_session');
+          localStorage.removeItem('arivo_session');
+          // Mark checked_out in DB
+          db.from('guests').update({checked_out:true}).eq('id',r.data.id).then(function(){});
+          expireGuestSession();
+          return;
+        }
+        // Use DB checkout date (authoritative)
+        s.checkout=dbDate;
+        state.checkout=dbDate;
+      }
+      // All checks passed - show the app
+      guestId=r.data.id;
+      s.guestId=guestId;
+      sessionStorage.setItem('arivo_session',JSON.stringify(s));
+      localStorage.setItem('arivo_session',JSON.stringify(s));
+      showSession(s);
     });
   }
-  initAfterDb();
+
+  function showSession(s){
+    setGuestContext(s.name,s.room);
+    var d=new Date(s.checkout);
+    var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    var fn=s.name.split(' ')[0];
+    document.getElementById('w-name').textContent=fn;
+    document.getElementById('w-room').textContent=s.room;
+    document.getElementById('w-co').textContent='Checkout '+fmt;
+    document.getElementById('app-name').textContent=fn;
+    document.getElementById('app-room').textContent=s.room;
+    document.getElementById('app-co').textContent='Out '+fmt;
+    document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
+    subscribeToUpdates();
+    loadMessagesFromSupabase();
+    enterApp();
+    startCheckoutReminders(s.checkout);
+  }
+
+  verifyThenEnter();
   return true;
 }
 
