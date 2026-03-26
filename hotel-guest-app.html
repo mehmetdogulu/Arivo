@@ -265,7 +265,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
     <div class="privacy-note">&#128274; Your details are used only for your stay and deleted 90 days after checkout.</div>
     <div class="fg">
       <label class="fl">Your Name</label>
-      <input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" oninput="debounceLookup(this.value)">
+      <input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" oninput="debounceLookup(this.value)" onblur="debounceLookup(this.value)">
       <div class="f-err" id="err-name">Please enter your name</div>
     </div>
 
@@ -718,27 +718,46 @@ var _returningGuest=null;
 function debounceLookup(val){
   clearTimeout(_lookupTimer);
   var trimmed=val.trim();
-  if(trimmed.length<2){clearReturning();return;}
-  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},500);
+  // Need at least 2 words typed before attempting lookup
+  var parts=trimmed.split(/\s+/).filter(function(p){return p.length>0;});
+  if(parts.length<2){clearReturning();return;}
+  // Wait 800ms after user stops typing
+  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},800);
 }
 
 function lookupGuestByName(name){
   name=name.trim();
   if(!name||!db)return;
-  db.from('guests').select('id,name,room,checkout_date,checked_out').eq('hotel_id',HOTEL_ID).ilike('name',name).single().then(function(r){
-    if(r.data&&r.data.name.toLowerCase()===name.toLowerCase()&&r.data.checked_out===false){
-      _returningGuest=r.data;
-      var coDate=r.data.checkout_date?new Date(r.data.checkout_date):null;
-      var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
-      document.getElementById('returning-info').innerHTML='<strong>Room '+r.data.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
-      document.getElementById('returning-card').style.display='block';
-      document.getElementById('new-guest-fields').style.display='none';
-      document.getElementById('reg-submit-btn').textContent='Continue →';
-      guestId=r.data.id;
-    } else {
-      clearReturning();
-    }
-  }).catch(function(){clearReturning();});
+  // Search using ilike wildcard so partial surname matches work
+  db.from('guests').select('id,name,room,checkout_date,checked_out')
+    .eq('hotel_id',HOTEL_ID)
+    .ilike('name','%'+name+'%')
+    .eq('checked_out',false)
+    .limit(5)
+    .then(function(r){
+      if(!r.data||r.data.length===0){clearReturning();return;}
+      // Find best match: exact match first, then startsWith
+      var nameLower=name.toLowerCase();
+      var exact=r.data.filter(function(g){return g.name.toLowerCase()===nameLower;});
+      var match=exact.length>0?exact[0]:null;
+      // Also accept if typed name is a prefix of the stored name (handles middle names etc)
+      if(!match){
+        var prefix=r.data.filter(function(g){return g.name.toLowerCase().startsWith(nameLower);});
+        match=prefix.length>0?prefix[0]:null;
+      }
+      if(match){
+        _returningGuest=match;
+        var coDate=match.checkout_date?new Date(match.checkout_date):null;
+        var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
+        document.getElementById('returning-info').innerHTML='<strong>Room '+match.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
+        document.getElementById('returning-card').style.display='block';
+        document.getElementById('new-guest-fields').style.display='none';
+        document.getElementById('reg-submit-btn').textContent='Continue →';
+        guestId=match.id;
+      } else {
+        clearReturning();
+      }
+    }).catch(function(){clearReturning();});
 }
 
 function clearReturning(){
