@@ -585,7 +585,18 @@ function submitReg(){
       if(sameGuest.length===0&&activeCount>=totalRooms){toast('Sorry — all rooms are currently occupied. Please contact reception.');state.registering=false;return;}
       if(sameGuest.length>0){
         var existingId=sameGuest[0].id;
-        db.from('guests').update({checkout_date:co,registered_at:new Date().toISOString()}).eq('id',existingId).then(function(){
+        // Fetch the DB checkout date - never overwrite it with what guest typed
+        db.from('guests').select('checkout_date').eq('id',existingId).single().then(function(dbGuest){
+          var dbDate = dbGuest.data && dbGuest.data.checkout_date ? dbGuest.data.checkout_date.split('T')[0] : co;
+          // Use DB date, update local state and session
+          state.checkout = dbDate;
+          var d2=new Date(dbDate);
+          var fmt2=d2.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+          document.getElementById('w-co').textContent='Checkout '+fmt2;
+          document.getElementById('app-co').textContent='Out '+fmt2;
+          sessionStorage.setItem('arivo_session',JSON.stringify({name:state.name,room:state.room,checkout:dbDate,guestId:existingId,ts:Date.now()}));
+          localStorage.setItem('arivo_session',JSON.stringify({name:state.name,room:state.room,checkout:dbDate,guestId:existingId,ts:Date.now()}));
+          startCheckoutReminders(dbDate);
           guestId=existingId;subscribeToUpdates();state.registering=false;
         });
       } else {
