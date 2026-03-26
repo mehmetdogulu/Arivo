@@ -318,7 +318,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
     <button class="cb-close" onclick="document.getElementById('checkout-banner').classList.remove('show')">&#10005;</button>
   </div>
   <div class="info-strip">
-    <div class="ii"><div class="ii-lbl">Check-out</div><div class="ii-val">11:00</div></div>
+    <div class="ii"><div class="ii-lbl">Check-out</div><div class="ii-val" id="info-checkout-time">11:00</div></div>
     <div class="ii"><div class="ii-lbl">Breakfast</div><div class="ii-val">8-10</div></div>
     <div class="ii"><div class="ii-lbl">Bar</div><div class="ii-val">5pm-12</div></div>
   </div>
@@ -628,7 +628,12 @@ function restoreSession(){
   if(!saved)return false;
   var s=JSON.parse(saved);
   if(!s.name||!s.room||!s.checkout)return false;
-  var co=new Date(s.checkout);co.setHours(12,0,0,0);
+  // Use hotel checkout time + 1hr grace, fallback to 1pm
+  var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) ? hotelSettings.checkoutTime : '13:00';
+  var ctParts = checkoutTimeStr.split(':');
+  var ctHour = (parseInt(ctParts[0]) || 11) + 1; // +1hr grace
+  var ctMin = parseInt(ctParts[1]) || 0;
+  var co=new Date(s.checkout);co.setHours(ctHour,ctMin,0,0);
   if(new Date()>co){sessionStorage.removeItem('arivo_session');localStorage.removeItem('arivo_session');return false;}
   state.name=s.name;state.room=s.room;state.checkout=s.checkout;
   guestId=s.guestId||null;
@@ -680,7 +685,7 @@ function lookupGuestByName(name){
 function enterApp(){
   showScreen('screen-app');
   if(db){
-    db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info,rooms').eq('hotel_id',HOTEL_ID).single().then(function(r){
+    db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info,rooms,checkout_time').eq('hotel_id',HOTEL_ID).single().then(function(r){
       if(r.data){
         if(r.data.address){
           hotelSettings=r.data.address;
@@ -704,6 +709,14 @@ function enterApp(){
         }
         if(r.data.logo_url){var logoEl=document.getElementById('hotel-logo-display');if(logoEl)logoEl.innerHTML='<img src="'+r.data.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px">';}
         if(r.data.menu_url){var menuBtn=document.querySelector('.menu-btn-wrap');if(menuBtn)menuBtn.onclick=function(){window.open(r.data.menu_url,'_blank');};}
+        if(r.data.checkout_time){
+          hotelSettings.checkoutTime=r.data.checkout_time;
+          // Update info strip display
+          var infoTime=document.getElementById('info-checkout-time');
+          if(infoTime)infoTime.textContent=r.data.checkout_time;
+          // Restart checkout reminders with real checkout time from hotel
+          if(state.checkout) startCheckoutReminders(state.checkout);
+        }
       }
     });
     loadMessagesFromSupabase();
@@ -723,26 +736,41 @@ function submitBypass(){
 }
 
 function startCheckoutReminders(coDateStr){
-  var coDate=new Date(coDateStr);coDate.setHours(11,0,0,0);
+  // Use checkout time from hotel settings, fallback to 11:00
+  var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) ? hotelSettings.checkoutTime : '11:00';
+  var parts = checkoutTimeStr.split(':');
+  var checkoutHour = parseInt(parts[0]) || 11;
+  var checkoutMin = parseInt(parts[1]) || 0;
+  var coDate=new Date(coDateStr);
+  coDate.setHours(checkoutHour, checkoutMin, 0, 0);
   var now=new Date();
   var msUntilCheckout=coDate.getTime()-now.getTime();
   var msUntil2hr=msUntilCheckout-2*60*60*1000;
   var msUntil1hr=msUntilCheckout-1*60*60*1000;
-  var msUntilExpiry=msUntilCheckout+60*60*1000;
-  if(msUntil2hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 2 hours (11:00 AM). Please ensure your belongings are ready.');showHotelMessage('Friendly reminder: your checkout is in 2 hours at 11:00 AM. We hope you have had a wonderful stay!');},msUntil2hr);
-  if(msUntil1hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 1 hour (11:00 AM). Please drop your key at reception.');showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');},msUntil1hr);
-  if(msUntilExpiry>0)setTimeout(function(){expireGuestSession();},msUntilExpiry);
+  var msUntilExpiry=msUntilCheckout+60*60*1000; // 1hr grace after checkout
+  var checkoutDisplay=checkoutTimeStr;
+  if(msUntil2hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 2 hours ('+checkoutDisplay+'). Please ensure your belongings are ready.');showHotelMessage('Friendly reminder: your checkout is in 2 hours at '+checkoutDisplay+'. We hope you have had a wonderful stay!');},msUntil2hr);
+  if(msUntil1hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 1 hour ('+checkoutDisplay+'). Please drop your key at reception.');showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');},msUntil1hr);
+  if(msUntilExpiry>0){
+    setTimeout(function(){expireGuestSession();},msUntilExpiry);
+  } else {
+    // Checkout time already passed - expire immediately
+    expireGuestSession();
+  }
 }
 
 function expireGuestSession(){
   // Clear session so guest cannot refresh back in
   sessionStorage.removeItem('arivo_session');
   localStorage.removeItem('arivo_session');
+  // Mark as checked out in Supabase so server-side check also blocks them
+  if(db && guestId){
+    db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){});
+  }
   var overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:#1E3A2F;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;font-family:DM Sans,sans-serif;';
   overlay.innerHTML='<div style="font-size:40px;margin-bottom:16px">&#127964;</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;color:#fff;margin-bottom:8px">Thank you for your stay</div><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:24px;line-height:1.6">Your checkout time has passed.<br>We hope to welcome you back soon.</div><div style="font-size:12px;color:rgba(255,255,255,0.35)">Please return your key to reception.</div>';
   document.body.appendChild(overlay);
-  localStorage.setItem('arivo_guest_checked_out',JSON.stringify({room:state.room,name:state.name,time:new Date().toISOString()}));
 }
 function showCheckoutBanner(msg){document.getElementById('checkout-banner-text').textContent=msg;document.getElementById('checkout-banner').classList.add('show');}
 
