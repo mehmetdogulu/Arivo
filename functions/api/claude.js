@@ -1,17 +1,11 @@
 export async function onRequestPost(context) {
   try {
-    // Try multiple ways to access the API key
-    const apiKey = context.env.ANTHROPIC_API_KEY 
-                || context.env['ANTHROPIC_API_KEY']
-                || (typeof ANTHROPIC_API_KEY !== 'undefined' ? ANTHROPIC_API_KEY : null);
+    const apiKey = (context.env.ANTHROPIC_API_KEY || '').trim();
 
-    if (!apiKey) {
-      // Return debug info about what env vars are available
-      const envKeys = context.env ? Object.keys(context.env) : [];
+    if (!apiKey || apiKey.length < 10) {
       return new Response(JSON.stringify({ 
         error: 'API key not configured',
-        debug: 'Available env keys: ' + (envKeys.length ? envKeys.join(', ') : 'none'),
-        hasEnv: !!context.env
+        debug: 'Key length: ' + apiKey.length + ', starts with: ' + apiKey.slice(0,7)
       }), {
         status: 500,
         headers: { 
