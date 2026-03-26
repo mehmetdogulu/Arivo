@@ -808,65 +808,7 @@ var _lookupTimer=null;
 var _returningGuest=null;
 var _pendingLookupName=null; // queued if db not ready yet
 
-function debounceLookup(val){
-  clearTimeout(_lookupTimer);
-  var trimmed=val.trim();
-  var parts=trimmed.split(' ').filter(function(p){return p.length>0;});
-  if(parts.length<2){clearReturning();return;}
-  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},600);
-}
 
-function lookupGuestByName(name){
-  name=name.trim();
-  if(!name)return;
-  // If db not ready yet, queue and retry
-  if(!db){
-    _pendingLookupName=name;
-    setTimeout(function(){
-      if(_pendingLookupName===name)lookupGuestByName(name);
-    },400);
-    return;
-  }
-  _pendingLookupName=null;
-  db.from('guests').select('id,name,room,checkout_date,checked_out')
-    .eq('hotel_id',HOTEL_ID)
-    .eq('checked_out',false)
-    .ilike('name',name)
-    .then(function(r){
-      var guests=r.data||[];
-      // Exact case-insensitive match
-      var nameLower=name.toLowerCase();
-      var match=null;
-      for(var i=0;i<guests.length;i++){
-        if(guests[i].name.toLowerCase()===nameLower){match=guests[i];break;}
-      }
-      if(match){
-        showReturningGuest(match);
-      } else {
-        clearReturning();
-      }
-    }).catch(function(e){console.log('Lookup error:',e);clearReturning();});
-}
-
-function showReturningGuest(g){
-  _returningGuest=g;
-  guestId=g.id;
-  var coDate=g.checkout_date?new Date(g.checkout_date):null;
-  var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
-  document.getElementById('returning-info').innerHTML='<strong>Room '+g.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
-  document.getElementById('returning-card').style.display='block';
-  document.getElementById('new-guest-fields').style.display='none';
-  document.getElementById('reg-submit-btn').textContent='Continue →';
-}
-
-function clearReturning(){
-  _returningGuest=null;
-  guestId=null;
-  _pendingLookupName=null;
-  document.getElementById('returning-card').style.display='none';
-  document.getElementById('new-guest-fields').style.display='block';
-  document.getElementById('reg-submit-btn').textContent="Let's go";
-}
 function enterApp(){
   showScreen('screen-app');
   if(db){
