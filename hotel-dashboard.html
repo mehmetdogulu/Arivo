@@ -438,6 +438,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="fg"><label class="fl">Postcode</label><input class="fi" id="hotel-postcode" value="BA1 2LW" style="text-transform:uppercase" ></div>
     </div>
     <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="+44 1225 000123" ></div>
+    <div class="fg"><label class="fl">Checkout Time</label><input class="fi" id="hotel-checkout-time" type="time" value="11:00" style="max-width:160px"><div style="font-size:11px;color:var(--tx3);margin-top:4px;">Used for guest session expiry and checkout reminders</div></div>
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Room Manager</div><div class="ca" onclick="addRoom()">+ Add Room</div></div>
     <div id="roomlist">
@@ -1048,7 +1049,7 @@ function etaGuestMessage(taskTitle, mins) {
 // ── SETTINGS ──
 function loadSettings() {
   if (!db) return;
-  db.from('hotel_settings').select('rooms,logo_url,menu_url').eq('hotel_id', HOTEL_ID).single().then(function(rs) {
+  db.from('hotel_settings').select('rooms,logo_url,menu_url,checkout_time').eq('hotel_id', HOTEL_ID).single().then(function(rs) {
     if (!rs.data) return;
     if (rs.data.rooms && rs.data.rooms.length) {
       var list = document.getElementById('roomlist');
@@ -1067,6 +1068,7 @@ function loadSettings() {
     }
     if (rs.data.logo_url) { var prev = document.getElementById('logo-preview'); if (prev) prev.innerHTML = '<img src="' + rs.data.logo_url + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px">'; }
     if (rs.data.menu_url) { var lbl = document.getElementById('menu-upload-label'); if (lbl) lbl.textContent = 'Menu uploaded \u2714 Tap to replace'; }
+    if (rs.data.checkout_time) { var ctField = document.getElementById('hotel-checkout-time'); if (ctField) ctField.value = rs.data.checkout_time; }
   });
   loadHotelAddress();
   loadHotelInfo();
@@ -1095,11 +1097,12 @@ function saveHotelAddress() {
   var postcode  = document.getElementById('hotel-postcode')   ? document.getElementById('hotel-postcode').value.toUpperCase() : '';
   var phone     = document.getElementById('hotel-phone')      ? document.getElementById('hotel-phone').value      : '';
   var hotelName = document.getElementById('hotel-name-input') ? document.getElementById('hotel-name-input').value : 'The Maison Collective';
+  var checkoutTime = document.getElementById('hotel-checkout-time') ? document.getElementById('hotel-checkout-time').value : '11:00';
   if (!db) { toast('Not connected', 'err'); return; }
   var address = {name:hotelName, street:street, city:city, postcode:postcode, phone:phone};
-  db.from('hotel_settings').update({address: address}).eq('hotel_id', HOTEL_ID).then(function(r) {
+  db.from('hotel_settings').update({address: address, checkout_time: checkoutTime}).eq('hotel_id', HOTEL_ID).then(function(r) {
     if (r.error) { toast('Save failed', 'err'); return; }
-    toast('Address saved \u2014 AI will use new location');
+    toast('Settings saved \u2014 checkout time updated');
     var hn   = document.getElementById('hname');    if (hn)   hn.textContent = hotelName;
     var hloc = document.getElementById('hloc');
     if (hloc) { var rooms = document.querySelectorAll('#roomlist .irow').length; hloc.textContent = rooms + ' rooms \u00b7 ' + city + ', UK'; }
