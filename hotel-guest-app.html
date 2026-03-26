@@ -263,10 +263,26 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
   </div>
   <div class="reg-form">
     <div class="privacy-note">&#128274; Your details are used only for your stay and deleted 90 days after checkout.</div>
-    <div class="fg"><label class="fl">Your Name</label><input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" onblur="lookupGuestByName(this.value)"><div class="f-err" id="err-name">Please enter your name</div></div>
-    <div class="fg"><label class="fl">Room Number</label><select class="fi" id="reg-room"><option value="">Select your room...</option></select><div class="f-hint">Select the room shown on your key card</div><div class="f-err" id="err-room">Please select your room</div></div>
-    <div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="reg-checkout" type="date"><div class="f-err" id="err-checkout">Please select your check-out date</div></div>
-    <button class="btn-primary" onclick="submitReg()" style="margin-top:8px;">Let's go</button>
+    <div class="fg">
+      <label class="fl">Your Name</label>
+      <input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" oninput="debounceLookup(this.value)">
+      <div class="f-err" id="err-name">Please enter your name</div>
+    </div>
+
+    <!-- Returning guest confirmation card (hidden by default) -->
+    <div id="returning-card" style="display:none;background:rgba(30,58,47,0.08);border:1.5px solid rgba(30,58,47,0.25);border-radius:14px;padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--forest);font-weight:600;margin-bottom:8px;">&#127775; Welcome back!</div>
+      <div id="returning-info" style="font-size:14px;color:var(--charcoal);font-weight:500;line-height:1.6;"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Not you? <button onclick="clearReturning()" style="background:none;border:none;color:var(--gold);font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit;padding:0;">Enter details manually</button></div>
+    </div>
+
+    <!-- New guest fields (shown for first-time, hidden when returning guest found) -->
+    <div id="new-guest-fields">
+      <div class="fg"><label class="fl">Room Number</label><select class="fi" id="reg-room"><option value="">Select your room...</option></select><div class="f-hint">Select the room shown on your key card</div><div class="f-err" id="err-room">Please select your room</div></div>
+      <div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="reg-checkout" type="date"><div class="f-err" id="err-checkout">Please select your check-out date</div></div>
+    </div>
+
+    <button class="btn-primary" id="reg-submit-btn" onclick="submitReg()" style="margin-top:8px;">Let's go</button>
     <div style="text-align:center;margin-top:16px;"><button class="bypass-link" onclick="showScreen('screen-bypass')">Have a bypass code? Enter it here</button></div>
   </div>
 </div>
@@ -563,15 +579,45 @@ function markMessagesRead(){
 
 function submitReg(){
   var name=document.getElementById('reg-name').value.trim();
+  document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
+  if(!name){document.getElementById('err-name').classList.add('show');return;}
+
+  // RETURNING GUEST PATH: name matched existing guest in DB
+  if(_returningGuest){
+    var rg=_returningGuest;
+    var co=rg.checkout_date?rg.checkout_date.split('T')[0]:'';
+    state.name=rg.name;state.room=rg.room;state.checkout=co;
+    guestId=rg.id;
+    setGuestContext(rg.name,rg.room);
+    _returningGuest=null;
+    var d=new Date(co);
+    var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    var fn=rg.name.split(' ')[0];
+    document.getElementById('w-name').textContent=fn;
+    document.getElementById('w-room').textContent=rg.room;
+    document.getElementById('w-co').textContent='Checkout '+fmt;
+    document.getElementById('app-name').textContent=fn;
+    document.getElementById('app-room').textContent=rg.room;
+    document.getElementById('app-co').textContent='Out '+fmt;
+    document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
+    startCheckoutReminders(co);
+    sessionStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
+    localStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
+    subscribeToUpdates();
+    logEvent('guest_login','Returning guest logged in: '+rg.name+', Room '+rg.room,rg.name,rg.room);
+    showScreen('screen-welcome');
+    return;
+  }
+
+  // NEW GUEST PATH: require room + checkout date
   var roomSel=document.getElementById('reg-room');
   var room=roomSel.value;
   var co=document.getElementById('reg-checkout').value;
   var ok=true;
-  document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
-  if(!name){document.getElementById('err-name').classList.add('show');ok=false;}
   if(!room){document.getElementById('err-room').classList.add('show');ok=false;}
   if(!co){document.getElementById('err-checkout').classList.add('show');ok=false;}
   if(!ok)return;
+
   var totalRooms=JSON.parse(localStorage.getItem('arivo_hotel_rooms')||'[]').length||22;
   state.name=name;state.room=room;
   setGuestContext(name,room);state.checkout=co;
@@ -585,22 +631,10 @@ function submitReg(){
       if(sameGuest.length===0&&activeCount>=totalRooms){toast('Sorry — all rooms are currently occupied. Please contact reception.');state.registering=false;return;}
       if(sameGuest.length>0){
         var existingId=sameGuest[0].id;
-        // Fetch the DB checkout date - never overwrite it with what guest typed
-        db.from('guests').select('checkout_date').eq('id',existingId).single().then(function(dbGuest){
-          var dbDate = dbGuest.data && dbGuest.data.checkout_date ? dbGuest.data.checkout_date.split('T')[0] : co;
-          // Use DB date, update local state and session
-          state.checkout = dbDate;
-          var d2=new Date(dbDate);
-          var fmt2=d2.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-          document.getElementById('w-co').textContent='Checkout '+fmt2;
-          document.getElementById('app-co').textContent='Out '+fmt2;
-          sessionStorage.setItem('arivo_session',JSON.stringify({name:state.name,room:state.room,checkout:dbDate,guestId:existingId,ts:Date.now()}));
-          localStorage.setItem('arivo_session',JSON.stringify({name:state.name,room:state.room,checkout:dbDate,guestId:existingId,ts:Date.now()}));
-          startCheckoutReminders(dbDate);
+        db.from('guests').update({checkout_date:co,registered_at:new Date().toISOString()}).eq('id',existingId).then(function(){
           guestId=existingId;subscribeToUpdates();state.registering=false;
         });
       } else {
-        // FIX 2: Same room different name = soft warning only, not hard block
         var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room&&g.name.toLowerCase()!==name.toLowerCase();});
         if(sameRoom.length>0){toast('Room '+room+' may already be occupied. If this is your room, please continue.');}
         db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false}).select().then(function(result){
@@ -630,9 +664,6 @@ function submitReg(){
   localStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
   showScreen('screen-welcome');
 }
-
-var hotelSettings={};
-
 function restoreSession(){
   // Try sessionStorage first, fall back to localStorage for mobile refresh
   var saved = sessionStorage.getItem('arivo_session') || localStorage.getItem('arivo_session');
@@ -673,20 +704,42 @@ function restoreSession(){
   return true;
 }
 
-function lookupGuestByName(name){
-  name=name.trim();if(!name||!db)return;
-  db.from('guests').select('id,name,room,checkout_date').eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name).single().then(function(r){
-    if(r.data&&r.data.name.toLowerCase()===name.toLowerCase()){
-      var roomSel=document.getElementById('reg-room');
-      var coInput=document.getElementById('reg-checkout');
-      Array.from(roomSel.options).forEach(function(opt){if(opt.value===r.data.room){roomSel.value=r.data.room;}});
-      if(r.data.checkout_date&&coInput)coInput.value=r.data.checkout_date.split('T')[0];
-      guestId=r.data.id;
-      toast('Welcome back! Your room has been pre-filled.');
-    }
-  });
+var _lookupTimer=null;
+var _returningGuest=null;
+
+function debounceLookup(val){
+  clearTimeout(_lookupTimer);
+  var trimmed=val.trim();
+  if(trimmed.length<2){clearReturning();return;}
+  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},500);
 }
 
+function lookupGuestByName(name){
+  name=name.trim();
+  if(!name||!db)return;
+  db.from('guests').select('id,name,room,checkout_date,checked_out').eq('hotel_id',HOTEL_ID).ilike('name',name).single().then(function(r){
+    if(r.data&&r.data.name.toLowerCase()===name.toLowerCase()&&r.data.checked_out===false){
+      _returningGuest=r.data;
+      var coDate=r.data.checkout_date?new Date(r.data.checkout_date):null;
+      var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
+      document.getElementById('returning-info').innerHTML='<strong>Room '+r.data.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
+      document.getElementById('returning-card').style.display='block';
+      document.getElementById('new-guest-fields').style.display='none';
+      document.getElementById('reg-submit-btn').textContent='Continue →';
+      guestId=r.data.id;
+    } else {
+      clearReturning();
+    }
+  }).catch(function(){clearReturning();});
+}
+
+function clearReturning(){
+  _returningGuest=null;
+  guestId=null;
+  document.getElementById('returning-card').style.display='none';
+  document.getElementById('new-guest-fields').style.display='block';
+  document.getElementById('reg-submit-btn').textContent="Let's go";
+}
 function enterApp(){
   showScreen('screen-app');
   if(db){
