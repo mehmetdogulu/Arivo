@@ -577,6 +577,30 @@ function markMessagesRead(){
   logEvent('messages_read','Guest opened Messages tab',state.name,state.room);
 }
 
+function enterAsReturningGuest(rg){
+  var co=rg.checkout_date?rg.checkout_date.split('T')[0]:'';
+  state.name=rg.name;state.room=rg.room;state.checkout=co;
+  guestId=rg.id;
+  setGuestContext(rg.name,rg.room);
+  _returningGuest=null;
+  var d=new Date(co);
+  var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  var fn=rg.name.split(' ')[0];
+  document.getElementById('w-name').textContent=fn;
+  document.getElementById('w-room').textContent=rg.room;
+  document.getElementById('w-co').textContent='Checkout '+fmt;
+  document.getElementById('app-name').textContent=fn;
+  document.getElementById('app-room').textContent=rg.room;
+  document.getElementById('app-co').textContent='Out '+fmt;
+  document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
+  startCheckoutReminders(co);
+  sessionStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
+  localStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
+  subscribeToUpdates();
+  logEvent('guest_login','Returning guest logged in: '+rg.name+', Room '+rg.room,rg.name,rg.room);
+  showScreen('screen-welcome');
+}
+
 function submitReg(){
   var name=document.getElementById('reg-name').value.trim();
   document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
@@ -590,42 +614,46 @@ function submitReg(){
     return;
   }
 
-  // RETURNING GUEST PATH: name matched existing guest in DB
+  // RETURNING GUEST PATH: either pre-matched by lookup, or do sync check now
   if(_returningGuest){
-    var rg=_returningGuest;
-    var co=rg.checkout_date?rg.checkout_date.split('T')[0]:'';
-    state.name=rg.name;state.room=rg.room;state.checkout=co;
-    guestId=rg.id;
-    setGuestContext(rg.name,rg.room);
-    _returningGuest=null;
-    var d=new Date(co);
-    var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    var fn=rg.name.split(' ')[0];
-    document.getElementById('w-name').textContent=fn;
-    document.getElementById('w-room').textContent=rg.room;
-    document.getElementById('w-co').textContent='Checkout '+fmt;
-    document.getElementById('app-name').textContent=fn;
-    document.getElementById('app-room').textContent=rg.room;
-    document.getElementById('app-co').textContent='Out '+fmt;
-    document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
-    startCheckoutReminders(co);
-    sessionStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
-    localStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
-    subscribeToUpdates();
-    logEvent('guest_login','Returning guest logged in: '+rg.name+', Room '+rg.room,rg.name,rg.room);
-    showScreen('screen-welcome');
+    enterAsReturningGuest(_returningGuest);
+    return;
+  }
+  // If lookup hasn't resolved yet (guest tapped submit quickly), check DB now
+  if(db && nameParts.length>=2){
+    var btn=document.getElementById('reg-submit-btn');
+    btn.textContent='Checking...';btn.disabled=true;
+    db.from('guests').select('id,name,room,checkout_date,checked_out')
+      .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
+      .then(function(r){
+        btn.disabled=false;
+        var guests=r.data||[];
+        var nameLower=name.toLowerCase();
+        var match=null;
+        for(var i=0;i<guests.length;i++){if(guests[i].name.toLowerCase()===nameLower){match=guests[i];break;}}
+        if(match){
+          enterAsReturningGuest(match);
+        } else {
+          btn.textContent="Let's go";
+          proceedAsNewGuest(name);
+        }
+      }).catch(function(){btn.disabled=false;btn.textContent="Let's go";proceedAsNewGuest(name);});
     return;
   }
 
-  // NEW GUEST PATH: require room + checkout date
+  // NEW GUEST PATH
+  proceedAsNewGuest(name);
+}
+
+function proceedAsNewGuest(name){
   var roomSel=document.getElementById('reg-room');
   var room=roomSel.value;
   var co=document.getElementById('reg-checkout').value;
   var ok=true;
+  document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
   if(!room){document.getElementById('err-room').classList.add('show');ok=false;}
   if(!co){document.getElementById('err-checkout').classList.add('show');ok=false;}
   if(!ok)return;
-
   var totalRooms=JSON.parse(localStorage.getItem('arivo_hotel_rooms')||'[]').length||22;
   state.name=name;state.room=room;
   setGuestContext(name,room);state.checkout=co;
@@ -643,8 +671,6 @@ function submitReg(){
           guestId=existingId;subscribeToUpdates();state.registering=false;
         });
       } else {
-        var sameRoom=(allGuests.data||[]).filter(function(g){return g.room===room&&g.name.toLowerCase()!==name.toLowerCase();});
-        if(sameRoom.length>0){toast('Room '+room+' may already be occupied. If this is your room, please continue.');}
         db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false}).select().then(function(result){
           if(result.data&&result.data[0]){
             guestId=result.data[0].id;subscribeToUpdates();
@@ -665,13 +691,15 @@ function submitReg(){
   document.getElementById('app-name').textContent=fn;
   document.getElementById('app-room').textContent=room;
   document.getElementById('app-co').textContent='Out '+fmt;
-  document.getElementById('chat-greeting').textContent='Hello '+fn+'! I am your personal concierge for The Maison. How can I make your stay even better?';
+  document.getElementById('chat-greeting').textContent='Hello '+fn+'! I am your personal concierge. How can I make your stay even better?';
   startCheckoutReminders(co);
   logEvent('guest_register','Guest registered: '+name+', Room '+room+', Checkout '+co,name,room);
   sessionStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
   localStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
   showScreen('screen-welcome');
 }
+
+
 function restoreSession(){
   // Try sessionStorage first, fall back to localStorage for mobile refresh
   var saved = sessionStorage.getItem('arivo_session') || localStorage.getItem('arivo_session');
@@ -714,55 +742,63 @@ function restoreSession(){
 
 var _lookupTimer=null;
 var _returningGuest=null;
+var _pendingLookupName=null; // queued if db not ready yet
 
 function debounceLookup(val){
   clearTimeout(_lookupTimer);
   var trimmed=val.trim();
-  // Need at least 2 words typed before attempting lookup
-  var parts=trimmed.split(/\s+/).filter(function(p){return p.length>0;});
+  var parts=trimmed.split(' ').filter(function(p){return p.length>0;});
   if(parts.length<2){clearReturning();return;}
-  // Wait 800ms after user stops typing
-  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},800);
+  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},600);
 }
 
 function lookupGuestByName(name){
   name=name.trim();
-  if(!name||!db)return;
-  // Search using ilike wildcard so partial surname matches work
+  if(!name)return;
+  // If db not ready yet, queue and retry
+  if(!db){
+    _pendingLookupName=name;
+    setTimeout(function(){
+      if(_pendingLookupName===name)lookupGuestByName(name);
+    },400);
+    return;
+  }
+  _pendingLookupName=null;
   db.from('guests').select('id,name,room,checkout_date,checked_out')
     .eq('hotel_id',HOTEL_ID)
-    .ilike('name','%'+name+'%')
     .eq('checked_out',false)
-    .limit(5)
+    .ilike('name',name)
     .then(function(r){
-      if(!r.data||r.data.length===0){clearReturning();return;}
-      // Find best match: exact match first, then startsWith
+      var guests=r.data||[];
+      // Exact case-insensitive match
       var nameLower=name.toLowerCase();
-      var exact=r.data.filter(function(g){return g.name.toLowerCase()===nameLower;});
-      var match=exact.length>0?exact[0]:null;
-      // Also accept if typed name is a prefix of the stored name (handles middle names etc)
-      if(!match){
-        var prefix=r.data.filter(function(g){return g.name.toLowerCase().startsWith(nameLower);});
-        match=prefix.length>0?prefix[0]:null;
+      var match=null;
+      for(var i=0;i<guests.length;i++){
+        if(guests[i].name.toLowerCase()===nameLower){match=guests[i];break;}
       }
       if(match){
-        _returningGuest=match;
-        var coDate=match.checkout_date?new Date(match.checkout_date):null;
-        var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
-        document.getElementById('returning-info').innerHTML='<strong>Room '+match.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
-        document.getElementById('returning-card').style.display='block';
-        document.getElementById('new-guest-fields').style.display='none';
-        document.getElementById('reg-submit-btn').textContent='Continue →';
-        guestId=match.id;
+        showReturningGuest(match);
       } else {
         clearReturning();
       }
-    }).catch(function(){clearReturning();});
+    }).catch(function(e){console.log('Lookup error:',e);clearReturning();});
+}
+
+function showReturningGuest(g){
+  _returningGuest=g;
+  guestId=g.id;
+  var coDate=g.checkout_date?new Date(g.checkout_date):null;
+  var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
+  document.getElementById('returning-info').innerHTML='<strong>Room '+g.room+'</strong> &nbsp;&middot;&nbsp; Checkout '+coFmt;
+  document.getElementById('returning-card').style.display='block';
+  document.getElementById('new-guest-fields').style.display='none';
+  document.getElementById('reg-submit-btn').textContent='Continue →';
 }
 
 function clearReturning(){
   _returningGuest=null;
   guestId=null;
+  _pendingLookupName=null;
   document.getElementById('returning-card').style.display='none';
   document.getElementById('new-guest-fields').style.display='block';
   document.getElementById('reg-submit-btn').textContent="Let's go";
