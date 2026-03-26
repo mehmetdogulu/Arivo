@@ -1,10 +1,23 @@
 export async function onRequestPost(context) {
   try {
-    const apiKey = context.env.ANTHROPIC_API_KEY;
+    // Try multiple ways to access the API key
+    const apiKey = context.env.ANTHROPIC_API_KEY 
+                || context.env['ANTHROPIC_API_KEY']
+                || (typeof ANTHROPIC_API_KEY !== 'undefined' ? ANTHROPIC_API_KEY : null);
+
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'API key not configured' }), {
+      // Return debug info about what env vars are available
+      const envKeys = context.env ? Object.keys(context.env) : [];
+      return new Response(JSON.stringify({ 
+        error: 'API key not configured',
+        debug: 'Available env keys: ' + (envKeys.length ? envKeys.join(', ') : 'none'),
+        hasEnv: !!context.env
+      }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
       });
     }
 
@@ -33,7 +46,10 @@ export async function onRequestPost(context) {
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
   }
 }
