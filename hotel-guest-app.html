@@ -796,17 +796,16 @@ function viewInMessages(){document.getElementById('notif-banner-overlay').classL
 function loadMessagesFromSupabase(){
   if(!db)return;
   function fetchAndRender(id){
-    Promise.all([
-      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id').eq('hotel_id',HOTEL_ID).eq('guest_id',id).order('created_at',{ascending:true}).limit(100),
-      db.from('messages').select('id,body,created_at,sender_name,direction,guest_id').eq('hotel_id',HOTEL_ID).eq('direction','hotel_to_guest').is('guest_id',null).order('created_at',{ascending:true}).limit(50)
-    ]).then(function(results){
-      var msgs=[];
-      if(results[0].data)msgs=msgs.concat(results[0].data);
-      if(results[1].data)msgs=msgs.concat(results[1].data);
-      var seen={};msgs=msgs.filter(function(m){if(seen[m.id])return false;seen[m.id]=true;return true;});
-      msgs.sort(function(a,b){return new Date(a.created_at)-new Date(b.created_at);});
-      renderChatThread(msgs);
-    });
+    // Only fetch messages addressed to THIS guest - no broadcasts
+    db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+      .eq('hotel_id',HOTEL_ID)
+      .eq('guest_id',id)
+      .order('created_at',{ascending:true})
+      .limit(100)
+      .then(function(result){
+        var msgs = result.data || [];
+        renderChatThread(msgs);
+      });
   }
   if(guestId){fetchAndRender(guestId);}
   else if(state.name&&state.room){
@@ -1086,9 +1085,7 @@ function subscribeToUpdates(){
   db.channel('guest-messages-'+guestId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'guest_id=eq.'+guestId},function(payload){
     if(payload.new.direction==='hotel_to_guest'){showHotelMessage(payload.new.body);incrementMsgBadge();if(_activeTab==='messages')loadMessagesFromSupabase();}
   }).subscribe();
-  db.channel('guest-broadcast-'+HOTEL_ID).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
-    if(payload.new.direction==='hotel_to_guest'&&!payload.new.guest_id){showHotelMessage(payload.new.body);incrementMsgBadge();if(_activeTab==='messages')loadMessagesFromSupabase();}
-  }).subscribe();
+  // Broadcast channel removed - all messages now addressed to specific guests by guest_id
   db.channel('guest-sessions-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:'guest_id=eq.'+guestId},function(payload){if(payload.new.killed)expireGuestSession();}).subscribe();
   db.channel('guest-requests-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'requests',filter:'guest_id=eq.'+guestId},function(payload){updateRequestStatus(payload.new.id,payload.new.status,null);}).subscribe();
 }
