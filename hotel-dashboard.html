@@ -1236,10 +1236,19 @@ function loadTpl(t) {
 // ── SESSIONS ──
 function killSess(n, guestId) {
   if (!confirm('Kill session for ' + n + '?')) return;
-  var payload = JSON.stringify({type:'kill', name:n, time:Date.now()});
-  localStorage.setItem('arivo_dashboard_to_guest', payload);
-  window.dispatchEvent(new StorageEvent('storage', {key:'arivo_dashboard_to_guest', newValue:payload}));
-  if (db && guestId) db.from('guests').update({checked_out:true}).eq('id', guestId).then(function() { loadGuests(); });
+  if (!db || !guestId) { toast('Cannot kill session - not connected', 'err'); return; }
+  // Mark guest as checked out in Supabase
+  db.from('guests').update({checked_out:true}).eq('id', guestId).then(function(r) {
+    if (r.error) { toast('Error: ' + r.error.message, 'err'); return; }
+    loadGuests();
+  });
+  // Insert/upsert into sessions table so real-time fires only for THIS guest
+  db.from('sessions').upsert({
+    guest_id: guestId,
+    hotel_id: HOTEL_ID,
+    killed: true,
+    killed_at: new Date().toISOString()
+  }, {onConflict: 'guest_id'}).then(function(){});
   toast('Session killed for ' + n);
   logEvent('session_kill', 'Session killed: ' + n, 'Manager', '-');
 }
