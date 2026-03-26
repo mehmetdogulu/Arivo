@@ -265,7 +265,7 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
     <div class="privacy-note">&#128274; Your details are used only for your stay and deleted 90 days after checkout.</div>
     <div class="fg">
       <label class="fl">Your Name</label>
-      <input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" oninput="debounceLookup(this.value)" onblur="debounceLookup(this.value)">
+      <input class="fi" id="reg-name" type="text" placeholder="e.g. Sarah Chen" autocomplete="name" oninput="debounceLookup(this.value)">
       <div class="f-err" id="err-name">Please enter your name</div>
     </div>
 
@@ -578,6 +578,28 @@ function markMessagesRead(){
 }
 
 
+function lookupAndEnter(name,btn){
+  if(!db){setTimeout(function(){lookupAndEnter(name,btn);},300);return;}
+  db.from('guests').select('id,name,room,checkout_date,checked_out')
+    .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
+    .then(function(r){
+      if(btn){btn.disabled=false;btn.textContent='Continue →';}
+      var guests=r.data||[];
+      var nl=name.toLowerCase();
+      var match=null;
+      for(var i=0;i<guests.length;i++){if(guests[i].name.toLowerCase()===nl){match=guests[i];break;}}
+      if(match){
+        doEnterReturning(match);
+      } else {
+        clearReturning();
+        if(btn){btn.textContent="Let's go";}
+      }
+    }).catch(function(){
+      if(btn){btn.disabled=false;btn.textContent="Let's go";}
+      clearReturning();
+    });
+}
+
 function submitReg(){
   var name=document.getElementById('reg-name').value.trim();
   // Clear errors
@@ -599,6 +621,13 @@ function submitReg(){
   // If returning guest already identified by lookup — go straight in
   if(_returningGuest){
     doEnterReturning(_returningGuest);
+    return;
+  }
+  // Card visible but _returningGuest was cleared (race with onblur) — re-fetch by name
+  if(document.getElementById('returning-card').style.display!=='none'){
+    var btn=document.getElementById('reg-submit-btn');
+    btn.textContent='One moment...';btn.disabled=true;
+    lookupAndEnter(name,btn);
     return;
   }
   // New guest — validate room and checkout
