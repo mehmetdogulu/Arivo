@@ -187,21 +187,140 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 The anon key is a public key governed by Supabase RLS (Row Level Security) policies — it is intentionally embedded in client code.
 
-### Key Database Tables (inferred)
+### Key Database Tables
 
-| Table | Key Columns |
-|---|---|
-| `hotels` | id, name, location, rooms, settings |
-| `guests` | id, name, email, phone, room_number, hotel_id, check_in_date, check_out_date, consent_given |
-| `requests` | id, guest_id, type, status, priority, description, created_at, completed_at |
-| `staff` | id, name, email, hotel_id, role, avatar, status |
-| `messages` | id, guest_id, content, role, created_at, session_id |
-| `audit_logs` | id, action, user_id, resource, timestamp |
+**`hotels`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `name` | TEXT | |
+| `slug` | TEXT | URL-safe identifier |
+| `address` | TEXT | |
+| `city` | TEXT | |
+| `postcode` | TEXT | |
+| `country` | TEXT | |
+| `phone` | TEXT | |
+| `email` | TEXT | |
+| `whatsapp` | TEXT | |
+| `logo_url` | TEXT | |
+| `plan` | TEXT | Subscription plan |
+| `status` | TEXT | |
+| `created_at` | TIMESTAMPTZ | |
 
-Request statuses: `new`, `pending`, `in-progress`, `completed`
-Request types: `service`, `dining`, `concierge`
-Staff roles: `staff`, `manager`, `admin`
-Message roles: `guest`, `concierge`, `system`
+**`hotel_settings`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `rooms` | TEXT[] | Array of room identifiers |
+| `updated_at` | TIMESTAMPTZ | |
+| `address` | JSONB | Structured address fields |
+| `logo_url` | TEXT | |
+| `menu_url` | TEXT | Link to dining menu |
+| `hotel_info` | JSONB | General hotel information blob |
+| `manager_name` | TEXT | |
+| `manager_email` | TEXT | |
+| `checkout_time` | TEXT | e.g. "11:00" |
+
+**`guests`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `name` | TEXT | |
+| `room` | TEXT | Room number/identifier |
+| `checkout_date` | DATE | |
+| `registered_at` | TIMESTAMPTZ | |
+| `checked_out` | BOOL | |
+| `checked_out_at` | TIMESTAMPTZ | |
+| `source` | TEXT | e.g. `qr`, `staff`, `onboarding` |
+
+**`requests`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `type` | TEXT | e.g. `service`, `dining`, `concierge` |
+| `detail` | TEXT | Request description |
+| `photo_url` | TEXT | Optional photo attachment |
+| `status` | TEXT | `new`, `in-progress`, `completed` |
+| `claimed_by` | UUID | FK → staff.id |
+| `claimed_at` | TIMESTAMPTZ | |
+| `completed_at` | TIMESTAMPTZ | |
+| `eta_minutes` | INT4 | Estimated completion time |
+| `created_at` | TIMESTAMPTZ | |
+| `due_at` | TIMESTAMPTZ | Deadline |
+
+**`messages`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `guest_id` | UUID | FK → guests |
+| `direction` | TEXT | `inbound` (guest) or `outbound` (staff/AI) |
+| `sender_name` | TEXT | |
+| `body` | TEXT | Message content |
+| `read` | BOOL | |
+| `read_at` | TIMESTAMPTZ | |
+| `created_at` | TIMESTAMPTZ | |
+
+**`ratings`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `guest_id` | UUID | FK → guests |
+| `stars` | INT4 | 1–5 star rating |
+| `priority_alert` | BOOL | Flag low ratings for manager attention |
+| `created_at` | TIMESTAMPTZ | |
+
+**`staff`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `name` | TEXT | |
+| `role` | TEXT | `staff`, `manager`, `admin` |
+| `email` | TEXT | |
+| `password_hash` | TEXT | Hashed — never expose in client |
+| `active` | BOOL | |
+| `created_at` | TIMESTAMPTZ | |
+
+**`activity_log`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `action` | TEXT | Action type |
+| `detail` | TEXT | Human-readable description |
+| `user_name` | TEXT | Who performed the action |
+| `room` | TEXT | Affected room (if applicable) |
+| `source` | TEXT | e.g. `staff`, `guest`, `system` |
+| `created_at` | TIMESTAMPTZ | |
+
+**`sessions`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `guest_id` | UUID | FK → guests |
+| `bypass_code` | TEXT | Short-lived access code |
+| `bypass_expires_at` | TIMESTAMPTZ | |
+| `killed` | BOOL | Session invalidated flag |
+| `killed_at` | TIMESTAMPTZ | |
+| `created_at` | TIMESTAMPTZ | |
+
+**`local_places`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `name` | TEXT | Place name |
+| `category` | TEXT | e.g. `restaurant`, `attraction`, `transport` |
+| `detail` | TEXT | Description or tips |
+| `emoji` | TEXT | Display emoji |
+| `source` | TEXT | e.g. `staff`, `ai` |
+| `created_at` | TIMESTAMPTZ | |
 
 ---
 
