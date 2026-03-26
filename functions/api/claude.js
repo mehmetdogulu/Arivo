@@ -2,16 +2,10 @@ export async function onRequestPost(context) {
   try {
     const apiKey = (context.env.ANTHROPIC_API_KEY || '').trim();
 
-    if (!apiKey || apiKey.length < 10) {
-      return new Response(JSON.stringify({ 
-        error: 'API key not configured',
-        debug: 'Key length: ' + apiKey.length + ', starts with: ' + apiKey.slice(0,7)
-      }), {
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
         status: 500,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
@@ -31,19 +25,13 @@ export async function onRequestPost(context) {
 
     return new Response(JSON.stringify(data), {
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
 
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 }
