@@ -577,111 +577,104 @@ function markMessagesRead(){
   logEvent('messages_read','Guest opened Messages tab',state.name,state.room);
 }
 
-function enterAsReturningGuest(rg){
-  var co=rg.checkout_date?rg.checkout_date.split('T')[0]:'';
-  state.name=rg.name;state.room=rg.room;state.checkout=co;
-  guestId=rg.id;
-  setGuestContext(rg.name,rg.room);
-  _returningGuest=null;
-  var d=new Date(co);
-  var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  var fn=rg.name.split(' ')[0];
-  document.getElementById('w-name').textContent=fn;
-  document.getElementById('w-room').textContent=rg.room;
-  document.getElementById('w-co').textContent='Checkout '+fmt;
-  document.getElementById('app-name').textContent=fn;
-  document.getElementById('app-room').textContent=rg.room;
-  document.getElementById('app-co').textContent='Out '+fmt;
-  document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
-  startCheckoutReminders(co);
-  sessionStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
-  localStorage.setItem('arivo_session',JSON.stringify({name:rg.name,room:rg.room,checkout:co,guestId:guestId,ts:Date.now()}));
-  subscribeToUpdates();
-  logEvent('guest_login','Returning guest logged in: '+rg.name+', Room '+rg.room,rg.name,rg.room);
-  showScreen('screen-welcome');
-}
 
 function submitReg(){
   var name=document.getElementById('reg-name').value.trim();
-  document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
-  if(!name){document.getElementById('err-name').classList.add('show');return;}
-  // Full name required: must have at least first name + surname
+  // Clear errors
+  document.querySelectorAll('.f-err').forEach(function(e){
+    e.classList.remove('show');
+    e.textContent=e.id==='err-name'?'Please enter your name':e.textContent;
+  });
+  // Require full name (first + last)
+  if(!name){
+    document.getElementById('err-name').classList.add('show');
+    return;
+  }
   var nameParts=name.split(/\s+/).filter(function(p){return p.length>0;});
   if(nameParts.length<2){
-    var errEl=document.getElementById('err-name');
-    errEl.textContent='Please enter your full name (first and last name)';
-    errEl.classList.add('show');
+    document.getElementById('err-name').textContent='Please enter your full name (first and last name)';
+    document.getElementById('err-name').classList.add('show');
     return;
   }
-
-  // RETURNING GUEST PATH: either pre-matched by lookup, or do sync check now
+  // If returning guest already identified by lookup — go straight in
   if(_returningGuest){
-    enterAsReturningGuest(_returningGuest);
+    doEnterReturning(_returningGuest);
     return;
   }
-  // If lookup hasn't resolved yet (guest tapped submit quickly), check DB now
-  if(db && nameParts.length>=2){
-    var btn=document.getElementById('reg-submit-btn');
-    btn.textContent='Checking...';btn.disabled=true;
-    db.from('guests').select('id,name,room,checkout_date,checked_out')
-      .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
-      .then(function(r){
-        btn.disabled=false;
-        var guests=r.data||[];
-        var nameLower=name.toLowerCase();
-        var match=null;
-        for(var i=0;i<guests.length;i++){if(guests[i].name.toLowerCase()===nameLower){match=guests[i];break;}}
-        if(match){
-          enterAsReturningGuest(match);
-        } else {
-          btn.textContent="Let's go";
-          proceedAsNewGuest(name);
-        }
-      }).catch(function(){btn.disabled=false;btn.textContent="Let's go";proceedAsNewGuest(name);});
-    return;
-  }
-
-  // NEW GUEST PATH
-  proceedAsNewGuest(name);
-}
-
-function proceedAsNewGuest(name){
-  var roomSel=document.getElementById('reg-room');
-  var room=roomSel.value;
+  // New guest — validate room and checkout
+  var room=document.getElementById('reg-room').value;
   var co=document.getElementById('reg-checkout').value;
   var ok=true;
-  document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
   if(!room){document.getElementById('err-room').classList.add('show');ok=false;}
   if(!co){document.getElementById('err-checkout').classList.add('show');ok=false;}
   if(!ok)return;
-  var totalRooms=JSON.parse(localStorage.getItem('arivo_hotel_rooms')||'[]').length||22;
-  state.name=name;state.room=room;
-  setGuestContext(name,room);state.checkout=co;
-  if(state.registering)return;
-  state.registering=true;
-  setTimeout(function(){
-    if(!db){state.registering=false;return;}
-    db.from('guests').select('id,name,room').eq('hotel_id',HOTEL_ID).eq('checked_out',false).then(function(allGuests){
-      var activeCount=(allGuests.data||[]).length;
-      var sameGuest=(allGuests.data||[]).filter(function(g){return g.name.toLowerCase()===name.toLowerCase()&&g.room===room;});
-      if(sameGuest.length===0&&activeCount>=totalRooms){toast('Sorry — all rooms are currently occupied. Please contact reception.');state.registering=false;return;}
-      if(sameGuest.length>0){
-        var existingId=sameGuest[0].id;
-        db.from('guests').update({checkout_date:co,registered_at:new Date().toISOString()}).eq('id',existingId).then(function(){
-          guestId=existingId;subscribeToUpdates();state.registering=false;
+  // Insert new guest and proceed
+  doRegisterNewGuest(name,room,co);
+}
+
+function doEnterReturning(rg){
+  var co=rg.checkout_date?rg.checkout_date.split('T')[0]:'';
+  guestId=rg.id;
+  state.name=rg.name;state.room=rg.room;state.checkout=co;
+  setGuestContext(rg.name,rg.room);
+  _returningGuest=null;
+  setWelcomeUI(rg.name,rg.room,co);
+  startCheckoutReminders(co);
+  saveSession(rg.name,rg.room,co,rg.id);
+  subscribeToUpdates();
+  logEvent('guest_login','Returning guest: '+rg.name+', Room '+rg.room,rg.name,rg.room);
+  showScreen('screen-welcome');
+}
+
+function doRegisterNewGuest(name,room,co){
+  state.name=name;state.room=room;state.checkout=co;
+  setGuestContext(name,room);
+  setWelcomeUI(name,room,co);
+  startCheckoutReminders(co);
+  saveSession(name,room,co,null);
+  showScreen('screen-welcome');
+  // Insert to DB in background
+  if(!db){setTimeout(function(){doRegisterNewGuest_db(name,room,co);},500);return;}
+  doRegisterNewGuest_db(name,room,co);
+}
+
+function doRegisterNewGuest_db(name,room,co){
+  if(!db){setTimeout(function(){doRegisterNewGuest_db(name,room,co);},500);return;}
+  db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
+    .ilike('name',name).eq('room',room).single()
+    .then(function(r){
+      if(r.data&&r.data.id){
+        // Already exists - just update
+        guestId=r.data.id;
+        db.from('guests').update({checkout_date:co,registered_at:new Date().toISOString()}).eq('id',guestId).then(function(){
+          saveSession(name,room,co,guestId);
+          subscribeToUpdates();
         });
       } else {
-        db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false}).select().then(function(result){
-          if(result.data&&result.data[0]){
-            guestId=result.data[0].id;subscribeToUpdates();
-            var sess=JSON.parse(sessionStorage.getItem('arivo_session')||'{}');
-            if(sess.name){sess.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(sess));localStorage.setItem('arivo_session',JSON.stringify(sess));}
-          }
-          state.registering=false;
-        });
+        db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false})
+          .select().then(function(result){
+            if(result.data&&result.data[0]){
+              guestId=result.data[0].id;
+              saveSession(name,room,co,guestId);
+              subscribeToUpdates();
+            }
+          });
       }
+      logEvent('guest_register','New guest: '+name+', Room '+room+', Checkout '+co,name,room);
+    }).catch(function(){
+      // If query fails just insert fresh
+      db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false})
+        .select().then(function(result){
+          if(result.data&&result.data[0]){
+            guestId=result.data[0].id;
+            saveSession(name,room,co,guestId);
+            subscribeToUpdates();
+          }
+        });
     });
-  },0);
+}
+
+function setWelcomeUI(name,room,co){
   var d=new Date(co);
   var fmt=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   var fn=name.split(' ')[0];
@@ -691,12 +684,54 @@ function proceedAsNewGuest(name){
   document.getElementById('app-name').textContent=fn;
   document.getElementById('app-room').textContent=room;
   document.getElementById('app-co').textContent='Out '+fmt;
-  document.getElementById('chat-greeting').textContent='Hello '+fn+'! I am your personal concierge. How can I make your stay even better?';
-  startCheckoutReminders(co);
-  logEvent('guest_register','Guest registered: '+name+', Room '+room+', Checkout '+co,name,room);
-  sessionStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
-  localStorage.setItem('arivo_session',JSON.stringify({name:name,room:room,checkout:co,guestId:guestId,ts:Date.now()}));
-  showScreen('screen-welcome');
+  document.getElementById('chat-greeting').textContent='Hello '+fn+'! How can I make your stay even better?';
+}
+
+function saveSession(name,room,co,id){
+  var sess={name:name,room:room,checkout:co,guestId:id,ts:Date.now()};
+  sessionStorage.setItem('arivo_session',JSON.stringify(sess));
+  localStorage.setItem('arivo_session',JSON.stringify(sess));
+}
+
+var _lookupTimer=null;
+var _returningGuest=null;
+
+function debounceLookup(val){
+  clearTimeout(_lookupTimer);
+  var trimmed=val.trim();
+  var parts=trimmed.split(' ').filter(function(p){return p.length>0;});
+  if(parts.length<2){clearReturning();return;}
+  _lookupTimer=setTimeout(function(){lookupGuestByName(trimmed);},700);
+}
+
+function lookupGuestByName(name){
+  if(!db){setTimeout(function(){lookupGuestByName(name);},400);return;}
+  db.from('guests').select('id,name,room,checkout_date,checked_out')
+    .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
+    .then(function(r){
+      var guests=r.data||[];
+      var nl=name.toLowerCase();
+      var match=null;
+      for(var i=0;i<guests.length;i++){if(guests[i].name.toLowerCase()===nl){match=guests[i];break;}}
+      if(match){
+        _returningGuest=match;
+        var coDate=match.checkout_date?new Date(match.checkout_date):null;
+        var coFmt=coDate?coDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'TBC';
+        document.getElementById('returning-info').innerHTML='<strong>Room '+match.room+'</strong>&nbsp;&middot;&nbsp;Checkout '+coFmt;
+        document.getElementById('returning-card').style.display='block';
+        document.getElementById('new-guest-fields').style.display='none';
+        document.getElementById('reg-submit-btn').textContent='Continue →';
+      } else {
+        clearReturning();
+      }
+    }).catch(function(){clearReturning();});
+}
+
+function clearReturning(){
+  _returningGuest=null;
+  document.getElementById('returning-card').style.display='none';
+  document.getElementById('new-guest-fields').style.display='block';
+  document.getElementById('reg-submit-btn').textContent="Let's go";
 }
 
 
