@@ -581,6 +581,14 @@ function submitReg(){
   var name=document.getElementById('reg-name').value.trim();
   document.querySelectorAll('.f-err').forEach(function(e){e.classList.remove('show');});
   if(!name){document.getElementById('err-name').classList.add('show');return;}
+  // Full name required: must have at least first name + surname
+  var nameParts=name.split(/\s+/).filter(function(p){return p.length>0;});
+  if(nameParts.length<2){
+    var errEl=document.getElementById('err-name');
+    errEl.textContent='Please enter your full name (first and last name)';
+    errEl.classList.add('show');
+    return;
+  }
 
   // RETURNING GUEST PATH: name matched existing guest in DB
   if(_returningGuest){
@@ -805,12 +813,13 @@ function startCheckoutReminders(coDateStr){
   var msUntilCheckout=coDate.getTime()-now.getTime();
   var msUntil2hr=msUntilCheckout-2*60*60*1000;
   var msUntil1hr=msUntilCheckout-1*60*60*1000;
-  var msUntilExpiry=msUntilCheckout+60*60*1000; // 1hr grace after checkout
   var checkoutDisplay=checkoutTimeStr;
   if(msUntil2hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 2 hours ('+checkoutDisplay+'). Please ensure your belongings are ready.');showHotelMessage('Friendly reminder: your checkout is in 2 hours at '+checkoutDisplay+'. We hope you have had a wonderful stay!');},msUntil2hr);
   if(msUntil1hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 1 hour ('+checkoutDisplay+'). Please drop your key at reception.');showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');},msUntil1hr);
-  if(msUntilExpiry>0){
-    setTimeout(function(){expireGuestSession();},msUntilExpiry);
+  // Expire exactly at checkout time (no grace period)
+  var msUntilExact=msUntilCheckout;
+  if(msUntilExact>0){
+    setTimeout(function(){expireGuestSession();},msUntilExact);
   } else {
     // Checkout time already passed - expire immediately
     expireGuestSession();
