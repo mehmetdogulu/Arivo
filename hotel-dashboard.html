@@ -1328,10 +1328,24 @@ function sendMsg() {
   if (!b) { toast('Type a message', 'err'); return; }
   var targetGuestId = sel.options[sel.selectedIndex].dataset.guestId || null;
   var targetLabel   = sel.value;
-  if (db) db.from('messages').insert({hotel_id:HOTEL_ID, guest_id:targetGuestId, direction:'hotel_to_guest', sender_name:'Hotel Team', body:b}).then(function() {});
-  logEvent('msg_sent', 'Message to ' + targetLabel + ': ' + b.slice(0, 60), 'Manager', '-');
-  toast('Message sent to: ' + targetLabel);
-  document.getElementById('msgbody').value = '';
+  if (!db) return;
+  if (!targetGuestId) {
+    // "All guests" - send individual message to each active guest
+    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('checked_out',false).then(function(r) {
+      if (!r.data || !r.data.length) { toast('No active guests', 'err'); return; }
+      r.data.forEach(function(guest) {
+        db.from('messages').insert({hotel_id:HOTEL_ID, guest_id:guest.id, direction:'hotel_to_guest', sender_name:'Hotel Team', body:b}).then(function() {});
+      });
+      logEvent('msg_sent', 'Message to all guests: ' + b.slice(0, 60), 'Manager', '-');
+      toast('Message sent to all ' + r.data.length + ' guests');
+      document.getElementById('msgbody').value = '';
+    });
+  } else {
+    db.from('messages').insert({hotel_id:HOTEL_ID, guest_id:targetGuestId, direction:'hotel_to_guest', sender_name:'Hotel Team', body:b}).then(function() {});
+    logEvent('msg_sent', 'Message to ' + targetLabel + ': ' + b.slice(0, 60), 'Manager', '-');
+    toast('Message sent to: ' + targetLabel);
+    document.getElementById('msgbody').value = '';
+  }
 }
 function sendMsgM() {
   var b  = document.getElementById('msgb2').value.trim(); var to = document.getElementById('msgto2').textContent;
