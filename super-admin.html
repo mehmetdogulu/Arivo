@@ -968,7 +968,7 @@ function sendBroadcast(){
   var body=document.getElementById('msg-body').value.trim();
   if(!subject||!body){toast('Please fill in subject and message','err');return;}
   toast('Message sent to: '+audience);
-  document.getElement('modal-broadcast').style.display='none';
+  document.getElementById('modal-broadcast').style.display='none';
   document.getElementById('bc-subject').value='';
   document.getElementById('bc-body').value='';
 }

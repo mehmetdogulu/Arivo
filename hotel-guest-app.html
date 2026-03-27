@@ -1032,8 +1032,8 @@ async function loadLocalSuggestions(city,postcode){
   var prompt='You are a knowledgeable local guide for a boutique hotel in '+(city||'')+', postcode '+postcode+', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. For each place include an estimated walking time from postcode '+postcode+' e.g. "5 min walk" or "12 min walk". Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item must have these exact keys: {"category": "Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights", "emoji": "one emoji", "name": "real place name", "description": "one sentence including walking time e.g. 5 min walk", "tags": ["tag1", "tag2"]}';
   try{
     var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
     if(!res.ok){ throw new Error('HTTP '+res.status); }
+    var data=await res.json();
     var text=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'';
     var start=text.indexOf('[');var end=text.lastIndexOf(']');if(start<0||end<start)throw new Error('No JSON array');
     var places=JSON.parse(text.slice(start,end+1));
@@ -1157,6 +1157,7 @@ async function sendChat(){
   var sys='You are a warm, knowledgeable AI concierge for '+hotelName+', a boutique hotel at '+hotelStreet+', '+hotelCity+' '+hotelPostcode+', UK. Phone: '+hotelPhone+'. Guest: '+(state.name||'Guest')+', Room '+(state.room||'?')+'. Using your knowledge of '+hotelCity+' '+hotelPostcode+': answer questions about nearby pharmacies, bars, cafes, restaurants, taxi firms, train times, attractions, and local services. Hotel: WiFi TheMaison_Guest / maison2026. Breakfast 8-10am. Checkout 11am, late checkout until 1pm on request. Bar 5pm-midnight. Free parking. Pets welcome. Be warm and concise. 2-4 sentences max.';
   try{
     var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});
+    if(!res.ok){ throw new Error('HTTP '+res.status); }
     var data=await res.json();var reply=(data.content&&data.content[0]&&data.content[0].text)?data.content[0].text:'Sorry, I could not get a response. Try messaging us on WhatsApp!';
     typing.remove();addMsg(reply,'ai');chatHistory.push({role:'assistant',content:reply});
   }catch(e){typing.remove();addMsg('Sorry, I am having a moment! Try messaging us on WhatsApp instead.','ai');}
