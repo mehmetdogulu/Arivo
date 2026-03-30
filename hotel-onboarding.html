@@ -540,7 +540,7 @@ async function hashPassword(password) {
 var _newHotelId = null;
 
 async function completeOnboarding() {
-  var btn = document.querySelector('#s-step4 .btn-primary');
+  var btn = document.querySelector('#s4 .btn-primary');
   if (btn) { btn.textContent = 'Creating your account...'; btn.disabled = true; }
 
   // Collect all form data
@@ -556,7 +556,7 @@ async function completeOnboarding() {
   var wifiPass   = document.getElementById('s4-wifipass').value.trim();
   var checkoutT  = document.getElementById('s4-checkout').value || '11:00';
 
-  var slug = hotelName.toLowerCase().replace(/\s+/g,'- ').replace(/[^a-z0-9-]/g,'').replace(/-\s*/g,'-');
+  var slug = hotelName.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-');
 
   try {
     var db = null;
