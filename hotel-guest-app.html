@@ -369,13 +369,8 @@ var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
   </div>
   <!-- FACILITIES TAB -->
   <div class="tc" id="tab-facilities">
-    <div class="fac-grid">
-      <div class="fac-card"><div class="fac-thumb">&#127870;</div><div class="fac-name">The Garden Room</div><div class="fac-detail">Restaurant &bull; 7am-10pm</div></div>
-      <div class="fac-card"><div class="fac-thumb">&#127863;</div><div class="fac-name">The Cellar Bar</div><div class="fac-detail">Bar &bull; 5pm - Midnight</div></div>
-      <div class="fac-card"><div class="fac-thumb">&#129498;</div><div class="fac-name">Spa &amp; Wellness</div><div class="fac-detail">9am-7pm &bull; Book at reception</div></div>
-      <div class="fac-card"><div class="fac-thumb">&#127953;</div><div class="fac-name">Outdoor Pool</div><div class="fac-detail">May-Sept &bull; 7am-8pm</div></div>
-      <div class="fac-card"><div class="fac-thumb">&#127947;</div><div class="fac-name">Fitness Suite</div><div class="fac-detail">24 hours &bull; Guests only</div></div>
-      <div class="fac-card"><div class="fac-thumb">&#128652;</div><div class="fac-name">Complimentary Bike Hire</div><div class="fac-detail">Ask at reception</div></div>
+    <div class="fac-grid" id="fac-grid">
+      <div id="fac-loading" style="grid-column:1/-1;padding:32px;text-align:center;color:var(--muted);font-size:13px;">Loading facilities...</div>
     </div>
   </div>
   <!-- LOCAL TAB -->
@@ -848,6 +843,7 @@ function enterApp(){
       }
     });
     loadMessagesFromSupabase();
+    loadFacilities();
     setTimeout(checkIfAlreadyRated,1000);
   }
   var lastCheckout=localStorage.getItem('arivo_last_checkout');
@@ -1107,6 +1103,20 @@ function renderLocalSuggestions(places,cityName,append){
   });
   // Append to container (staff picks may already be there)
   var aiDiv=document.createElement('div');aiDiv.innerHTML=html;container.appendChild(aiDiv);
+}
+
+function loadFacilities(){
+  if(!db)return;
+  db.from('local_places').select('*').eq('hotel_id',HOTEL_ID).eq('source','facility').order('created_at',{ascending:true}).then(function(r){
+    var grid=document.getElementById('fac-grid');if(!grid)return;
+    grid.innerHTML='';
+    if(!r.data||!r.data.length){grid.innerHTML='<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--muted);font-size:13px;">No facilities listed yet.</div>';return;}
+    r.data.forEach(function(f){
+      var card=document.createElement('div');card.className='fac-card';
+      card.innerHTML='<div class="fac-thumb">'+(f.emoji||'\uD83C\uDFE8')+'</div>'+'<div class="fac-name">'+f.name+'</div>'+'<div class="fac-detail">'+(f.category||'')+'</div>';
+      grid.appendChild(card);
+    });
+  });
 }
 
 function checkIfAlreadyRated(){

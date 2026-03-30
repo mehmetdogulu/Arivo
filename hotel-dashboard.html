@@ -736,6 +736,7 @@ function loadAll() {
   loadAvgRating();
   loadRecs();
   loadAiRecs();
+  loadFac();
   subscribeToStaffMessages();
 }
 
@@ -1491,10 +1492,39 @@ function delSec(id) { document.getElementById(id).remove(); }
 function addFac() {
   var n = document.getElementById('afn').value.trim(); var d = document.getElementById('afd').value.trim(); var e = document.getElementById('afe').value.trim();
   if (!n) { toast('Enter facility name', 'err'); return; }
-  var row = document.createElement('div'); row.className = 'rrow';
-  row.innerHTML = '<div class="rthumb">' + (e || '&#127968;') + '</div><div class="rinfo"><div class="rn">' + n + '</div><div class="rc">' + d + '</div></div><div style="display:flex;gap:5px"><div class="icb" onclick="editRec(this,\'fac\')">&#9999;</div><div class="icb del" onclick="delRec(this)">&#10005;</div></div>';
-  document.getElementById('faclist').appendChild(row); closeM('mfac'); toast('Facility added');
-  document.getElementById('afn').value = ''; document.getElementById('afd').value = ''; document.getElementById('afe').value = '';
+  if (!db) { toast('Not connected', 'err'); return; }
+  db.from('local_places').insert({hotel_id: HOTEL_ID, name: n, category: d, emoji: e || '\uD83C\uDFE8', source: 'facility'}).select().then(function(r) {
+    if (r.error) { toast('Error saving', 'err'); return; }
+    closeM('mfac');
+    document.getElementById('afn').value = ''; document.getElementById('afd').value = ''; document.getElementById('afe').value = '';
+    toast('Facility added'); loadFac();
+  });
+}
+
+function loadFac() {
+  if (!db) return;
+  db.from('local_places').select('*').eq('hotel_id', HOTEL_ID).eq('source', 'facility').order('created_at', {ascending: true}).then(function(r) {
+    var list = document.getElementById('faclist');
+    var empty = document.getElementById('faclist-empty');
+    if (!list) return;
+    list.querySelectorAll('.rrow').forEach(function(row) { row.remove(); });
+    if (!r.data || !r.data.length) { if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    r.data.forEach(function(place) {
+      var row = document.createElement('div');
+      row.className = 'rrow';
+      row.dataset.placeId = place.id;
+      row.dataset.source = 'facility';
+      row.innerHTML = '<div class="rthumb">' + (place.emoji || '\uD83C\uDFE8') + '</div>'
+        + '<div class="rinfo"><div class="rn">' + place.name + '</div>'
+        + '<div class="rc">' + (place.category || '') + '</div></div>'
+        + '<div style="display:flex;gap:5px">'
+        + '<div class="icb" onclick="editRec(this,\'fac\')">&#9999;</div>'
+        + '<div class="icb del" onclick="delRec(this)">&#10005;</div>'
+        + '</div>';
+      list.appendChild(row);
+    });
+  });
 }
 function addRec() {
   var n = document.getElementById('arn').value.trim();
@@ -1631,7 +1661,7 @@ function saveRecEdit() {
       if (r.error) { toast('Error saving', 'err'); return; }
       closeM('medit-rec');
       toast('Saved');
-      if (source === 'ai') { loadAiRecs(); } else { loadRecs(); }
+      if (source === 'ai') { loadAiRecs(); } else if (source === 'facility') { loadFac(); } else { loadRecs(); }
     });
   } else {
     // Fallback DOM update
@@ -1653,8 +1683,8 @@ function delRec(btn) {
       if (r.error) { toast('Error deleting', 'err'); return; }
       row.remove();
       toast('Removed');
-      var listId = source === 'ai' ? 'aireclist' : 'reclist';
-      var emptyId = source === 'ai' ? 'aireclist-empty' : 'reclist-empty';
+      var listId = source === 'ai' ? 'aireclist' : source === 'facility' ? 'faclist' : 'reclist';
+      var emptyId = source === 'ai' ? 'aireclist-empty' : source === 'facility' ? 'faclist-empty' : 'reclist-empty';
       var list = document.getElementById(listId);
       if (list && !list.querySelectorAll('.rrow').length) {
         var empty = document.getElementById(emptyId);
@@ -1780,7 +1810,7 @@ function simReq() {
 }
 
 // ── NAV ──
-function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local'){loadRecs();loadAiRecs();}if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();} }
+function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local'){loadRecs();loadAiRecs();}if(name==='fac')loadFac();if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();} }
 function setBN(id) { document.querySelectorAll('.bnitem').forEach(function(b){b.classList.remove('on');});document.getElementById(id).classList.add('on'); }
 function openSidebar()  { document.getElementById('sbar').classList.add('open');    document.getElementById('ov').classList.add('on'); }
 function closeSidebar() { document.getElementById('sbar').classList.remove('open'); document.getElementById('ov').classList.remove('on'); }
