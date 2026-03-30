@@ -1029,6 +1029,27 @@ async function loadLocalSuggestions(city,postcode){
       }
     }catch(e){ console.log('Staff picks error:',e); }
   }
+  // Check for AI suggestions already saved in DB — skip AI call if found
+  if(db){
+    try{
+      var saved=await db.from('local_places').select('*').eq('hotel_id',HOTEL_ID).eq('source','ai').order('created_at',{ascending:true});
+      if(saved.data&&saved.data.length){
+        var places=saved.data.map(function(row){return{name:row.name,category:row.category,description:row.detail,emoji:row.emoji,tags:[]};});
+        _localLoaded=cacheKey;
+        if(staffPicksHtml){
+          var aiHeader='<div class="rc-lbl">&#10024; ARIVO AI SUGGESTIONS</div>';
+          container.innerHTML='';
+          var staffDiv=document.createElement('div');
+          staffDiv.innerHTML=staffPicksHtml+aiHeader;
+          container.appendChild(staffDiv);
+          renderLocalSuggestions(places,city||postcode,true);
+        } else {
+          renderLocalSuggestions(places,city||postcode,false);
+        }
+        return;
+      }
+    }catch(e){console.log('Saved suggestions check error:',e);}
+  }
   var prompt='You are a knowledgeable local guide for a boutique hotel in '+(city||'')+', postcode '+postcode+', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. For each place include an estimated walking time from postcode '+postcode+' e.g. "5 min walk" or "12 min walk". Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item must have these exact keys: {"category": "Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights", "emoji": "one emoji", "name": "real place name", "description": "one sentence including walking time e.g. 5 min walk", "tags": ["tag1", "tag2"]}';
   try{
     var res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
@@ -1038,6 +1059,11 @@ async function loadLocalSuggestions(city,postcode){
     var start=text.indexOf('[');var end=text.lastIndexOf(']');if(start<0||end<start)throw new Error('No JSON array');
     var places=JSON.parse(text.slice(start,end+1));
     _localLoaded=cacheKey;
+    // Save AI suggestions to DB so future loads skip the AI call
+    if(db){
+      var rows=places.map(function(p){return{hotel_id:HOTEL_ID,name:p.name,category:p.category,detail:p.description,emoji:p.emoji,source:'ai'};});
+      db.from('local_places').insert(rows).then(function(r){if(r.error)console.log('Save suggestions error:',r.error.message);});
+    }
     // Show staff picks first, then AI suggestions
     if(staffPicksHtml){
       var aiHeader='<div class="rc-lbl">&#10024; ARIVO AI SUGGESTIONS</div>';
