@@ -594,8 +594,18 @@ var TITLES = {ov:'Overview',req:'Requests',guests:'Guests',sess:'Sessions & Acce
 document.addEventListener('DOMContentLoaded', function() {
   try { if (window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
   var saved = sessionStorage.getItem('arivo_mgr_session') || localStorage.getItem('arivo_mgr_session');
-  if (saved) {
-    try { var s = JSON.parse(saved); if (s.email) { enterDashboard(); return; } } catch(e) {}
+  var hasSession = false;
+  if (saved) { try { var s = JSON.parse(saved); if (s.email) hasSession = true; } catch(e) {} }
+  if (!hasSession) return;
+  // If no hotel param in URL, resolve the real hotel_id from DB before entering dashboard
+  var urlHotel = new URLSearchParams(window.location.search).get('hotel');
+  if (!urlHotel && db) {
+    db.from('hotels').select('id').limit(1).single().then(function(r) {
+      if (r.data && r.data.id) HOTEL_ID = r.data.id;
+      enterDashboard();
+    });
+  } else {
+    enterDashboard();
   }
 });
 document.getElementById('lp').addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
@@ -1677,10 +1687,14 @@ function loadAiRecs() {
 
 async function refreshAiSuggestions(btn) {
   if (!db) { toast('Not connected', 'err'); return; }
-  var pc = (document.getElementById('hotel-postcode') || {}).value || '';
-  var city = (document.getElementById('hotel-city') || {}).value || '';
-  pc = pc.trim();
-  if (!pc) { toast('Please save your postcode in Settings first', 'err'); return; }
+  // Read postcode from DOM input (if populated) or fetch from DB
+  var pc = ((document.getElementById('hotel-postcode') || {}).value || '').trim();
+  var city = ((document.getElementById('hotel-city') || {}).value || '').trim();
+  if (!pc) {
+    var addr = await db.from('hotel_settings').select('address').eq('hotel_id', HOTEL_ID).single();
+    if (addr.data && addr.data.address) { pc = (addr.data.address.postcode || '').trim(); city = addr.data.address.city || city; }
+  }
+  if (!pc) { toast('Please save your hotel postcode in Settings first', 'err'); return; }
   btn.textContent = 'Generating...'; btn.disabled = true;
   try {
     await db.from('local_places').delete().eq('hotel_id', HOTEL_ID).eq('source', 'ai');
