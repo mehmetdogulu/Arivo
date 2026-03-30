@@ -233,7 +233,7 @@ window.onerror = function(msg){if(msg==='Script error.'||msg==='Script error')re
 var db=null;
 try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){console.log('Supabase init failed:',e);}
 var _urlParams=new URLSearchParams(window.location.search);
-var HOTEL_ID=_urlParams.get('hotel')||'00000000-0000-0000-0000-000000000001';
+var HOTEL_ID=_urlParams.get('hotel')||null;
 </script>
 </head>
 <body>
@@ -521,6 +521,15 @@ function loadRoomDropdown(){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(!db){try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}}
+  if(!HOTEL_ID){
+    var sc=document.getElementById('screen-consent');
+    if(sc)sc.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;">'
+      +'<div style="font-size:48px;margin-bottom:24px;">&#128247;</div>'
+      +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Scan the QR code</div>'
+      +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">To access the guest app, please scan the QR code provided by your hotel reception.</div>'
+      +'</div>';
+    return;
+  }
   loadRoomDropdown();
   if(!restoreSession()){}
 });

@@ -787,25 +787,13 @@ function exportAdminLogs(){
 <div id="toast"></div><script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-// Hotel ID — read from URL ?hotel= param, fallback to default
 var _urlParams = new URLSearchParams(window.location.search);
-var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
+var HOTEL_ID = _urlParams.get('hotel') || null;
 var db = null;
 document.addEventListener('DOMContentLoaded', function(){
   try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
-// ── DATA ──
-var hotels = [
-  {id:1,name:'The Maison Collective',loc:'Bath, UK',plan:'pro',status:'active',mrr:299,since:'1 Feb 2026',lastActive:'3 hrs ago',scans:312,guests:47},
-  {id:2,name:'The Anchor Hotel',loc:'Lyme Regis, UK',plan:'pro',status:'active',mrr:299,since:'8 Feb 2026',lastActive:'Yesterday',scans:188,guests:31},
-  {id:3,name:'Clifton Manor Hotel',loc:'Bristol, UK',plan:'complete',status:'active',mrr:499,since:'15 Feb 2026',lastActive:'2 days ago',scans:421,guests:68},
-  {id:4,name:'The Larkspur House',loc:'Mousehole, UK',plan:'starter',status:'active',mrr:99,since:'19 Feb 2026',lastActive:'2 min ago',scans:94,guests:14},
-  {id:5,name:'The Salcombe',loc:'Devon, UK',plan:'starter',status:'active',mrr:99,since:'24 Feb 2026',lastActive:'Today',scans:76,guests:12},
-  {id:6,name:'Briarwood Inn',loc:'Cotswolds, UK',plan:'trial',status:'trial',mrr:0,since:'27 Feb 2026',lastActive:'4 days ago',scans:22,guests:3},
-  {id:7,name:'The Harbour Arms',loc:'Padstow, UK',plan:'trial',status:'trial',mrr:0,since:'5 Mar 2026',lastActive:'Yesterday',scans:45,guests:7},
-  {id:8,name:'Oakwood Guesthouse',loc:'Lake District, UK',plan:'trial',status:'trial',mrr:0,since:'10 Mar 2026',lastActive:'Today',scans:34,guests:5}
-];
 
 var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',settings:'Platform Settings'};
 var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
