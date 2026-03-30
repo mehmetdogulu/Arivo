@@ -544,6 +544,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div></div>
 
 <div class="mov" id="mextend"><div class="modal"><div class="mhdr"><div class="mt">Extend Stay</div><div class="mclose" onclick="closeM('mextend')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Guest: <strong id="extend-guest-name" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">New Checkout Date</label><input class="fi" id="extend-date" type="date"><div style="font-size:11px;color:var(--tx3);margin-top:4px">Current: <span id="extend-current-date">—</span></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveExtension()">Save Extension</button><button class="btn btn-s" onclick="closeM('mextend')">Cancel</button></div></div></div>
+<div class="mov" id="mmove"><div class="modal"><div class="mhdr"><div class="mt">Move Room</div><div class="mclose" onclick="closeM('mmove')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Guest: <strong id="move-guest-name" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Current Room</label><div style="font-size:14px;font-weight:500;color:var(--tx);padding:8px 0" id="move-current-room">—</div></div><div class="fg"><label class="fl">New Room</label><select class="fi" id="move-room-select"></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveMoveRoom()">Move Guest</button><button class="btn btn-s" onclick="closeM('mmove')">Cancel</button></div></div></div>
 <div class="mov" id="mmsg"><div class="modal"><div class="mhdr"><div class="mt">Message Guest</div><div class="mclose" onclick="closeM('mmsg')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">To: <strong id="msgto2" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Message</label><textarea class="msgin" id="msgb2" placeholder="Type your message..."></textarea></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="sendMsgM()">Send</button><button class="btn btn-s" onclick="closeM('mmsg')">Cancel</button></div></div></div>
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Add Staff Member</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
 <div class="mov" id="medit-staff"><div class="modal"><div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="edit-sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="edit-sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Status</label><select class="fi" id="edit-sfs"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveStaffEdit()">Save Changes</button><button class="btn btn-r" onclick="removeStaffById()">Remove Staff</button></div></div></div>
@@ -787,6 +788,8 @@ function renderGuests(guests) {
           + 'onclick="openMsgM(\'' + safeId + '\',\'' + safeName + '\',\'' + safeRoom + '\')">&#128172;</button>'
           + '<button class="btn btn-s" style="margin-left:4px;font-size:11px;padding:5px 9px" '
           + 'onclick="openExtend(\'' + safeId + '\',\'' + safeName + '\',\'' + (g.checkout_date||'') + '\')">Extend</button>'
+          + '<button class="btn btn-s" style="margin-left:4px;font-size:11px;padding:5px 9px" '
+          + 'onclick="openMoveRoom(\'' + safeId + '\',\'' + safeName + '\',\'' + safeRoom + '\')">Move</button>'
           + '</div>';
   });
 
@@ -1402,6 +1405,44 @@ function saveExtension() {
     closeM('mextend');
     toast(name + '\u2019s stay extended to ' + new Date(newDate).toLocaleDateString('en-GB', {day:'numeric',month:'short'}));
     logEvent('stay_extended', 'Stay extended for ' + name + ' to ' + newDate, 'Manager', '-');
+    loadGuests();
+  });
+}
+function openMoveRoom(guestId, name, currentRoom) {
+  document.getElementById('move-guest-name').textContent = name;
+  document.getElementById('move-current-room').textContent = currentRoom || '—';
+  document.getElementById('mmove').dataset.guestId = guestId;
+  document.getElementById('mmove').dataset.guestName = name;
+  document.getElementById('mmove').dataset.currentRoom = currentRoom || '';
+  // Populate room selector from DB
+  var sel = document.getElementById('move-room-select');
+  sel.innerHTML = '<option value="">Select new room...</option>';
+  if (db) {
+    db.from('hotel_settings').select('rooms').eq('hotel_id', HOTEL_ID).single().then(function(r) {
+      var rooms = (r.data && r.data.rooms) ? r.data.rooms : [];
+      rooms.forEach(function(rm) {
+        if (rm === currentRoom) return; // exclude current room
+        var opt = document.createElement('option');
+        opt.value = rm; opt.textContent = rm;
+        sel.appendChild(opt);
+      });
+      if (sel.options.length <= 1) sel.innerHTML = '<option value="">No other rooms available</option>';
+    });
+  }
+  openM('mmove');
+}
+function saveMoveRoom() {
+  var newRoom = document.getElementById('move-room-select').value;
+  var guestId = document.getElementById('mmove').dataset.guestId;
+  var name    = document.getElementById('mmove').dataset.guestName;
+  var oldRoom = document.getElementById('mmove').dataset.currentRoom;
+  if (!newRoom) { toast('Please select a room', 'err'); return; }
+  if (!db || !guestId) { toast('Not connected', 'err'); return; }
+  db.from('guests').update({room: newRoom}).eq('id', guestId).then(function(r) {
+    if (r.error) { toast('Error moving guest: ' + r.error.message, 'err'); return; }
+    closeM('mmove');
+    toast(name + ' moved to ' + newRoom);
+    logEvent('room_change', 'Guest ' + name + ' moved from ' + oldRoom + ' to ' + newRoom, 'Manager', newRoom);
     loadGuests();
   });
 }
