@@ -305,10 +305,10 @@ var HOTEL_ID=_urlParams.get('hotel')||null;
 <!-- SCREEN 3: WELCOME -->
 <div class="screen welcome-screen" id="screen-welcome">
   <div class="w-icon">&#128477;</div>
-  <div class="w-eyebrow">The Maison Collective</div>
+  <div class="w-eyebrow" id="w-hotel-eyebrow"></div>
   <div class="w-heading">Welcome,</div>
-  <div class="w-name" id="w-name">Sarah</div>
-  <div class="w-chips"><span class="w-chip" id="w-room">Room 14</span><span class="w-chip" id="w-co">Checkout 23 Mar</span></div>
+  <div class="w-name" id="w-name"></div>
+  <div class="w-chips"><span class="w-chip" id="w-room"></span><span class="w-chip" id="w-co"></span></div>
   <p class="w-msg">Your room is ready and everything you need is right here. We hope your stay is everything you imagined.</p>
   <button class="w-btn" onclick="enterApp()">Explore your stay</button>
 </div>
@@ -318,12 +318,12 @@ var HOTEL_ID=_urlParams.get('hotel')||null;
   <div class="app-header">
     <div class="hotel-logo-row">
       <div class="hotel-logo-thumb" id="hotel-logo-display">&#127968;</div>
-      <div class="app-hotel-lbl">The Maison Collective</div>
+      <div class="app-hotel-lbl" id="app-hotel-lbl"></div>
     </div>
     <div class="app-gname">Hello, <em id="app-name">Sarah</em></div>
     <div class="app-room-row">
-      <span class="app-chip" id="app-room">Room 14</span>
-      <span class="app-chip" id="app-co">Out 23 Mar</span>
+      <span class="app-chip" id="app-room"></span>
+      <span class="app-chip" id="app-co"></span>
     </div>
     <button class="edit-btn" onclick="openEdit()">&#9999; Edit my details</button>
     <div class="pending-chip" id="pending-chip">&#9203; Change pending hotel confirmation</div>
@@ -350,9 +350,9 @@ var HOTEL_ID=_urlParams.get('hotel')||null;
   <!-- HOTEL TAB -->
   <div class="tc active" id="tab-hotel">
     <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128246;</div><div class="ic-ttl">WiFi</div></div><div class="ir"><span class="ir-lbl">Network</span><span class="ir-val" id="wifi-network">—</span></div><div class="ir"><span class="ir-lbl">Password</span><span class="wifi-p" id="wifi-password">—</span></div></div>
-    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128336;</div><div class="ic-ttl">Key Times</div></div><div class="ir"><span class="ir-lbl">Check-out</span><span class="ir-val">11:00 AM</span></div><div class="ir"><span class="ir-lbl">Late checkout</span><span class="ir-val">On request (until 1pm)</span></div><div class="ir"><span class="ir-lbl">Breakfast</span><span class="ir-val">8:00 - 10:00 AM</span></div><div class="ir"><span class="ir-lbl">Bar</span><span class="ir-val">5:00 PM - Midnight</span></div></div>
-    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128203;</div><div class="ic-ttl">House Rules</div></div><div class="ir"><span class="ir-lbl">Quiet hours</span><span class="ir-val">10 PM - 8 AM</span></div><div class="ir"><span class="ir-lbl">Smoking</span><span class="ir-val">Garden terrace only</span></div><div class="ir"><span class="ir-lbl">Pets</span><span class="ir-val">Welcome</span></div><div class="ir"><span class="ir-lbl">Parking</span><span class="ir-val">Private car park, free</span></div></div>
-    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128222;</div><div class="ic-ttl">Contact</div></div><div class="ir"><span class="ir-lbl">Reception</span><span class="ir-val"><a href="tel:0" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.3);">Dial 0</a></span></div><div class="ir"><span class="ir-lbl">Emergency</span><span class="ir-val"><a href="tel:+442079460123" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.3);">+44 20 7946 0123</a></span></div></div>
+    <div class="ic" id="info-card-times" style="display:none;"></div>
+    <div class="ic" id="info-card-rules" style="display:none;"></div>
+    <div class="ic" id="info-card-contact" style="display:none;"></div>
     <div class="menu-btn-wrap" onclick="toast('Opening menu PDF...')"><div class="menu-ico">&#128196;</div><div class="menu-info"><div class="menu-title">Restaurant Menu</div><div class="menu-sub">Tap to view our full menu &amp; wine list</div></div><span style="font-size:18px;color:var(--muted);">&#8250;</span></div>
     <div class="feedback-box">
       <div class="feedback-title">How is your stay?</div>
@@ -439,7 +439,7 @@ var HOTEL_ID=_urlParams.get('hotel')||null;
       <div class="ai-chip" onclick="askAI(this.textContent)">Taxi number?</div>
     </div>
     <div class="chat-box">
-      <div class="chat-msgs" id="chatMsgs"><div class="msg ai" id="chat-greeting">Hello! I am your personal concierge for The Maison. How can I make your stay even better?</div></div>
+      <div class="chat-msgs" id="chatMsgs"><div class="msg ai" id="chat-greeting">Hello! I am your AI concierge. How can I make your stay even better?</div></div>
       <div class="chat-in-row"><input class="chat-in" id="chatInput" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-send" onclick="sendChat()">&#8594;</button></div>
     </div>
     <button class="wa-btn" onclick="openWhatsApp()">&#128172; Continue on WhatsApp</button>
@@ -464,7 +464,7 @@ var HOTEL_ID=_urlParams.get('hotel')||null;
 <div class="notif-banner-overlay" id="notif-banner-overlay">
   <div class="notif-banner-box">
     <div class="nb-icon">&#128172;</div>
-    <div class="nb-from">Message from The Maison</div>
+    <div class="nb-from" id="nb-from-hotel">Message from your hotel</div>
     <div class="nb-msg" id="nb-msg-text">We hope you are enjoying your stay!</div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="nb-close" style="flex:1" onclick="dismissHotelMsg()">Got it</button>
@@ -531,6 +531,17 @@ document.addEventListener('DOMContentLoaded',function(){
     return;
   }
   loadRoomDropdown();
+  // Load hotel name early so consent + welcome screens show it before enterApp()
+  db.from('hotels').select('name,city').eq('id',HOTEL_ID).single().then(function(r){
+    if(r.data){
+      var hn=r.data.name||'Your Hotel';
+      var city=r.data.city||'';
+      var consentName=document.getElementById('consent-hotel-name');
+      if(consentName)consentName.textContent=hn+(city?' \u00b7 '+city:'');
+      var welcomeEyebrow=document.getElementById('w-hotel-eyebrow');
+      if(welcomeEyebrow)welcomeEyebrow.textContent=hn;
+    }
+  });
   if(!restoreSession()){}
 });
 
@@ -821,6 +832,22 @@ function enterApp(){
       if(hr.data){
         if(hr.data.whatsapp)hotelSettings.whatsapp=hr.data.whatsapp;
         if(hr.data.phone&&!hotelSettings.phone)hotelSettings.phone=hr.data.phone;
+        var contactCard=document.getElementById('info-card-contact');
+        if(contactCard){
+          var phone=hr.data.phone||hr.data.whatsapp||'';
+          var contactRows='';
+          if(phone){
+            var cleanPhone=phone.replace(/\s/g,'');
+            contactRows+='<div class="ir"><span class="ir-lbl">Phone</span><span class="ir-val"><a href="tel:'+cleanPhone+'" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(0,0,0,0.2);">'+phone+'</a></span></div>';
+          }
+          if(hr.data.whatsapp){
+            contactRows+='<div class="ir"><span class="ir-lbl">WhatsApp</span><span class="ir-val" style="cursor:pointer;color:var(--green);" onclick="openWhatsApp()">Message us</span></div>';
+          }
+          if(contactRows){
+            contactCard.innerHTML='<div class="ic-hdr"><div class="ic-ico">&#128222;</div><div class="ic-ttl">Contact</div></div>'+contactRows;
+            contactCard.style.display='';
+          }
+        }
       }
     });
     db.from('hotel_settings').select('address,logo_url,menu_url,hotel_info,rooms,checkout_time').eq('hotel_id',HOTEL_ID).single().then(function(r){
@@ -833,12 +860,15 @@ function enterApp(){
           // Update AI banner
           var aiLabel=document.querySelector('.ai-banner');
           if(aiLabel&&pc){aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
-          // Update hotel name on consent screen dynamically
+          // Update hotel name everywhere
           var consentName=document.getElementById('consent-hotel-name');
           if(consentName)consentName.textContent=hotelName+(city?' \u00b7 '+city:'');
-          // Update app header hotel label
-          var hotelLbl=document.querySelector('.app-hotel-lbl');
+          var hotelLbl=document.getElementById('app-hotel-lbl');
           if(hotelLbl)hotelLbl.textContent=hotelName;
+          var welcomeEyebrow=document.getElementById('w-hotel-eyebrow');
+          if(welcomeEyebrow)welcomeEyebrow.textContent=hotelName;
+          var nbFrom=document.getElementById('nb-from-hotel');
+          if(nbFrom)nbFrom.textContent='Message from '+hotelName;
           // Trigger local suggestions now that we have real postcode
           if(pc){
             _localLoaded=null; // always refresh when settings load
@@ -857,14 +887,31 @@ function enterApp(){
         }
         if(r.data.hotel_info){
           hotelSettings.hotelInfo=r.data.hotel_info;
-          // Update WiFi card with real credentials
-          var wifiSec=r.data.hotel_info['sec-wifi'];
+          var hi=r.data.hotel_info;
+          // WiFi card
+          var wifiSec=hi['sec-wifi'];
           if(wifiSec&&wifiSec.rows){
             var netRow=wifiSec.rows.find(function(row){return row.key==='Network';});
             var passRow=wifiSec.rows.find(function(row){return row.key==='Password';});
             var netEl=document.getElementById('wifi-network');var passEl=document.getElementById('wifi-password');
             if(netEl&&netRow&&netRow.value)netEl.textContent=netRow.value;
             if(passEl&&passRow&&passRow.value)passEl.textContent=passRow.value;
+          }
+          // Key Times card
+          var timesCard=document.getElementById('info-card-times');
+          var timesSec=hi['sec-times'];
+          if(timesCard&&timesSec&&timesSec.rows&&timesSec.rows.length){
+            var rowsHtml=timesSec.rows.map(function(row){return '<div class="ir"><span class="ir-lbl">'+row.key+'</span><span class="ir-val">'+row.value+'</span></div>';}).join('');
+            timesCard.innerHTML='<div class="ic-hdr"><div class="ic-ico">&#128336;</div><div class="ic-ttl">Key Times</div></div>'+rowsHtml;
+            timesCard.style.display='';
+          }
+          // House Rules card
+          var rulesCard=document.getElementById('info-card-rules');
+          var rulesSec=hi['sec-rules'];
+          if(rulesCard&&rulesSec&&rulesSec.rows&&rulesSec.rows.length){
+            var rulesHtml=rulesSec.rows.map(function(row){return '<div class="ir"><span class="ir-lbl">'+row.key+'</span><span class="ir-val">'+row.value+'</span></div>';}).join('');
+            rulesCard.innerHTML='<div class="ic-hdr"><div class="ic-ico">&#128203;</div><div class="ic-ttl">House Rules</div></div>'+rulesHtml;
+            rulesCard.style.display='';
           }
         }
       }
@@ -882,8 +929,30 @@ function enterApp(){
 function bypassNext(el,nextId){if(el.value.length>=1&&nextId)document.getElementById(nextId).focus();}
 function submitBypass(){
   var code=['bp1','bp2','bp3','bp4'].map(function(id){return document.getElementById(id).value;}).join('');
-  if(code==='1234'){state.name='Returning Guest';state.room='14';state.checkout='';document.getElementById('app-name').textContent='Guest';document.getElementById('app-room').textContent='Room 14';document.getElementById('app-co').textContent='Out TBC';showScreen('screen-app');toast('Access restored. Welcome back!');}
-  else{toast('Invalid code. Please ask reception for a new code.');}
+  if(code.length<4){toast('Please enter your 4-digit code.');return;}
+  if(!db){toast('Connection error. Please try again.');return;}
+  db.from('sessions').select('guest_id,bypass_expires_at,killed').eq('hotel_id',HOTEL_ID).eq('bypass_code',code).single().then(function(r){
+    if(r.error||!r.data){toast('Invalid code. Please ask reception for a new code.');return;}
+    if(r.data.killed){toast('This code has been cancelled. Please ask reception for a new one.');return;}
+    if(r.data.bypass_expires_at&&new Date(r.data.bypass_expires_at)<new Date()){toast('This code has expired. Please ask reception for a new one.');return;}
+    db.from('guests').select('id,name,room,checkout_date').eq('id',r.data.guest_id).single().then(function(gr){
+      if(gr.error||!gr.data){toast('Could not restore your session. Please ask reception for help.');return;}
+      var g=gr.data;
+      var co=g.checkout_date?g.checkout_date.split('T')[0]:'';
+      state.name=g.name;state.room=g.room;state.checkout=co;
+      guestId=g.id;
+      setGuestContext(g.name,g.room);
+      saveSession(g.name,g.room,co,g.id);
+      var fn=g.name.split(' ')[0];
+      var fmt=co?new Date(co).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
+      document.getElementById('app-name').textContent=fn;
+      document.getElementById('app-room').textContent=g.room;
+      document.getElementById('app-co').textContent='Out '+fmt;
+      document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
+      enterApp();
+      toast('Access restored. Welcome back, '+fn+'!');
+    });
+  });
 }
 
 function startCheckoutReminders(coDateStr){
