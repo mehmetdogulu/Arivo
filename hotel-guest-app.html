@@ -1220,7 +1220,15 @@ async function pushRequest(type,detail,photoData){
   if(lsReqs.length>100)lsReqs=lsReqs.slice(0,100);
   localStorage.setItem('arivo_requests',JSON.stringify(lsReqs));window.dispatchEvent(new StorageEvent('storage',{key:'arivo_requests',newValue:JSON.stringify(lsReqs)}));
   if(!db){console.log('db not ready');return;}if(!guestId){setTimeout(function(){if(guestId)pushRequest(type,detail,photoData);},1000);return;}
-  db.from('requests').insert({hotel_id:HOTEL_ID,guest_id:guestId,type:type,detail:detail,photo_url:(photoData&&photoData.startsWith('http'))?photoData:null,status:'new'}).then(function(r){if(r.error)console.log('Request insert error:',r.error.message);});
+  db.from('requests').insert({hotel_id:HOTEL_ID,guest_id:guestId,type:type,detail:detail,photo_url:(photoData&&photoData.startsWith('http'))?photoData:null,status:'new'}).select('id').single().then(function(r){
+    if(r.error){console.log('Request insert error:',r.error.message);return;}
+    if(r.data&&r.data.id){
+      var reqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+      var entry=reqs.find(function(req){return req.id===reqId;});
+      if(entry)entry.dbId=r.data.id;
+      localStorage.setItem('arivo_requests',JSON.stringify(reqs));
+    }
+  });
 }
 
 // FIX 3: No stray async, guard requires BOTH guestId AND db
@@ -1244,7 +1252,7 @@ function updateRequestStatus(reqId,status,staffName){
     // Mark as done in localStorage but do NOT re-enable the button
     // Buttons stay locked until midnight (daily reset handles this)
     var requests=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
-    requests.forEach(function(r){if(r.id===reqId)r.status='done';});
+    requests.forEach(function(r){if(r.id===reqId||r.dbId===reqId)r.status='done';});
     localStorage.setItem('arivo_requests',JSON.stringify(requests));
   }
 }
