@@ -1036,6 +1036,10 @@ async function loadLocalSuggestions(city,postcode){
     try{
       var saved=await db.from('local_places').select('*').eq('hotel_id',HOTEL_ID).eq('source','ai').order('created_at',{ascending:true});
       if(saved.data&&saved.data.length){
+        // If postcode has changed, delete stale suggestions and fetch fresh ones
+        if(saved.data[0].postcode&&saved.data[0].postcode.trim().toUpperCase()!==cacheKey){
+          await db.from('local_places').delete().eq('hotel_id',HOTEL_ID).eq('source','ai');
+        } else {
         var places=saved.data.map(function(row){return{name:row.name,category:row.category,description:row.detail,emoji:row.emoji,tags:[]};});
         _localLoaded=cacheKey;
         if(staffPicksHtml){
@@ -1049,6 +1053,7 @@ async function loadLocalSuggestions(city,postcode){
           renderLocalSuggestions(places,city||postcode,false);
         }
         return;
+        } // end postcode-match else
       }
     }catch(e){console.log('Saved suggestions check error:',e);}
   }
@@ -1063,7 +1068,7 @@ async function loadLocalSuggestions(city,postcode){
     _localLoaded=cacheKey;
     // Save AI suggestions to DB so future loads skip the AI call
     if(db){
-      var rows=places.map(function(p){return{hotel_id:HOTEL_ID,name:p.name,category:p.category,detail:p.description,emoji:p.emoji,source:'ai'};});
+      var rows=places.map(function(p){return{hotel_id:HOTEL_ID,name:p.name,category:p.category,detail:p.description,emoji:p.emoji,source:'ai',postcode:cacheKey};});
       db.from('local_places').insert(rows).then(function(r){if(r.error)console.log('Save suggestions error:',r.error.message);});
     }
     // Show staff picks first, then AI suggestions
