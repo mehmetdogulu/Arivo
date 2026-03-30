@@ -700,7 +700,9 @@ function exportAdminLogs(){
         <div class="fg"><label class="fl">City</label><input class="fi" id="ah-city" placeholder="e.g. Bath"></div>
         <div class="fg"><label class="fl">Country</label><input class="fi" id="ah-country" value="United Kingdom"></div>
       </div>
+      <div class="fg"><label class="fl">Manager Name</label><input class="fi" id="ah-mgr-name" placeholder="e.g. James Mitchell"></div>
       <div class="fg"><label class="fl">Manager Email</label><input class="fi" id="ah-email" type="email" placeholder="manager@hotel.com"></div>
+      <div class="fg"><label class="fl">Manager Password</label><input class="fi" id="ah-mgr-pass" type="password" placeholder="Temporary password (min. 8 chars)"></div>
       <div class="fg"><label class="fl">Plan</label>
         <select class="fi" id="ah-plan">
           <option value="trial">Free Trial (30 days)</option>
@@ -831,7 +833,7 @@ function enterAdmin(){
   var now=new Date();
   var el=document.getElementById('overview-date');
   if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  renderHotels();
+  loadHotels();
   renderRevChart();
 }
 
@@ -914,20 +916,71 @@ function openHotelDetail(id){
   openModal('modal-hotel-detail');
 }
 
+// ── PASSWORD HASH (SHA-256 via Web Crypto) ──
+async function hashPassword(password){
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
 // ── ADD HOTEL ──
-function addHotel(){
-  var name=document.getElementById('ah-name').value.trim();
-  var city=document.getElementById('ah-city').value.trim();
-  var country=document.getElementById('ah-country').value.trim();
-  var plan=document.getElementById('ah-plan').value;
+async function addHotel(){
+  var name    = document.getElementById('ah-name').value.trim();
+  var city    = document.getElementById('ah-city').value.trim();
+  var country = document.getElementById('ah-country').value.trim();
+  var plan    = document.getElementById('ah-plan').value;
+  var mgrName = document.getElementById('ah-mgr-name').value.trim();
+  var mgrEmail= document.getElementById('ah-email').value.trim().toLowerCase();
+  var mgrPass = document.getElementById('ah-mgr-pass').value;
   if(!name){toast('Please enter a hotel name','err');return;}
-  var newHotel={id:hotels.length+1,name:name,loc:(city?city+', ':'')+country,plan:plan,status:plan==='trial'?'trial':'active',mrr:plan==='starter'?99:plan==='pro'?299:plan==='complete'?499:0,since:'Today',lastActive:'Just now',scans:0,guests:0};
-  hotels.push(newHotel);
-  renderHotels();
-  document.getElementById('sb-hotel-count').textContent=hotels.length;
-  closeModal('modal-add-hotel');
-  document.getElementById('ah-name').value='';document.getElementById('ah-city').value='';
-  toast('Hotel added — welcome email sent to manager');
+  if(!mgrEmail){toast('Please enter manager email','err');return;}
+  if(!mgrPass||mgrPass.length<8){toast('Manager password must be at least 8 characters','err');return;}
+  if(!db){toast('Not connected','err');return;}
+  var addBtn=document.querySelector('#modal-add-hotel .modal-footer .btn-primary');
+  if(addBtn){addBtn.textContent='Creating...';addBtn.disabled=true;}
+  try{
+    var slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    var hotelRes=await db.from('hotels').insert({name:name,slug:slug,city:city,country:country,plan:plan,status:plan==='trial'?'trial':'active'}).select('id').single();
+    if(hotelRes.error)throw hotelRes.error;
+    var hotelId=hotelRes.data.id;
+    // Create hotel_settings row
+    await db.from('hotel_settings').insert({hotel_id:hotelId,rooms:[],address:{name:name,city:city,postcode:''},hotel_info:{}});
+    // Create manager account
+    var hash=await hashPassword(mgrPass);
+    var staffRes=await db.from('staff').insert({hotel_id:hotelId,name:mgrName||'Manager',email:mgrEmail,password_hash:hash,role:'manager',active:true});
+    if(staffRes.error)throw staffRes.error;
+    closeModal('modal-add-hotel');
+    ['ah-name','ah-city','ah-mgr-name','ah-email','ah-mgr-pass'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    toast('Hotel created — manager can now log in at hotel-dashboard.html?hotel='+hotelId);
+    loadHotels();
+  }catch(err){
+    toast('Error: '+(err.message||'Unknown error'),'err');
+    console.error('addHotel error:',err);
+  }finally{
+    if(addBtn){addBtn.textContent='Add Hotel';addBtn.disabled=false;}
+  }
+}
+
+// ── LOAD HOTELS FROM DB ──
+function loadHotels(){
+  if(!db)return;
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').order('created_at',{ascending:false}).then(function(r){
+    if(r.error||!r.data)return;
+    var tbody=document.getElementById('hotels-tbody');if(!tbody)return;
+    tbody.innerHTML='';
+    r.data.forEach(function(h){
+      var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+      var statusClass=h.status==='active'?'pill active':h.status==='trial'?'pill trial':'pill';
+      var planLabel={'starter':'Starter','pro':'Pro','complete':'Complete','trial':'Trial'}[h.plan]||h.plan||'—';
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><strong>'+h.name+'</strong><br><span style="font-size:11px;color:var(--muted)">'+(h.city||'')+(h.country?', '+h.country:'')+'</span></td>'
+        +'<td><span class="'+statusClass+'">'+h.status+'</span></td>'
+        +'<td>'+planLabel+'</td>'
+        +'<td>'+since+'</td>'
+        +'<td><button class="btn-sm" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">Open</button></td>';
+      tbody.appendChild(tr);
+    });
+    var cnt=document.getElementById('sb-hotel-count');if(cnt)cnt.textContent=r.data.length;
+  });
 }
 
 // ── EXTEND TRIAL ──

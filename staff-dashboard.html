@@ -333,11 +333,11 @@ var completeReqId = '';
 var completeTaskTitle = '';
 var completeTaskRoom = '';
 
-var STAFF = {
-  'maria@maison.com': {name:'Maria Rodriguez', role:'Housekeeping', initials:'MR', pass:'staff123'},
-  'tom@maison.com':   {name:'Tom Kim',          role:'Front Desk',   initials:'TK', pass:'staff123'},
-  'lena@maison.com':  {name:'Lena Petrov',       role:'Concierge',    initials:'LP', pass:'staff123'}
-};
+// ── PASSWORD HASH (SHA-256 via Web Crypto) ──
+async function hashPassword(password) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
 
 // ── STAFF MESSAGING ──
 var _staffMsgCount = 0;
@@ -445,14 +445,14 @@ function subscribeToStaffMessages() {
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
   try { if (window.supabase) db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
-  // Try sessionStorage first, fall back to localStorage for mobile refresh
   var saved = sessionStorage.getItem('arivo_staff_session') || localStorage.getItem('arivo_staff_session');
   if (saved) {
     try {
       var s = JSON.parse(saved);
-      if (s.email && STAFF[s.email]) {
-        var revoked = JSON.parse(localStorage.getItem('arivo_revoked_staff') || '[]');
-        if (revoked.indexOf(STAFF[s.email].name) < 0) { enterStaffApp(STAFF[s.email]); return; }
+      if (s.email && s.hotel_id && s.name) {
+        HOTEL_ID = s.hotel_id;
+        enterStaffApp(s);
+        return;
       }
     } catch(e) {}
     sessionStorage.removeItem('arivo_staff_session');
@@ -461,50 +461,44 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 document.getElementById('l-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 
-// Live revocation — sign out immediately if manager removes this staff member
-window.addEventListener('storage', function(e) {
-  if (e.key === 'arivo_revoked_staff' && currentStaff) {
-    var revoked = JSON.parse(e.newValue || '[]');
-    if (revoked.indexOf(currentStaff.name) >= 0) {
-      alert('Your access has been removed by the manager. You will now be signed out.');
-      doLogout();
-    }
-  }
-});
-
 // ── AUTH ──
-function doLogin() {
+async function doLogin() {
   var email = document.getElementById('l-email').value.trim().toLowerCase();
   var pass  = document.getElementById('l-pass').value;
   var err   = document.getElementById('l-err');
-  var s = STAFF[email];
-  if (s && pass === s.pass) {
-    var revoked = JSON.parse(localStorage.getItem('arivo_revoked_staff') || '[]');
-    if (revoked.indexOf(s.name) >= 0) {
-      err.style.display = 'block';
-      err.textContent = 'Your access has been removed. Please contact your manager.';
-      return;
-    }
-    err.style.display = 'none';
-    sessionStorage.setItem('arivo_staff_session', JSON.stringify({email:email, ts:Date.now()}));
-    localStorage.setItem('arivo_staff_session', JSON.stringify({email:email, ts:Date.now()}));
-    enterStaffApp(s);
-  } else {
-    err.style.display = 'block';
+  err.style.display = 'none';
+  if (!email || !pass) { err.style.display = 'block'; err.textContent = 'Please enter email and password.'; return; }
+  if (!db) { err.style.display = 'block'; err.textContent = 'Not connected. Please refresh.'; return; }
+  var lbtn = document.querySelector('#screen-login .lbtn'); if (lbtn) { lbtn.textContent = 'Signing in...'; lbtn.disabled = true; }
+  try {
+    var hash = await hashPassword(pass);
+    var r = await db.from('staff').select('id,hotel_id,name,role,active,password_hash').eq('email', email).eq('active', true).single();
+    if (r.error || !r.data || r.data.password_hash !== hash) throw new Error('Invalid email or password');
+    HOTEL_ID = r.data.hotel_id;
+    var ini = r.data.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+    var sess = {email: email, hotel_id: r.data.hotel_id, name: r.data.name, role: r.data.role, initials: ini, ts: Date.now()};
+    sessionStorage.setItem('arivo_staff_session', JSON.stringify(sess));
+    localStorage.setItem('arivo_staff_session', JSON.stringify(sess));
+    enterStaffApp(sess);
+  } catch(e) {
+    err.style.display = 'block'; err.textContent = e.message || 'Login failed';
+    if (lbtn) { lbtn.textContent = 'Sign In'; lbtn.disabled = false; }
   }
 }
 
 function enterStaffApp(s) {
   currentStaff = s;
+  if (s.hotel_id) HOTEL_ID = s.hotel_id;
+  var ini = s.initials || s.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
   logEvent('staff_login', 'Staff logged in: ' + s.name, s.name, '-');
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-app').classList.add('active');
-  document.getElementById('staff-av').textContent      = s.initials;
+  document.getElementById('staff-av').textContent       = ini;
   document.getElementById('staff-name-hdr').textContent = s.name;
-  document.getElementById('staff-role-hdr').textContent = s.role + ' \u00b7 On shift';
-  document.getElementById('profile-av').textContent    = s.initials;
-  document.getElementById('profile-name').textContent  = s.name;
-  document.getElementById('profile-role').textContent  = s.role;
+  document.getElementById('staff-role-hdr').textContent = (s.role || 'Staff') + ' \u00b7 On shift';
+  document.getElementById('profile-av').textContent     = ini;
+  document.getElementById('profile-name').textContent   = s.name;
+  document.getElementById('profile-role').textContent   = s.role || 'Staff';
   initPing();
   loadTasks();
   subscribeToRequests();

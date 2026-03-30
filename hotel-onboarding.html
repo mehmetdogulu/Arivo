@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Arivo — Get Started</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.supabase=null;console.log('Supabase CDN blocked');"></script>
 <style>
 :root {
   --bg:#0F1117; --surface:#181B23; --surface2:#1E2130;
@@ -528,20 +529,105 @@ function selectPlan(card) {
   card.classList.add('selected');
 }
 
-function completeOnboarding() {
-  var hotelName = document.getElementById('s1-name').value.trim() || 'yourhotel';
-  var slug = hotelName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  var url = 'guest.arivo.app/' + slug;
-  document.getElementById('success-url').textContent = url;
+// ── PASSWORD HASH (SHA-256 via Web Crypto) ──
+async function hashPassword(password) {
+  var msgBuffer = new TextEncoder().encode(password);
+  var hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  var hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
 
-  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
-  document.getElementById('s-success').classList.add('active');
-  window.scrollTo(0,0);
+var _newHotelId = null;
+
+async function completeOnboarding() {
+  var btn = document.querySelector('#s-step4 .btn-primary');
+  if (btn) { btn.textContent = 'Creating your account...'; btn.disabled = true; }
+
+  // Collect all form data
+  var hotelName  = document.getElementById('s1-name').value.trim();
+  var city       = document.getElementById('s1-city').value.trim();
+  var country    = document.getElementById('s1-country').value;
+  var roomCount  = parseInt(document.getElementById('s1-rooms').value) || 0;
+  var mgrName    = document.getElementById('s2-name').value.trim();
+  var mgrEmail   = document.getElementById('s2-email').value.trim().toLowerCase();
+  var mgrWa      = document.getElementById('s2-whatsapp').value.trim();
+  var mgrPass    = document.getElementById('s2-pass').value;
+  var wifiNet    = document.getElementById('s4-wifi').value.trim();
+  var wifiPass   = document.getElementById('s4-wifipass').value.trim();
+  var checkoutT  = document.getElementById('s4-checkout').value || '11:00';
+
+  var slug = hotelName.toLowerCase().replace(/\s+/g,'- ').replace(/[^a-z0-9-]/g,'').replace(/-\s*/g,'-');
+
+  try {
+    var db = null;
+    if (window.supabase) db = supabase.createClient(
+      'https://htisbhrvnwzvmkjhqgcr.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ'
+    );
+    if (!db) throw new Error('Database not available');
+
+    // 1. Create hotel record
+    var hotelRes = await db.from('hotels').insert({
+      name: hotelName, slug: slug, city: city, country: country,
+      whatsapp: mgrWa, status: 'active', plan: 'starter'
+    }).select('id').single();
+    if (hotelRes.error) throw hotelRes.error;
+    var hotelId = hotelRes.data.id;
+    _newHotelId = hotelId;
+
+    // 2. Build room list e.g. ["Room 1", "Room 2", ...]
+    var rooms = [];
+    for (var i = 1; i <= roomCount; i++) rooms.push('Room ' + i);
+
+    // 3. Build hotel_info JSONB with WiFi + Key Times sections
+    var hotelInfo = {};
+    if (wifiNet || wifiPass) {
+      hotelInfo['sec-wifi'] = {title:'WiFi', rows:[
+        {key:'Network', value: wifiNet || ''},
+        {key:'Password', value: wifiPass || ''}
+      ]};
+    }
+    hotelInfo['sec-times'] = {title:'Key Times', rows:[
+      {key:'Check-out', value: checkoutT},
+      {key:'Breakfast', value: '8:00 - 10:00 AM'}
+    ]};
+
+    // 4. Create hotel_settings
+    var settingsRes = await db.from('hotel_settings').insert({
+      hotel_id: hotelId,
+      rooms: rooms,
+      checkout_time: checkoutT,
+      address: {name: hotelName, city: city, postcode: ''},
+      hotel_info: hotelInfo
+    });
+    if (settingsRes.error) throw settingsRes.error;
+
+    // 5. Hash password and create manager account
+    var hash = await hashPassword(mgrPass);
+    var staffRes = await db.from('staff').insert({
+      hotel_id: hotelId, name: mgrName, email: mgrEmail,
+      password_hash: hash, role: 'manager', active: true
+    });
+    if (staffRes.error) throw staffRes.error;
+
+    // 6. Show success screen with real URL
+    var guestUrl = window.location.origin + '/hotel-guest-app.html?hotel=' + hotelId;
+    document.getElementById('success-url').textContent = guestUrl;
+    document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('s-success').classList.add('active');
+    window.scrollTo(0,0);
+
+  } catch(err) {
+    if (btn) { btn.textContent = 'Launch my Arivo ✦'; btn.disabled = false; }
+    toast('Setup failed: ' + (err.message || 'Unknown error'));
+    console.error('Onboarding error:', err);
+  }
 }
 
 function openDashboard() {
+  var url = 'hotel-dashboard.html' + (_newHotelId ? '?hotel=' + _newHotelId : '');
   toast('Opening your dashboard...');
-  setTimeout(function(){ window.location.href = 'hotel-dashboard.html'; }, 1000);
+  setTimeout(function(){ window.location.href = url; }, 800);
 }
 
 function toast(msg) {
