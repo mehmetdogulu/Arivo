@@ -400,10 +400,18 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div class="sec" id="s-local">
-  <div class="sech"><div class="secr"><div><div class="sect">Local Guide</div><div class="secs">Staff picks + Arivo AI suggestions</div></div><button class="btn btn-g" onclick="openM('mrec')">+ Add Place</button></div></div>
-  <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; Arivo AI suggests local spots based on your hotel postcode.</div>
+  <div class="sech"><div class="secr"><div><div class="sect">Local Guide</div><div class="secs">Manage what guests see in the Local Guide</div></div><button class="btn btn-g" onclick="openM('mrec')">+ Add Staff Pick</button></div></div>
+  <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">&#11088; Staff Picks</div>
   <div class="card" id="reclist">
-    <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="reclist-empty">No places added yet. Use the button above to add your first staff pick.</div>
+    <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="reclist-empty">No staff picks yet. Use the button above to add your first recommendation.</div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 8px;">
+    <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;">&#10024; Arivo AI Suggestions</div>
+    <button class="btn btn-s" onclick="refreshAiSuggestions(this)">&#8635; Refresh AI</button>
+  </div>
+  <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; AI suggestions are generated from your hotel postcode and saved instantly for guests.</div>
+  <div class="card" id="aireclist">
+    <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="aireclist-empty">No AI suggestions yet. Click "Refresh AI" to generate suggestions for your postcode.</div>
   </div>
 </div>
 
@@ -727,6 +735,7 @@ function loadAll() {
   loadSettings();
   loadAvgRating();
   loadRecs();
+  loadAiRecs();
   subscribeToStaffMessages();
 }
 
@@ -1508,30 +1517,22 @@ function addRec() {
 
 function loadRecs() {
   if (!db) return;
-  // Update AI label with real postcode
-  var pc = document.getElementById('hpostcode') ? document.getElementById('hpostcode').value : '';
-  var aiLbl = document.getElementById('local-ai-label');
-  if (aiLbl && pc) aiLbl.innerHTML = '&#10024; Arivo AI suggests local spots near <strong>' + pc + '</strong>.';
-
   db.from('local_places').select('*').eq('hotel_id', HOTEL_ID).eq('source', 'staff').order('created_at', {ascending: true}).then(function(r) {
     var list = document.getElementById('reclist');
     var empty = document.getElementById('reclist-empty');
     if (!list) return;
-    // Remove existing staff rows
     list.querySelectorAll('.rrow').forEach(function(row) { row.remove(); });
-    if (!r.data || !r.data.length) {
-      if (empty) empty.style.display = 'block';
-      return;
-    }
+    if (!r.data || !r.data.length) { if (empty) empty.style.display = 'block'; return; }
     if (empty) empty.style.display = 'none';
     r.data.forEach(function(place) {
       var row = document.createElement('div');
       row.className = 'rrow';
       row.dataset.placeId = place.id;
+      row.dataset.source = 'staff';
       row.innerHTML = '<div class="rthumb">' + (place.emoji || '\uD83D\uDCCD') + '</div>'
         + '<div class="rinfo"><div class="rn">' + place.name + '</div>'
         + '<div class="rc">' + (place.category || '') + '</div>'
-        + '<div class="rsrc staff">Staff pick</div></div>'
+        + '<div class="rsrc staff">&#11088; Staff Pick</div></div>'
         + '<div style="display:flex;gap:5px">'
         + '<div class="icb" onclick="editRec(this,\'rec\')">&#9999;</div>'
         + '<div class="icb del" onclick="delRec(this)">&#10005;</div>'
@@ -1539,6 +1540,61 @@ function loadRecs() {
       list.appendChild(row);
     });
   });
+}
+
+function loadAiRecs() {
+  if (!db) return;
+  db.from('local_places').select('*').eq('hotel_id', HOTEL_ID).eq('source', 'ai').order('created_at', {ascending: true}).then(function(r) {
+    var list = document.getElementById('aireclist');
+    var empty = document.getElementById('aireclist-empty');
+    if (!list) return;
+    list.querySelectorAll('.rrow').forEach(function(row) { row.remove(); });
+    if (!r.data || !r.data.length) { if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    r.data.forEach(function(place) {
+      var row = document.createElement('div');
+      row.className = 'rrow';
+      row.dataset.placeId = place.id;
+      row.dataset.source = 'ai';
+      row.innerHTML = '<div class="rthumb">' + (place.emoji || '\uD83D\uDCCD') + '</div>'
+        + '<div class="rinfo"><div class="rn">' + place.name + '</div>'
+        + '<div class="rc">' + (place.detail || '') + '</div>'
+        + '<div class="rsrc ai">&#10024; AI &middot; ' + (place.category || '') + '</div></div>'
+        + '<div style="display:flex;gap:5px">'
+        + '<div class="icb" onclick="editRec(this,\'rec\')">&#9999;</div>'
+        + '<div class="icb del" onclick="delRec(this)">&#10005;</div>'
+        + '</div>';
+      list.appendChild(row);
+    });
+  });
+}
+
+async function refreshAiSuggestions(btn) {
+  if (!db) { toast('Not connected', 'err'); return; }
+  var pc = (document.getElementById('hotel-postcode') || {}).value || '';
+  var city = (document.getElementById('hotel-city') || {}).value || '';
+  pc = pc.trim();
+  if (!pc) { toast('Please save your postcode in Settings first', 'err'); return; }
+  btn.textContent = 'Generating...'; btn.disabled = true;
+  try {
+    await db.from('local_places').delete().eq('hotel_id', HOTEL_ID).eq('source', 'ai');
+    var prompt = 'You are a knowledgeable local guide for a boutique hotel in ' + (city || '') + ', postcode ' + pc + ', UK. Generate a curated list of genuinely local recommendations near this exact postcode. Include: 2 coffee/breakfast spots, 3 restaurants (mix of price ranges), 2 bars or pubs, 2 useful nearby (pharmacy, transport, supermarket), 2 culture or sights. For each place include an estimated walking time from postcode ' + pc + ' e.g. "5 min walk" or "12 min walk". Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation. Each item must have these exact keys: {"category": "Coffee & Breakfast" or "Restaurants" or "Bars" or "Useful Nearby" or "Culture & Sights", "emoji": "one emoji", "name": "real place name", "description": "one sentence including walking time e.g. 5 min walk", "tags": ["tag1", "tag2"]}';
+    var res = await fetch('/api/claude', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{role: 'user', content: prompt}]})});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+    var start = text.indexOf('['); var end = text.lastIndexOf(']');
+    if (start < 0 || end < start) throw new Error('No JSON array');
+    var places = JSON.parse(text.slice(start, end + 1));
+    var cacheKey = pc.toUpperCase();
+    var rows = places.map(function(p) { return {hotel_id: HOTEL_ID, name: p.name, category: p.category, detail: p.description, emoji: p.emoji, source: 'ai', postcode: cacheKey}; });
+    await db.from('local_places').insert(rows);
+    toast('AI suggestions refreshed');
+    loadAiRecs();
+  } catch(e) {
+    toast('Could not refresh: ' + (e.message || 'Unknown error'), 'err');
+  }
+  btn.textContent = '\u21BB Refresh AI'; btn.disabled = false;
 }
 function editRec(btn, mode) {
   var row = btn.closest('.rrow'); if (!row) return;
@@ -1568,13 +1624,14 @@ function saveRecEdit() {
   var placeId = row.dataset.placeId;
   // Update in Supabase if we have an ID
   if (db && placeId) {
-    db.from('local_places').update({
-      name: name, category: detail, emoji: emoji
-    }).eq('id', placeId).then(function(r) {
+    var source = row.dataset.source;
+    var updateData = {name: name, emoji: emoji};
+    if (source === 'ai') { updateData.detail = detail; } else { updateData.category = detail; }
+    db.from('local_places').update(updateData).eq('id', placeId).then(function(r) {
       if (r.error) { toast('Error saving', 'err'); return; }
       closeM('medit-rec');
       toast('Saved');
-      loadRecs();
+      if (source === 'ai') { loadAiRecs(); } else { loadRecs(); }
     });
   } else {
     // Fallback DOM update
@@ -1591,13 +1648,16 @@ function delRec(btn) {
   var row = btn.closest('.rrow');
   var placeId = row ? row.dataset.placeId : null;
   if (db && placeId) {
+    var source = row.dataset.source;
     db.from('local_places').delete().eq('id', placeId).then(function(r) {
       if (r.error) { toast('Error deleting', 'err'); return; }
       row.remove();
       toast('Removed');
-      var list = document.getElementById('reclist');
+      var listId = source === 'ai' ? 'aireclist' : 'reclist';
+      var emptyId = source === 'ai' ? 'aireclist-empty' : 'reclist-empty';
+      var list = document.getElementById(listId);
       if (list && !list.querySelectorAll('.rrow').length) {
-        var empty = document.getElementById('reclist-empty');
+        var empty = document.getElementById(emptyId);
         if (empty) empty.style.display = 'block';
       }
     });
@@ -1720,7 +1780,7 @@ function simReq() {
 }
 
 // ── NAV ──
-function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local')loadRecs();if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();} }
+function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local'){loadRecs();loadAiRecs();}if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();} }
 function setBN(id) { document.querySelectorAll('.bnitem').forEach(function(b){b.classList.remove('on');});document.getElementById(id).classList.add('on'); }
 function openSidebar()  { document.getElementById('sbar').classList.add('open');    document.getElementById('ov').classList.add('on'); }
 function closeSidebar() { document.getElementById('sbar').classList.remove('open'); document.getElementById('ov').classList.remove('on'); }
