@@ -143,6 +143,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 .rq-btn.pend .rq-lbl2{color:var(--gold);}
 .rq-btn.dupl{background:var(--cream-dark);border-color:var(--cream-dark);cursor:not-allowed;}
 .rq-btn.dupl .rq-lbl2{color:var(--muted);font-size:10px;}
+.rq-cancel{font-size:10px;color:var(--red);margin-top:5px;text-decoration:underline;cursor:pointer;}
 .rq-ico{font-size:24px;margin-bottom:6px;}
 .rq-lbl2{font-size:11px;font-weight:500;color:var(--charcoal);}
 .car-countdown{background:var(--forest);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;display:none;}
@@ -1117,11 +1118,19 @@ function handleReq(btn){
     if(btn.classList.contains('sent')||btn.classList.contains('dupl'))return;
     var existingReqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
     var today=new Date().toDateString();
-    var alreadyOpen=existingReqs.some(function(r){return r.type===label&&r.status!=='done'&&r.room===state.room&&new Date(r.time).toDateString()===today;});
+    var alreadyOpen=existingReqs.some(function(r){return r.type===label&&r.status!=='done'&&r.status!=='cancelled'&&r.room===state.room&&new Date(r.time).toDateString()===today;});
     if(alreadyOpen){toast(label+' is already being handled by the team');return;}
+    btn.dataset.origIco=btn.querySelector('.rq-ico').textContent;
+    btn.dataset.origLbl=btn.querySelector('.rq-lbl2').textContent;
     btn.classList.add('sent');btn.querySelector('.rq-ico').textContent='\u2713';btn.querySelector('.rq-lbl2').textContent='On its way!';
     pushRequest(label,availMsg||label,null);toast(label+' sent to the team');
-    setTimeout(function(){btn.classList.remove('sent');btn.classList.add('dupl');btn.querySelector('.rq-ico').textContent='\uD83D\uDD12';btn.querySelector('.rq-lbl2').textContent='Already requested';},4000);
+    setTimeout(function(){
+      btn.classList.remove('sent');btn.classList.add('dupl');
+      btn.querySelector('.rq-ico').textContent='\uD83D\uDD12';btn.querySelector('.rq-lbl2').textContent='Already requested';
+      var cancelLink=document.createElement('div');cancelLink.className='rq-cancel';cancelLink.textContent='Undo';
+      cancelLink.onclick=function(e){e.stopPropagation();cancelRequest(btn);};
+      btn.appendChild(cancelLink);
+    },4000);
   } else if(type==='availability'){
     if(btn.classList.contains('pend')||btn.classList.contains('dupl'))return;
     btn.classList.add('pend');btn.querySelector('.rq-ico').textContent='\u23F3';btn.querySelector('.rq-lbl2').textContent='Requested';
@@ -1141,6 +1150,23 @@ function startCarCountdown(){
   var m=Math.floor(carSeconds/60);var s=carSeconds%60;document.getElementById('car-timer').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;},1000);
 }
 function cancelCar(){clearInterval(carTimer);document.getElementById('car-countdown').classList.remove('active');toast('Car request cancelled');}
+
+function cancelRequest(btn){
+  var label=btn.dataset.label;
+  var reqs=JSON.parse(localStorage.getItem('arivo_requests')||'[]');
+  var today=new Date().toDateString();
+  var req=reqs.find(function(r){return r.type===label&&r.status!=='done'&&r.status!=='cancelled'&&r.room===state.room&&new Date(r.time).toDateString()===today;});
+  if(req){
+    req.status='cancelled';
+    localStorage.setItem('arivo_requests',JSON.stringify(reqs));
+    if(db&&req.dbId){db.from('requests').update({status:'cancelled'}).eq('id',req.dbId).then(function(r){if(r.error)console.log('Cancel error:',r.error.message);});}
+  }
+  btn.classList.remove('dupl');
+  btn.querySelector('.rq-ico').textContent=btn.dataset.origIco||'\u2713';
+  btn.querySelector('.rq-lbl2').textContent=btn.dataset.origLbl||label;
+  var cancelEl=btn.querySelector('.rq-cancel');if(cancelEl)cancelEl.remove();
+  toast('Request cancelled');
+}
 
 function triggerPhotoUpload(){document.getElementById('photo-input').click();}
 var pendingPhotoBlob=null;
