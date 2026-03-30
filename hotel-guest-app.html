@@ -878,12 +878,13 @@ function startCheckoutReminders(coDateStr){
   var checkoutDisplay=checkoutTimeStr;
   if(msUntil2hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 2 hours ('+checkoutDisplay+'). Please ensure your belongings are ready.');showHotelMessage('Friendly reminder: your checkout is in 2 hours at '+checkoutDisplay+'. We hope you have had a wonderful stay!');},msUntil2hr);
   if(msUntil1hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 1 hour ('+checkoutDisplay+'). Please drop your key at reception.');showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');},msUntil1hr);
-  // Expire exactly at checkout time (no grace period)
-  var msUntilExact=msUntilCheckout;
-  if(msUntilExact>0){
-    setTimeout(function(){expireGuestSession();},msUntilExact);
+  // Expire at checkout time + 1 hour grace period
+  var graceMs=60*60*1000;
+  var msUntilExpiry=msUntilCheckout+graceMs;
+  if(msUntilExpiry>0){
+    setTimeout(function(){expireGuestSession();},msUntilExpiry);
   } else {
-    // Checkout time already passed - expire immediately
+    // Both checkout time and grace period have passed - expire immediately
     expireGuestSession();
   }
 }
