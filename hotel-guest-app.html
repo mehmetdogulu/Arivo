@@ -350,10 +350,7 @@ var _roomToken=_urlParams.get('token')||null;
   </div>
   <!-- HOTEL TAB -->
   <div class="tc active" id="tab-hotel">
-    <div class="ic"><div class="ic-hdr"><div class="ic-ico">&#128246;</div><div class="ic-ttl">WiFi</div></div><div class="ir"><span class="ir-lbl">Network</span><span class="ir-val" id="wifi-network">—</span></div><div class="ir"><span class="ir-lbl">Password</span><span class="wifi-p" id="wifi-password">—</span></div></div>
-    <div class="ic" id="info-card-times" style="display:none;"></div>
-    <div class="ic" id="info-card-rules" style="display:none;"></div>
-    <div class="ic" id="info-card-contact" style="display:none;"></div>
+    <div id="hotel-info-sections"></div>
     <div class="menu-btn-wrap" onclick="toast('Opening menu PDF...')"><div class="menu-ico">&#128196;</div><div class="menu-info"><div class="menu-title">Restaurant Menu</div><div class="menu-sub">Tap to view our full menu &amp; wine list</div></div><span style="font-size:18px;color:var(--muted);">&#8250;</span></div>
     <div class="feedback-box">
       <div class="feedback-title">How is your stay?</div>
@@ -930,32 +927,7 @@ function enterApp(){
         }
         if(r.data.hotel_info){
           hotelSettings.hotelInfo=r.data.hotel_info;
-          var hi=r.data.hotel_info;
-          // WiFi card
-          var wifiSec=hi['sec-wifi'];
-          if(wifiSec&&wifiSec.rows){
-            var netRow=wifiSec.rows.find(function(row){return row.key==='Network';});
-            var passRow=wifiSec.rows.find(function(row){return row.key==='Password';});
-            var netEl=document.getElementById('wifi-network');var passEl=document.getElementById('wifi-password');
-            if(netEl&&netRow&&netRow.value)netEl.textContent=netRow.value;
-            if(passEl&&passRow&&passRow.value)passEl.textContent=passRow.value;
-          }
-          // Key Times card
-          var timesCard=document.getElementById('info-card-times');
-          var timesSec=hi['sec-times'];
-          if(timesCard&&timesSec&&timesSec.rows&&timesSec.rows.length){
-            var rowsHtml=timesSec.rows.map(function(row){return '<div class="ir"><span class="ir-lbl">'+row.key+'</span><span class="ir-val">'+row.value+'</span></div>';}).join('');
-            timesCard.innerHTML='<div class="ic-hdr"><div class="ic-ico">&#128336;</div><div class="ic-ttl">Key Times</div></div>'+rowsHtml;
-            timesCard.style.display='';
-          }
-          // House Rules card
-          var rulesCard=document.getElementById('info-card-rules');
-          var rulesSec=hi['sec-rules'];
-          if(rulesCard&&rulesSec&&rulesSec.rows&&rulesSec.rows.length){
-            var rulesHtml=rulesSec.rows.map(function(row){return '<div class="ir"><span class="ir-lbl">'+row.key+'</span><span class="ir-val">'+row.value+'</span></div>';}).join('');
-            rulesCard.innerHTML='<div class="ic-hdr"><div class="ic-ico">&#128203;</div><div class="ic-ttl">House Rules</div></div>'+rulesHtml;
-            rulesCard.style.display='';
-          }
+          renderHotelInfoSections(r.data.hotel_info);
         }
       }
     });
@@ -1046,6 +1018,40 @@ function showHotelMessage(msg){
 }
 function dismissHotelMsg(){document.getElementById('notif-banner-overlay').classList.remove('open');setTimeout(loadMessagesFromSupabase,300);}
 function viewInMessages(){document.getElementById('notif-banner-overlay').classList.remove('open');clearMsgBadge();showTab('messages',document.getElementById('nav-tab-messages'));}
+
+// Default icons for known section IDs; falls back to ℹ️ for custom sections
+var _secIcons={'sec-wifi':'&#128246;','sec-times':'&#128336;','sec-rules':'&#128203;','sec-contact':'&#128222;'};
+
+function renderHotelInfoSections(hi){
+  var container=document.getElementById('hotel-info-sections');
+  if(!container)return;
+  container.innerHTML='';
+  // Render sections in the order they appear in the object
+  Object.keys(hi).forEach(function(secId){
+    var sec=hi[secId];
+    if(!sec||!sec.rows||!sec.rows.length)return;
+    // Normalise both {k,v} (dashboard format) and {key,value} (onboarding format)
+    var validRows=sec.rows.filter(function(row){
+      var k=row.k!==undefined?row.k:(row.key||'');
+      var v=row.v!==undefined?row.v:(row.value||'');
+      return k&&k!=='undefined'&&(v&&v!=='undefined');
+    });
+    if(!validRows.length)return;
+    var icon=_secIcons[secId]||'&#8505;&#65039;';
+    // Strip emoji from saved title if present, fallback to secId
+    var rawTitle=sec.title||secId;
+    // title may start with an emoji char — keep as-is, it looks fine
+    var rowsHtml=validRows.map(function(row){
+      var k=row.k!==undefined?row.k:(row.key||'');
+      var v=row.v!==undefined?row.v:(row.value||'');
+      return '<div class="ir"><span class="ir-lbl">'+k+'</span><span class="ir-val">'+v+'</span></div>';
+    }).join('');
+    var card=document.createElement('div');
+    card.className='ic';
+    card.innerHTML='<div class="ic-hdr"><div class="ic-ico">'+icon+'</div><div class="ic-ttl">'+rawTitle+'</div></div>'+rowsHtml;
+    container.appendChild(card);
+  });
+}
 
 function loadMessagesFromSupabase(){
   if(!db)return;
