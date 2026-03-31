@@ -254,48 +254,6 @@ textarea.fi{resize:vertical;min-height:80px;}
   .mrr-card{flex-direction:column;gap:16px;}
 }
 
-function loadHotelLogs(){
-  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
-  var container = document.getElementById('admin-log-entries');
-  if(!container) return;
-  if(!logs.length){
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:#7A7060;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
-    return;
-  }
-  container.innerHTML = '';
-  logs.forEach(function(log){
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #EDE6D6;font-size:12px;';
-    var d = new Date(log.ts);
-    var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    var srcColors = {'guest_app':'#B8933F','staff_app':'#2563EB','dashboard':'#16A34A'};
-    var srcColor = srcColors[log.source] || '#7A7060';
-    row.innerHTML =
-      '<div style="flex-shrink:0;width:90px;color:#7A7060;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
-      '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
-      '<div style="flex:1;min-width:0;">'+
-        '<div style="color:#1A1A1A;font-weight:500;">'+log.detail+'</div>'+
-        '<div style="color:#7A7060;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
-      '</div>';
-    container.appendChild(row);
-  });
-}
-
-function exportAdminLogs(){
-  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
-  if(!logs.length){alert('No logs to export.');return;}
-  var csv = 'Timestamp,Action,Detail,User,Room,Source
-';
-  logs.forEach(function(l){
-    csv += [l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'
-';
-  });
-  var blob = new Blob([csv],{type:'text/csv'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'arivo-admin-log-'+new Date().toISOString().split('T')[0]+'.csv';
-  a.click();
-}
 
 @media(min-width:901px) and (max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}}
 @media(min-width:1201px){.stats{grid-template-columns:repeat(4,1fr);}}
@@ -351,7 +309,7 @@ function exportAdminLogs(){
     <div class="ni active" onclick="go('overview',this)"><span class="ni-ico">&#9646;&#9646;</span>Overview</div>
     <div class="ni" onclick="go('hotels',this)"><span class="ni-ico">&#127968;</span>All Hotels<span class="ni-badge green" id="sb-hotel-count">5</span></div>
     <div class="ni" onclick="go('revenue',this)"><span class="ni-ico">&#128178;</span>Revenue</div>
-    <div class="ni" onclick="go('trials',this)"><span class="ni-ico">&#9203;</span>Trials<span class="ni-badge amber">3</span></div>
+    <div class="ni" onclick="go('trials',this)"><span class="ni-ico">&#9203;</span>Trials<span class="ni-badge amber" id="trials-nav-badge">0</span></div>
     <div class="nav-lbl">Operations</div>
     <div class="ni" onclick="go('activity',this)"><span class="ni-ico">&#9881;</span>Activity Log</div>
     <div class="ni" onclick="go('messages',this)"><span class="ni-ico">&#128172;</span>Broadcast</div>
@@ -388,22 +346,22 @@ function exportAdminLogs(){
         <div class="mrr-card">
           <div class="mrr-main">
             <div class="mrr-lbl">Monthly Recurring Revenue</div>
-            <div class="mrr-val">£1,296</div>
-            <div class="mrr-sub" style="color:var(--green);">&#8593; Growing · 5 active subscribers</div>
+            <div class="mrr-val" id="mrr-total">£0</div>
+            <div class="mrr-sub" id="mrr-sub-overview">Loading...</div>
           </div>
           <div class="mrr-breakdown">
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--blue);">2</div><div class="mrr-item-lbl">Starter<br>£198/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--gold);">2</div><div class="mrr-item-lbl">Professional<br>£598/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--purple);">1</div><div class="mrr-item-lbl">Complete<br>£499/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">3</div><div class="mrr-item-lbl">On Trial<br>£0/mo</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--blue);" id="mrr-starter-count">0</div><div class="mrr-item-lbl">Starter<br><span id="mrr-starter-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--gold);" id="mrr-pro-count">0</div><div class="mrr-item-lbl">Professional<br><span id="mrr-pro-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--purple);" id="mrr-complete-count">0</div><div class="mrr-item-lbl">Complete<br><span id="mrr-complete-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);" id="mrr-trial-count">0</div><div class="mrr-item-lbl">On Trial<br>£0/mo</div></div>
           </div>
         </div>
 
         <div class="stats">
-          <div class="stat green"><div class="stat-lbl">Active Hotels</div><div class="stat-val">5</div><div class="stat-note up">&#8593; 2 this month</div></div>
-          <div class="stat amber"><div class="stat-lbl">On Free Trial</div><div class="stat-val">3</div><div class="stat-note warn">1 expires in 3 days</div></div>
-          <div class="stat gold"><div class="stat-lbl">Total Guests</div><div class="stat-val">312</div><div class="stat-note up">&#8593; Across all hotels</div></div>
-          <div class="stat blue"><div class="stat-lbl">Requests Today</div><div class="stat-val">47</div><div class="stat-note up">&#8593; Platform-wide</div></div>
+          <div class="stat green"><div class="stat-lbl">Active Hotels</div><div class="stat-val" id="stat-active">0</div><div class="stat-note up">Paying subscribers</div></div>
+          <div class="stat amber"><div class="stat-lbl">On Free Trial</div><div class="stat-val" id="stat-trial">0</div><div class="stat-note warn">Free trial accounts</div></div>
+          <div class="stat gold"><div class="stat-lbl">Total Guests</div><div class="stat-val" id="stat-guests">0</div><div class="stat-note up">&#8593; Across all hotels</div></div>
+          <div class="stat blue"><div class="stat-lbl">Requests Today</div><div class="stat-val" id="stat-requests">0</div><div class="stat-note up">&#8593; Platform-wide</div></div>
         </div>
 
         <div class="two-col">
@@ -413,11 +371,7 @@ function exportAdminLogs(){
               <div class="card-title">Recent Activity <span class="notif"></span></div>
               <div class="card-action" onclick="go('activity',null)">View all →</div>
             </div>
-            <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">The Larkspur House signed up</div><div class="act-sub">Starter plan · Cornwall, UK</div></div><div class="act-time">2 min ago</div></div>
-            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £299</div><div class="act-sub">The Anchor Hotel · Professional</div></div><div class="act-time">1 hr ago</div></div>
-            <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expires in 3 days</div><div class="act-sub">Briarwood Inn · Not yet converted</div></div><div class="act-time">Auto alert</div></div>
-            <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel logged in</div><div class="act-sub">The Maison Collective · Bath</div></div><div class="act-time">3 hrs ago</div></div>
-            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £499</div><div class="act-sub">Clifton Manor Hotel · Complete</div></div><div class="act-time">Yesterday</div></div>
+            <div id="overview-activity"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
           </div>
 
           <!-- Trial Expirations -->
@@ -426,21 +380,7 @@ function exportAdminLogs(){
               <div class="card-title">Trial Expirations</div>
               <div class="card-action" onclick="go('trials',null)">Manage →</div>
             </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds · Signed up 27 Feb · No payment method</div></div>
-              <span class="days-badge urgent">3 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Chase</button>
-            </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow · Signed up 5 Mar</div></div>
-              <span class="days-badge soon">10 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
-            </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Signed up 10 Mar</div></div>
-              <span class="days-badge ok">15 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
-            </div>
+            <div id="overview-trials"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
           </div>
         </div>
       </div>
@@ -449,7 +389,7 @@ function exportAdminLogs(){
       <div class="sec" id="s-hotels">
         <div class="sec-hdr">
           <div class="sec-row">
-            <div><div class="sec-title">All Hotels</div><div class="sec-sub">8 properties · 5 paying · 3 on trial</div></div>
+            <div><div class="sec-title">All Hotels</div><div class="sec-sub" id="hotels-sub">Loading...</div></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-s" onclick="toast('Export CSV downloading...')">&#8659; Export CSV</button>
               <button class="btn btn-g" onclick="openModal('modal-add-hotel')">+ Add Hotel</button>
@@ -487,12 +427,12 @@ function exportAdminLogs(){
         <div class="mrr-card" style="margin-bottom:16px;">
           <div class="mrr-main">
             <div class="mrr-lbl">Current MRR</div>
-            <div class="mrr-val">£1,296</div>
-            <div class="mrr-sub">ARR equivalent: <strong style="color:var(--white);">£15,552</strong></div>
+            <div class="mrr-val" id="rev-mrr-total">£0</div>
+            <div class="mrr-sub">ARR equivalent: <strong style="color:var(--white);" id="rev-arr">£0</strong></div>
           </div>
           <div class="mrr-breakdown">
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--green);">£1,296</div><div class="mrr-item-lbl">Collected<br>this month</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--amber);">£897</div><div class="mrr-item-lbl">Potential<br>(trials convert)</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--green);" id="rev-collected">£0</div><div class="mrr-item-lbl">Collected<br>this month</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--amber);" id="rev-potential">£0</div><div class="mrr-item-lbl">Potential<br>(trials convert)</div></div>
             <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">0%</div><div class="mrr-item-lbl">Churn<br>this month</div></div>
           </div>
         </div>
@@ -506,12 +446,7 @@ function exportAdminLogs(){
         <div class="two-col">
           <div class="card">
             <div class="card-hdr"><div class="card-title">Revenue by Plan</div></div>
-            <div class="card-body" style="padding:12px 18px;">
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter (2 hotels)</span><span style="color:var(--white);font-weight:600;">£198/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional (2 hotels)</span><span style="color:var(--white);font-weight:600;">£598/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete (1 hotel)</span><span style="color:var(--white);font-weight:600;">£499/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£1,295/mo</span></div>
-            </div>
+            <div class="card-body" id="revenue-by-plan" style="padding:12px 18px;"></div>
           </div>
           <div class="card">
             <div class="card-hdr"><div class="card-title">Stripe Payouts</div></div>
@@ -527,38 +462,14 @@ function exportAdminLogs(){
       <div class="sec" id="s-trials">
         <div class="sec-hdr">
           <div class="sec-title">Trial Management</div>
-          <div class="sec-sub">3 hotels currently on free trial</div>
+          <div class="sec-sub" id="trials-sub">Loading...</div>
         </div>
         <div class="card">
           <div class="card-hdr">
             <div class="card-title">Active Trials</div>
             <div class="card-action" onclick="toast('Sending chase emails to all expiring trials...')">&#9993; Chase all expiring</div>
           </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds, UK · Starter plan interest · Signed up 27 Feb 2026 · No card added yet</div></div>
-            <span class="days-badge urgent">3 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Briarwood Inn')">+ Extend</button>
-              <button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast('Trial ended for Briarwood Inn')">End trial</button>
-            </div>
-          </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow, Cornwall · Professional plan interest · Signed up 5 Mar 2026</div></div>
-            <span class="days-badge soon">10 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('The Harbour Arms')">+ Extend</button>
-            </div>
-          </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Starter plan · Signed up 10 Mar 2026 · Very active (34 scans)</div></div>
-            <span class="days-badge ok">15 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Oakwood Guesthouse')">+ Extend</button>
-            </div>
-          </div>
+          <div id="trials-list"><div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">Loading trials...</div></div>
         </div>
       </div>
 
@@ -569,13 +480,7 @@ function exportAdminLogs(){
           <div class="sec-sub">Platform-wide events in real time</div>
         </div>
         <div class="card" id="activity-log">
-          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — The Larkspur House</div><div class="act-sub">Starter plan · Mousehole, Cornwall · via landing page</div></div><div class="act-time">2 min ago</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £299</div><div class="act-sub">The Anchor Hotel · Monthly renewal · Stripe</div></div><div class="act-time">1 hr ago</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Maison Collective</div><div class="act-sub">Bath · James Mitchell · Chrome on iPhone</div></div><div class="act-time">3 hrs ago</div></div>
-          <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expiry alert sent — Briarwood Inn</div><div class="act-sub">Auto email: 3 days remaining</div></div><div class="act-time">6 hrs ago</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £499</div><div class="act-sub">Clifton Manor Hotel · Monthly renewal</div></div><div class="act-time">Yesterday</div></div>
-          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — Oakwood Guesthouse</div><div class="act-sub">Starter trial · Ambleside, Lake District</div></div><div class="act-time">11 Mar</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Harbour Arms</div><div class="act-sub">Padstow · First login since signup</div></div><div class="act-time">10 Mar</div></div>
+          <div id="activity-log-rows"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
         </div>
         <!-- Hotel-level log viewer -->
         <div class="card" style="margin-top:14px;">
