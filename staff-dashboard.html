@@ -221,7 +221,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
       <div class="header-logo">Ari<em>vo</em></div>
       <div class="staff-av" id="staff-av" onclick="showTab('profile',document.querySelectorAll('.tab')[2])">MR</div>
     </div>
-    <div class="hotel-name" id="staff-hotel-name"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+      <div id="staff-hotel-logo" style="width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0;">&#127968;</div>
+      <div class="hotel-name" id="staff-hotel-name"></div>
+    </div>
     <div class="staff-name-hdr" id="staff-name-hdr"></div>
     <div class="staff-role-hdr" id="staff-role-hdr">Housekeeping &middot; On shift</div>
   </div>
@@ -499,12 +502,18 @@ function enterStaffApp(s) {
   document.getElementById('profile-av').textContent     = ini;
   document.getElementById('profile-name').textContent   = s.name;
   document.getElementById('profile-role').textContent   = s.role || 'Staff';
-  // Load hotel name from DB
+  // Load hotel name and logo from DB
   if (db && HOTEL_ID) {
     db.from('hotels').select('name').eq('id', HOTEL_ID).single().then(function(r) {
       var name = r.data ? r.data.name : '';
       var hn = document.getElementById('staff-hotel-name'); if (hn) hn.textContent = name;
       var phn = document.getElementById('profile-hotel-name'); if (phn) phn.textContent = name;
+    });
+    db.from('hotel_settings').select('logo_url').eq('hotel_id', HOTEL_ID).single().then(function(r) {
+      if (r.data && r.data.logo_url) {
+        var el = document.getElementById('staff-hotel-logo');
+        if (el) el.innerHTML = '<img src="' + r.data.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">';
+      }
     });
   }
   initPing();
