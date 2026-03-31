@@ -372,14 +372,14 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="sech"><div class="secr"><div><div class="sect">Hotel Info</div><div class="secs">Appears in guest app immediately</div></div><button class="btn btn-g" onclick="openM('msec')">+ Add Section</button></div></div>
   <div class="isec" id="sec-wifi">
     <div class="ish"><div class="ist"><div class="ith">&#128246;</div>WiFi</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR('sec-wifi','WiFi')">&#65291;</div><div class="icb del" onclick="delSec('sec-wifi')">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Network</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">Your WiFi network name</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Password</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">Your WiFi password</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk" contenteditable="true" onblur="saveHotelInfo()" style="min-width:90px;cursor:text;">Network</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()"></div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk" contenteditable="true" onblur="saveHotelInfo()" style="min-width:90px;cursor:text;">Password</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()"></div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
     <button class="addrow" onclick="openAR('sec-wifi','WiFi')">&#65291; Add row</button>
   </div>
   <div class="isec" id="sec-times">
     <div class="ish"><div class="ist"><div class="ith">&#128336;</div>Key Times</div><div style="display:flex;gap:5px"><div class="icb" onclick="openAR('sec-times','Key Times')">&#65291;</div><div class="icb del" onclick="delSec('sec-times')">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Check-out</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">e.g. 11:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
-    <div class="irow"><div class="irk">Breakfast</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()">e.g. 8:00 - 10:00 AM</div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk" contenteditable="true" onblur="saveHotelInfo()" style="min-width:90px;cursor:text;">Check-in</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()"></div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
+    <div class="irow"><div class="irk" contenteditable="true" onblur="saveHotelInfo()" style="min-width:90px;cursor:text;">Check-out</div><div class="irv" contenteditable="true" onblur="saveHotelInfo()"></div><div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div></div>
     <button class="addrow" onclick="openAR('sec-times','Key Times')">&#65291; Add row</button>
   </div>
   <div class="card"><div class="ch"><div class="ct">&#128196; Restaurant Menu (PDF)</div></div><div class="cb">
@@ -1541,12 +1541,18 @@ function loadHotelInfo() {
         // Remove existing irows and repopulate
         sec.querySelectorAll('.irow').forEach(function(row) { row.remove(); });
         var addBtn = sec.querySelector('.addrow');
-        data.rows.forEach(function(row) {
-          // Support both {k,v} (dashboard format) and {key,value} (onboarding format)
-          var k = row.k !== undefined ? row.k : (row.key || '');
-          var v = row.v !== undefined ? row.v : (row.value || '');
+        // Default key labels per section, used when DB has missing/corrupted labels
+        var defaultKeys = {'sec-wifi':['Network','Password'],'sec-times':['Check-in','Check-out']};
+        var sectionDefaults = defaultKeys[secId] || [];
+        data.rows.forEach(function(row, idx) {
+          // Support both {k,v} (dashboard) and {key,value} (onboarding) formats
+          var k = row.k !== undefined ? row.k : (row.key !== undefined ? row.key : '');
+          var v = row.v !== undefined ? row.v : (row.value !== undefined ? row.value : '');
+          // Sanitise literal "undefined" strings saved by old buggy code
+          if (k === 'undefined' || !k) k = sectionDefaults[idx] || '';
+          if (v === 'undefined') v = '';
           var el = document.createElement('div'); el.className = 'irow';
-          el.innerHTML = '<div class="irk">' + k + '</div>'
+          el.innerHTML = '<div class="irk" contenteditable="true" onblur="saveHotelInfo()" style="min-width:90px;cursor:text;">' + k + '</div>'
                        + '<div class="irv" contenteditable="true" onblur="saveHotelInfo()">' + v + '</div>'
                        + '<div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';
           sec.insertBefore(el, addBtn);
