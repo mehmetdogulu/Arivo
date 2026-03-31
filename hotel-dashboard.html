@@ -2196,8 +2196,12 @@ function loadRoomTokens() {
 
 async function generateRoomToken(room) {
   if (!db) return;
-  var token = crypto.randomUUID();
   var existing = await db.from('room_tokens').select('id').eq('hotel_id', HOTEL_ID).eq('room', room).single();
+  if (existing.data) {
+    var confirmed = confirm(room + ' already has an active QR code.\n\nRegenerating will invalidate the existing QR — any printed cards for this room will stop working.\n\nContinue?');
+    if (!confirmed) return;
+  }
+  var token = crypto.randomUUID();
   var r;
   if (existing.data) {
     r = await db.from('room_tokens').update({token: token}).eq('id', existing.data.id);
@@ -2205,7 +2209,7 @@ async function generateRoomToken(room) {
     r = await db.from('room_tokens').insert({hotel_id: HOTEL_ID, room: room, token: token});
   }
   if (r.error) { toast('Error: ' + r.error.message, 'err'); return; }
-  toast('QR token generated for ' + room);
+  toast('New QR token generated for ' + room);
   loadRoomTokens();
 }
 
