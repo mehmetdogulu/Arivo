@@ -1542,9 +1542,12 @@ function loadHotelInfo() {
         sec.querySelectorAll('.irow').forEach(function(row) { row.remove(); });
         var addBtn = sec.querySelector('.addrow');
         data.rows.forEach(function(row) {
+          // Support both {k,v} (dashboard format) and {key,value} (onboarding format)
+          var k = row.k !== undefined ? row.k : (row.key || '');
+          var v = row.v !== undefined ? row.v : (row.value || '');
           var el = document.createElement('div'); el.className = 'irow';
-          el.innerHTML = '<div class="irk">' + row.k + '</div>'
-                       + '<div class="irv" contenteditable="true" onblur="saveHotelInfo()">' + row.v + '</div>'
+          el.innerHTML = '<div class="irk">' + k + '</div>'
+                       + '<div class="irv" contenteditable="true" onblur="saveHotelInfo()">' + v + '</div>'
                        + '<div class="iract"><div class="icb del" onclick="delRow(this)">&#10005;</div></div>';
           sec.insertBefore(el, addBtn);
         });
