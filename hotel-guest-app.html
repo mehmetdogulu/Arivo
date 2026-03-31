@@ -234,6 +234,7 @@ var db=null;
 try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){console.log('Supabase init failed:',e);}
 var _urlParams=new URLSearchParams(window.location.search);
 var HOTEL_ID=_urlParams.get('hotel')||null;
+var _roomToken=_urlParams.get('token')||null;
 </script>
 </head>
 <body>
@@ -488,6 +489,55 @@ function showScreen(id){
   window.scrollTo(0,0);
 }
 
+function resolveRoomToken(token){
+  if(!db){setTimeout(function(){resolveRoomToken(token);},300);return;}
+  db.from('room_tokens').select('hotel_id,room').eq('token',token).single().then(function(r){
+    if(r.error||!r.data){
+      var sc=document.getElementById('screen-consent');
+      if(sc)sc.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;">'
+        +'<div style="font-size:48px;margin-bottom:24px;">&#128274;</div>'
+        +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Invalid QR code</div>'
+        +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">This QR code is not recognised. Please ask reception for a new one.</div>'
+        +'</div>';
+      return;
+    }
+    HOTEL_ID=r.data.hotel_id;
+    var preRoom=r.data.room;
+    initGuestApp();
+    // Pre-select the room once the dropdown loads
+    var waitRoom=setInterval(function(){
+      var sel=document.getElementById('reg-room');
+      if(sel&&sel.options.length>1){
+        clearInterval(waitRoom);
+        sel.value=preRoom;
+        // Also hide the room selector and show it as read-only
+        var roomFg=sel.closest('.fg');
+        if(roomFg){
+          roomFg.innerHTML='<label class="fl">Room</label>'
+            +'<div class="fi" style="background:rgba(30,58,47,0.06);border-color:rgba(30,58,47,0.2);color:var(--forest);font-weight:500;">'+preRoom+'</div>'
+            +'<input type="hidden" id="reg-room" value="'+preRoom+'">';
+        }
+      }
+    },100);
+  });
+}
+
+function initGuestApp(){
+  loadRoomDropdown();
+  // Load hotel name early so consent + welcome screens show it before enterApp()
+  db.from('hotels').select('name,city').eq('id',HOTEL_ID).single().then(function(r){
+    if(r.data){
+      var hn=r.data.name||'Your Hotel';
+      var city=r.data.city||'';
+      var consentName=document.getElementById('consent-hotel-name');
+      if(consentName)consentName.textContent=hn+(city?' \u00b7 '+city:'');
+      var welcomeEyebrow=document.getElementById('w-hotel-eyebrow');
+      if(welcomeEyebrow)welcomeEyebrow.textContent=hn;
+    }
+  });
+  if(!restoreSession()){}
+}
+
 function loadRoomDropdown(){
   var sel=document.getElementById('reg-room');
   if(!sel)return;
@@ -521,6 +571,11 @@ function loadRoomDropdown(){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(!db){try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}}
+  if(_roomToken){
+    // Token-based entry: resolve hotel+room from room_tokens table
+    resolveRoomToken(_roomToken);
+    return;
+  }
   if(!HOTEL_ID){
     var sc=document.getElementById('screen-consent');
     if(sc)sc.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;">'
@@ -530,19 +585,7 @@ document.addEventListener('DOMContentLoaded',function(){
       +'</div>';
     return;
   }
-  loadRoomDropdown();
-  // Load hotel name early so consent + welcome screens show it before enterApp()
-  db.from('hotels').select('name,city').eq('id',HOTEL_ID).single().then(function(r){
-    if(r.data){
-      var hn=r.data.name||'Your Hotel';
-      var city=r.data.city||'';
-      var consentName=document.getElementById('consent-hotel-name');
-      if(consentName)consentName.textContent=hn+(city?' \u00b7 '+city:'');
-      var welcomeEyebrow=document.getElementById('w-hotel-eyebrow');
-      if(welcomeEyebrow)welcomeEyebrow.textContent=hn;
-    }
-  });
-  if(!restoreSession()){}
+  initGuestApp();
 });
 
 function showTab(name,el){
