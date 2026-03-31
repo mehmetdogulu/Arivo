@@ -1614,7 +1614,6 @@ function _loadMoreThreadMessages(guestId) {
   if (!db || _threadAllLoaded || _threadLoadingMore) return;
   _threadLoadingMore = true;
   var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
-  // Show "loading" indicator at top
   var loader = document.createElement('div');
   loader.id = 'thread-load-more';
   loader.style.cssText = 'text-align:center;padding:8px;font-size:11px;color:var(--tx3);';
