@@ -550,7 +550,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mmove"><div class="modal"><div class="mhdr"><div class="mt">Move Room</div><div class="mclose" onclick="closeM('mmove')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Guest: <strong id="move-guest-name" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Current Room</label><div style="font-size:14px;font-weight:500;color:var(--tx);padding:8px 0" id="move-current-room">—</div></div><div class="fg"><label class="fl">New Room</label><select class="fi" id="move-room-select"></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveMoveRoom()">Move Guest</button><button class="btn btn-s" onclick="closeM('mmove')">Cancel</button></div></div></div>
 <div class="mov" id="mmsg"><div class="modal"><div class="mhdr"><div class="mt">Message Guest</div><div class="mclose" onclick="closeM('mmsg')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">To: <strong id="msgto2" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Message</label><textarea class="msgin" id="msgb2" placeholder="Type your message..."></textarea></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="sendMsgM()">Send</button><button class="btn btn-s" onclick="closeM('mmsg')">Cancel</button></div></div></div>
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option value="staff">Staff</option><option value="housekeeping">Housekeeping</option><option value="front_desk">Front Desk</option><option value="concierge">Concierge</option><option value="maintenance">Maintenance</option><option value="manager">Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"><div style="font-size:11px;color:var(--tx3);margin-top:4px;">An invitation email will be sent to this address</div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Send Invitation</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
-<div class="mov" id="medit-staff"><div class="modal"><div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="edit-sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="edit-sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Status</label><select class="fi" id="edit-sfs"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveStaffEdit()">Save Changes</button><button class="btn btn-r" onclick="removeStaffById()">Remove Staff</button></div></div></div>
+<div class="mov" id="medit-staff"><div class="modal"><div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="edit-sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="edit-sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Status</label><select class="fi" id="edit-sfs"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div></div><div class="mftr" style="flex-direction:column;gap:8px;"><div style="display:flex;gap:8px;width:100%;"><button class="btn btn-g btn-w" style="flex:1;" onclick="saveStaffEdit()">Save Changes</button><button class="btn btn-r" onclick="removeStaffById()">Remove Staff</button></div><button class="btn" style="width:100%;background:var(--surface,#2a2a2a);color:var(--tx2,#aaa);font-size:12px;" onclick="copyStaffInviteLink()">&#128279; Copy invite link (if no email received)</button></div></div></div>
 
 <div id="etapop">
   <div class="etabox">
@@ -1868,6 +1868,21 @@ function removeStaffById() {
   currentEditRow.remove();closeM('medit-staff');toast(name+' removed');currentEditRow=null;
 }
 function revokeStaffAccess(name) { var revoked=JSON.parse(localStorage.getItem('arivo_revoked_staff')||'[]');if(revoked.indexOf(name)<0)revoked.push(name);localStorage.setItem('arivo_revoked_staff',JSON.stringify(revoked));window.dispatchEvent(new StorageEvent('storage',{key:'arivo_revoked_staff',newValue:JSON.stringify(revoked)})); }
+async function copyStaffInviteLink() {
+  if (!currentEditRow) { toast('No staff selected', 'err'); return; }
+  var staffId = currentEditRow.dataset.staffId;
+  var staffName = currentEditRow.querySelector('.sn') ? currentEditRow.querySelector('.sn').textContent : 'staff';
+  if (!staffId || !db) { toast('Cannot find staff record', 'err'); return; }
+  toast('Generating link...');
+  var token = crypto.randomUUID();
+  var exp = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+  await db.from('staff').update({invite_token: token, invite_expires_at: exp, invite_used: false}).eq('id', staffId);
+  var setupUrl = window.location.origin + '/account-setup.html?token=' + token;
+  var copied = false;
+  try { await navigator.clipboard.writeText(setupUrl); copied = true; } catch(e) {}
+  if (copied) { toast('Setup link for ' + staffName + ' copied to clipboard!'); }
+  else { prompt('Copy this setup link for ' + staffName + ':', setupUrl); }
+}
 async function addStaff() {
   var name  = document.getElementById('sfn').value.trim();
   var role  = document.getElementById('sfr').value;
@@ -1886,14 +1901,25 @@ async function addStaff() {
   if (r.error) { toast('Error: ' + r.error.message, 'err'); return; }
   var setupUrl = window.location.origin + '/account-setup.html?token=' + inviteToken;
   var emailHtml = buildStaffInviteEmail(name, setupUrl);
-  await fetch('/api/email', {
+  var emailRes = await fetch('/api/email', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({to: email, subject: 'You\'ve been invited to join Arivo', html: emailHtml})
-  });
-  closeM('mstaff'); toast('Invitation sent to ' + email);
+  }).catch(function(){return {ok:false};});
+  closeM('mstaff');
   document.getElementById('sfn').value = ''; document.getElementById('sfe').value = '';
   loadStaff();
+  if (emailRes.ok) {
+    toast('Invitation sent to ' + email);
+  } else {
+    var copied = false;
+    try { await navigator.clipboard.writeText(setupUrl); copied = true; } catch(e) {}
+    if (copied) {
+      toast('Email failed — setup link copied to clipboard. Share it with ' + name + ' directly.');
+    } else {
+      setTimeout(function(){ prompt('Email failed. Copy this setup link for ' + name + ':', setupUrl); }, 300);
+    }
+  }
 }
 
 function buildStaffInviteEmail(name, setupUrl) {
