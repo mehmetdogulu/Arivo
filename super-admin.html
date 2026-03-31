@@ -509,12 +509,12 @@ textarea.fi{resize:vertical;min-height:80px;}
             <div class="fg">
               <label class="fl">Send to</label>
               <select class="fi" id="msg-audience">
-                <option>All hotels (8)</option>
-                <option>Paying hotels only (5)</option>
-                <option>Trial hotels only (3)</option>
-                <option>Starter plan (2)</option>
-                <option>Professional plan (2)</option>
-                <option>Complete plan (1)</option>
+                <option id="bc-opt-all">All hotels</option>
+                <option id="bc-opt-paying">Paying hotels only</option>
+                <option id="bc-opt-trial">Trial hotels only</option>
+                <option id="bc-opt-starter">Starter plan</option>
+                <option id="bc-opt-pro">Professional plan</option>
+                <option id="bc-opt-complete">Complete plan</option>
               </select>
             </div>
             <div class="fg">
@@ -533,8 +533,7 @@ textarea.fi{resize:vertical;min-height:80px;}
         </div>
         <div class="card">
           <div class="card-hdr"><div class="card-title">Previous Messages</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128172;</div><div class="act-info"><div class="act-title">Welcome to Arivo — Getting started guide</div><div class="act-sub">Sent to all hotels · 8 recipients · 100% opened</div></div><div class="act-time">15 Mar</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128172;</div><div class="act-info"><div class="act-title">New feature: Pre-arrival guest links</div><div class="act-sub">Sent to Professional + Complete · 3 recipients</div></div><div class="act-time">10 Mar</div></div>
+          <div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">No previous broadcasts yet.</div>
         </div>
       </div>
 
@@ -695,14 +694,18 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 var _urlParams = new URLSearchParams(window.location.search);
 var HOTEL_ID = _urlParams.get('hotel') || null;
 var db = null;
+var _hotelData = [];
 document.addEventListener('DOMContentLoaded', function(){
   try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
-
 var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',settings:'Platform Settings'};
 var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
 var PLAN_MRR = {starter:'£99/mo',pro:'£299/mo',complete:'£499/mo',trial:'Free trial'};
+
+// ── UTIL ──
+function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},3000);}
 
 // ── LOGIN ──
 function doLogin(){
@@ -728,6 +731,7 @@ function enterAdmin(){
   if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   loadHotels();
   renderRevChart();
+  loadOverview();
 }
 
 document.getElementById('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
@@ -760,6 +764,9 @@ function go(name,el){
   document.getElementById('ttitle').textContent=TITLES[name]||name;
   closeSidebar();
   window.scrollTo(0,0);
+  if(name==='overview') loadOverview();
+  if(name==='trials') loadTrials();
+  if(name==='activity') loadActivityRows('activity-log-rows',50);
 }
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
@@ -769,43 +776,19 @@ function openModal(id){document.getElementById(id).classList.add('open');documen
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 document.querySelectorAll('.modal-ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeModal(o.id);});});
 
-// ── RENDER HOTELS TABLE ──
-function renderHotels(){
-  var tbody=document.getElementById('hotels-tbody');
-  if(!tbody)return;
-  tbody.innerHTML='';
-  hotels.forEach(function(h){
-    var tr=document.createElement('tr');
-    var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':h.plan==='trial'?'':'starter';
-    var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
-    var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
-    var mrrStr=h.mrr>0?'&pound;'+h.mrr:'-';
-    tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+h.loc+'</div></td>'+
-      '<td><span class="plan-tag '+planCls+'">'+PLAN_LABELS[h.plan]+'</span></td>'+
-      '<td><span class="status-dot '+statusCls+'">'+statusLbl+'</span></td>'+
-      '<td style="color:var(--gold);font-weight:600;">'+mrrStr+'</td>'+
-      '<td style="color:var(--text3);">'+h.since+'</td>'+
-      '<td style="color:var(--text3);">'+h.lastActive+'</td>'+
-      '<td><div class="h-actions">'+
-        '<div class="ic-btn ok" title="View details" onclick="openHotelDetail('+h.id+')">&#128065;</div>'+
-        '<div class="ic-btn warn" title="Suspend" onclick="toast(\''+h.name+' suspended\')">&#9940;</div>'+
-        '<div class="ic-btn danger" title="Delete" onclick="toast(\'Are you sure? This cannot be undone.\')">&#128465;</div>'+
-      '</div></td>';
-    tbody.appendChild(tr);
-  });
-}
-
+// ── OPEN HOTEL DETAIL ──
 function openHotelDetail(id){
-  var h=hotels.find(function(x){return x.id===id;});
+  var h=_hotelData.find(function(x){return x.id===id;});
   if(!h)return;
   document.getElementById('detail-title').textContent=h.name;
-  document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan];
-  document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':'Overdue';
+  document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan]||h.plan;
+  document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':h.status;
   document.getElementById('detail-status').style.color=h.status==='active'?'var(--green)':h.status==='trial'?'var(--amber)':'var(--red)';
-  document.getElementById('detail-mrr').textContent=h.mrr>0?'£'+h.mrr+'/mo':'Free trial';
-  document.getElementById('detail-since').textContent=h.since;
+  var mrr={starter:99,pro:299,complete:499,trial:0};
+  document.getElementById('detail-mrr').textContent=h.status==='trial'?'Free trial':'£'+(mrr[h.plan]||0)+'/mo';
+  document.getElementById('detail-since').textContent=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
   var sel=document.getElementById('detail-plan-select');
-  sel.value=h.plan;
+  if(sel) sel.value=h.plan;
   openModal('modal-hotel-detail');
 }
 
@@ -835,9 +818,7 @@ async function addHotel(){
     var hotelRes=await db.from('hotels').insert({name:name,slug:slug,city:city,country:country,plan:plan,status:plan==='trial'?'trial':'active'}).select('id').single();
     if(hotelRes.error)throw hotelRes.error;
     var hotelId=hotelRes.data.id;
-    // Create hotel_settings row
     await db.from('hotel_settings').insert({hotel_id:hotelId,rooms:[],address:{name:name,city:city,postcode:''},hotel_info:{}});
-    // Create manager account
     var hash=await hashPassword(mgrPass);
     var staffRes=await db.from('staff').insert({hotel_id:hotelId,name:mgrName||'Manager',email:mgrEmail,password_hash:hash,role:'manager',active:true});
     if(staffRes.error)throw staffRes.error;
@@ -845,6 +826,7 @@ async function addHotel(){
     ['ah-name','ah-city','ah-mgr-name','ah-email','ah-mgr-pass'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
     toast('Hotel created — manager can now log in at hotel-dashboard.html?hotel='+hotelId);
     loadHotels();
+    loadOverview();
   }catch(err){
     toast('Error: '+(err.message||'Unknown error'),'err');
     console.error('addHotel error:',err);
@@ -858,21 +840,172 @@ function loadHotels(){
   if(!db)return;
   db.from('hotels').select('id,name,city,country,plan,status,created_at').order('created_at',{ascending:false}).then(function(r){
     if(r.error||!r.data)return;
+    _hotelData = r.data;
     var tbody=document.getElementById('hotels-tbody');if(!tbody)return;
     tbody.innerHTML='';
     r.data.forEach(function(h){
       var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
-      var statusClass=h.status==='active'?'pill active':h.status==='trial'?'pill trial':'pill';
-      var planLabel={'starter':'Starter','pro':'Pro','complete':'Complete','trial':'Trial'}[h.plan]||h.plan||'—';
+      var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':'starter';
+      var planLabel=PLAN_LABELS[h.plan]||h.plan||'—';
+      var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
+      var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
+      var mrrVal={starter:99,pro:299,complete:499}[h.plan];
+      var mrrStr=h.status==='active'&&mrrVal?'£'+mrrVal:'-';
       var tr=document.createElement('tr');
-      tr.innerHTML='<td><strong>'+h.name+'</strong><br><span style="font-size:11px;color:var(--muted)">'+(h.city||'')+(h.country?', '+h.country:'')+'</span></td>'
-        +'<td><span class="'+statusClass+'">'+h.status+'</span></td>'
-        +'<td>'+planLabel+'</td>'
-        +'<td>'+since+'</td>'
-        +'<td><button class="btn-sm" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">Open</button></td>';
+      tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+(h.city||'')+(h.country?', '+h.country:'')+'</div></td>'+
+        '<td><span class="plan-tag '+planCls+'">'+planLabel+'</span></td>'+
+        '<td><span class="status-dot '+statusCls+'">'+statusLbl+'</span></td>'+
+        '<td style="color:var(--gold);font-weight:600;">'+mrrStr+'</td>'+
+        '<td style="color:var(--text3);">'+since+'</td>'+
+        '<td style="color:var(--text3);">—</td>'+
+        '<td><div class="h-actions">'+
+          '<div class="ic-btn ok" title="View details" onclick="openHotelDetail(\''+h.id+'\')">&#128065;</div>'+
+          '<div class="ic-btn warn" title="Suspend" onclick="toast(\''+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' suspended\')">&#9940;</div>'+
+          '<div class="ic-btn danger" title="Delete" onclick="toast(\'Are you sure? This cannot be undone.\')">&#128465;</div>'+
+        '</div></td>';
       tbody.appendChild(tr);
     });
     var cnt=document.getElementById('sb-hotel-count');if(cnt)cnt.textContent=r.data.length;
+  });
+}
+
+// ── OVERVIEW ──
+function loadOverview(){
+  if(!db)return;
+  var MRR={starter:99,pro:299,complete:499,trial:0};
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').then(function(r){
+    if(!r.data)return;
+    var hotels=r.data;
+    var active=hotels.filter(function(h){return h.status==='active';});
+    var trials=hotels.filter(function(h){return h.status==='trial';});
+    var mrr=active.reduce(function(sum,h){return sum+(MRR[h.plan]||0);},0);
+    var starter=active.filter(function(h){return h.plan==='starter';});
+    var pro=active.filter(function(h){return h.plan==='pro';});
+    var complete=active.filter(function(h){return h.plan==='complete';});
+
+    // MRR banner
+    setEl('mrr-total',mrr>0?'£'+mrr.toLocaleString():'£0');
+    setEl('mrr-arr',mrr>0?'£'+(mrr*12).toLocaleString():'£0');
+    setEl('mrr-starter-count',starter.length);
+    setEl('mrr-starter-val','£'+(starter.length*99)+'/mo');
+    setEl('mrr-pro-count',pro.length);
+    setEl('mrr-pro-val','£'+(pro.length*299)+'/mo');
+    setEl('mrr-complete-count',complete.length);
+    setEl('mrr-complete-val','£'+(complete.length*499)+'/mo');
+    setEl('mrr-trial-count',trials.length);
+
+    // MRR sub text
+    var subEl=document.getElementById('mrr-sub-overview');
+    if(subEl) subEl.textContent=active.length>0?'ARR: £'+(mrr*12).toLocaleString()+' · '+active.length+' active subscriber'+(active.length!==1?'s':''):'No paying subscribers yet';
+
+    // Stats
+    setEl('stat-active',active.length);
+    setEl('stat-trial',trials.length);
+
+    // Sidebar badge
+    var badge=document.getElementById('trials-nav-badge');
+    if(badge){badge.textContent=trials.length;badge.style.display=trials.length>0?'':'none';}
+
+    // Hotels subtitle
+    setEl('hotels-sub',hotels.length+' properties · '+active.length+' paying · '+trials.length+' on trial');
+
+    // Revenue page
+    setEl('rev-mrr-total',mrr>0?'£'+mrr.toLocaleString():'£0');
+    setEl('rev-arr',mrr>0?'£'+(mrr*12).toLocaleString():'£0');
+    setEl('rev-collected',mrr>0?'£'+mrr.toLocaleString():'£0');
+    var potentialMrr=trials.reduce(function(sum,h){return sum+(MRR[h.plan]||MRR.starter);},0);
+    setEl('rev-potential','£'+potentialMrr);
+
+    // Revenue by plan
+    var rpEl=document.getElementById('revenue-by-plan');
+    if(rpEl){
+      if(active.length===0){
+        rpEl.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No paying hotels yet.</div>';
+      }else{
+        var rows='';
+        if(starter.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter ('+starter.length+' hotel'+(starter.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(starter.length*99)+'/mo</span></div>';
+        if(pro.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional ('+pro.length+' hotel'+(pro.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(pro.length*299)+'/mo</span></div>';
+        if(complete.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete ('+complete.length+' hotel'+(complete.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(complete.length*499)+'/mo</span></div>';
+        rows+='<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£'+mrr+'/mo</span></div>';
+        rpEl.innerHTML=rows;
+      }
+    }
+
+    // Trial expirations card (overview)
+    var trialCard=document.getElementById('overview-trials');
+    if(trialCard){
+      if(trials.length===0){
+        trialCard.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No active trials.</div>';
+      }else{
+        trialCard.innerHTML=trials.map(function(h){
+          var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
+          var loc=(h.city||'')+(h.country?', '+h.country:'');
+          return '<div class="trial-row"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown location')+' · Signed up '+since+'</div></div><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="go(\'trials\',null)">View</button></div>';
+        }).join('');
+      }
+    }
+
+    // Broadcast audience options
+    var selAll=document.getElementById('bc-opt-all');if(selAll)selAll.textContent='All hotels ('+hotels.length+')';
+    var selPaying=document.getElementById('bc-opt-paying');if(selPaying)selPaying.textContent='Paying hotels only ('+active.length+')';
+    var selTrial=document.getElementById('bc-opt-trial');if(selTrial)selTrial.textContent='Trial hotels only ('+trials.length+')';
+    var selS=document.getElementById('bc-opt-starter');if(selS)selS.textContent='Starter plan ('+starter.length+')';
+    var selP=document.getElementById('bc-opt-pro');if(selP)selP.textContent='Professional plan ('+pro.length+')';
+    var selC=document.getElementById('bc-opt-complete');if(selC)selC.textContent='Complete plan ('+complete.length+')';
+  });
+
+  // Guest count
+  db.from('guests').select('id',{count:'exact',head:true}).then(function(r){
+    setEl('stat-guests',r.count||0);
+  });
+
+  // Today's requests count
+  var today=new Date();today.setHours(0,0,0,0);
+  db.from('requests').select('id',{count:'exact',head:true}).gte('created_at',today.toISOString()).then(function(r){
+    setEl('stat-requests',r.count||0);
+  });
+
+  // Recent activity (overview)
+  loadActivityRows('overview-activity',5);
+}
+
+// ── ACTIVITY ROWS ──
+function loadActivityRows(containerId,limit){
+  if(!db)return;
+  var container=document.getElementById(containerId);
+  if(!container)return;
+  db.from('activity_log').select('action,detail,user_name,source,created_at').order('created_at',{ascending:false}).limit(limit||20).then(function(r){
+    if(!r.data||r.data.length===0){
+      container.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No activity yet.</div>';
+      return;
+    }
+    container.innerHTML=r.data.map(function(row){
+      var ico=row.source==='guest'?'&#128100;':row.action==='login'?'&#128100;':'&#9881;';
+      var icoClass=row.action==='login'?'login':'signup';
+      var time=row.created_at?new Date(row.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      return '<div class="activity-row"><div class="act-ico '+icoClass+'">'+ico+'</div><div class="act-info"><div class="act-title">'+(row.detail||row.action||'Event')+'</div><div class="act-sub">'+(row.user_name||'')+(row.source?' · '+row.source:'')+'</div></div><div class="act-time">'+time+'</div></div>';
+    }).join('');
+  });
+}
+
+// ── TRIALS ──
+function loadTrials(){
+  if(!db)return;
+  var container=document.getElementById('trials-list');
+  var subEl=document.getElementById('trials-sub');
+  if(!container)return;
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').eq('status','trial').order('created_at',{ascending:false}).then(function(r){
+    var trials=r.data||[];
+    if(subEl)subEl.textContent=trials.length+' hotels currently on free trial';
+    if(trials.length===0){
+      container.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">No hotels on trial.</div>';
+      return;
+    }
+    container.innerHTML=trials.map(function(h){
+      var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+      var loc=(h.city||'')+(h.country?', '+h.country:'');
+      return '<div class="trial-row" style="min-height:70px;"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown')+' · Signed up '+since+'</div></div><div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;"><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">&#128065; View</button><button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast(\'Contact '+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' about their trial\')">&#9993; Chase</button></div></div>';
+    }).join('');
   });
 }
 
@@ -887,17 +1020,14 @@ function renderRevChart(){
   var container=document.getElementById('rev-bars');
   if(!container)return;
   var months=['Oct','Nov','Dec','Jan','Feb','Mar'];
-  var values=[0,0,299,598,897,1296];
-  var max=Math.max.apply(null,values)||1;
+  var values=[0,0,0,0,0,0];
   container.innerHTML='';
   months.forEach(function(m,i){
     var wrap=document.createElement('div');
     wrap.className='rev-bar-wrap';
     var bar=document.createElement('div');
     bar.className='rev-bar'+(i===months.length-1?' current':'');
-    bar.style.height=Math.max(4,Math.round((values[i]/max)*75))+'px';
-    bar.title=m+': £'+values[i];
-    bar.onclick=function(){toast(m+' 2026: £'+values[i]+' MRR');};
+    bar.style.height='4px';
     var lbl=document.createElement('div');
     lbl.className='rev-bar-lbl';
     lbl.textContent=m;
@@ -907,6 +1037,48 @@ function renderRevChart(){
   });
 }
 
+// ── LOCAL HOTEL ACTIVITY LOG (device-based) ──
+function loadHotelLogs(){
+  var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
+  var container=document.getElementById('admin-log-entries');
+  if(!container)return;
+  if(!logs.length){
+    container.innerHTML='<div style="text-align:center;padding:24px;color:#7A7060;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
+    return;
+  }
+  container.innerHTML='';
+  logs.forEach(function(log){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #EDE6D6;font-size:12px;';
+    var d=new Date(log.ts);
+    var timeStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var srcColors={'guest_app':'#B8933F','staff_app':'#2563EB','dashboard':'#16A34A'};
+    var srcColor=srcColors[log.source]||'#7A7060';
+    row.innerHTML=
+      '<div style="flex-shrink:0;width:90px;color:#7A7060;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="color:#1A1A1A;font-weight:500;">'+log.detail+'</div>'+
+        '<div style="color:#7A7060;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
+      '</div>';
+    container.appendChild(row);
+  });
+}
+
+function exportAdminLogs(){
+  var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
+  if(!logs.length){alert('No logs to export.');return;}
+  var csv='Timestamp,Action,Detail,User,Room,Source\n';
+  logs.forEach(function(l){
+    csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
+  });
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='arivo-admin-log-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
 // ── BROADCAST ──
 function sendBroadcast(){
   var audience=document.getElementById('msg-audience').value;
@@ -914,9 +1086,8 @@ function sendBroadcast(){
   var body=document.getElementById('msg-body').value.trim();
   if(!subject||!body){toast('Please fill in subject and message','err');return;}
   toast('Message sent to: '+audience);
-  document.getElementById('modal-broadcast').style.display='none';
-  document.getElementById('bc-subject').value='';
-  document.getElementById('bc-body').value='';
+  document.getElementById('msg-subject').value='';
+  document.getElementById('msg-body').value='';
 }
 </script>
 </body>
