@@ -655,9 +655,12 @@ textarea.fi{resize:vertical;min-height:80px;}
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-g" style="flex:1;" onclick="toast('Changes saved');closeModal('modal-hotel-detail')">Save Changes</button>
-      <button class="btn btn-blu" onclick="toast('Logging in as this hotel manager...')">&#128100; Login as Hotel</button>
+    <div class="modal-footer" style="flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:8px;width:100%;">
+        <button class="btn btn-g" style="flex:1;" onclick="saveHotelDetail()">Save Changes</button>
+        <button class="btn btn-blu" onclick="resendManagerInvite()">&#128231; Resend Setup Link</button>
+      </div>
+      <button class="btn" style="width:100%;background:var(--surface2);color:var(--text2);font-size:12px;" onclick="copyManagerSetupLink()">&#128279; Copy Setup Link to Clipboard</button>
     </div>
   </div>
 </div>
@@ -777,9 +780,11 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 document.querySelectorAll('.modal-ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeModal(o.id);});});
 
 // ── OPEN HOTEL DETAIL ──
+var _detailHotelId=null;
 function openHotelDetail(id){
   var h=_hotelData.find(function(x){return x.id===id;});
   if(!h)return;
+  _detailHotelId=id;
   document.getElementById('detail-title').textContent=h.name;
   document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan]||h.plan;
   document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':h.status;
@@ -790,6 +795,56 @@ function openHotelDetail(id){
   var sel=document.getElementById('detail-plan-select');
   if(sel) sel.value=h.plan;
   openModal('modal-hotel-detail');
+}
+
+function saveHotelDetail(){
+  if(!_detailHotelId||!db)return;
+  var plan=document.getElementById('detail-plan-select').value;
+  db.from('hotels').update({plan:plan}).eq('id',_detailHotelId).then(function(r){
+    if(r.error){toast('Error saving: '+r.error.message,'err');return;}
+    toast('Changes saved');
+    closeModal('modal-hotel-detail');
+    loadHotels();loadOverview();
+  });
+}
+
+async function _freshManagerToken(hotelId){
+  var token=crypto.randomUUID();
+  var exp=new Date(Date.now()+72*60*60*1000).toISOString();
+  // find manager for this hotel
+  var r=await db.from('staff').select('id,name,email,role,invite_used').eq('hotel_id',hotelId).eq('role','manager').limit(1).single();
+  if(r.error||!r.data)return null;
+  var mgr=r.data;
+  // regenerate token even if already used (allows re-access)
+  await db.from('staff').update({invite_token:token,invite_expires_at:exp,invite_used:false}).eq('id',mgr.id);
+  return {token:token,name:mgr.name,email:mgr.email};
+}
+
+async function resendManagerInvite(){
+  if(!_detailHotelId){toast('No hotel selected','err');return;}
+  toast('Generating new invite link...');
+  var info=await _freshManagerToken(_detailHotelId);
+  if(!info){toast('No manager found for this hotel','err');return;}
+  var setupUrl=window.location.origin+'/account-setup.html?token='+info.token;
+  var hotelName=(document.getElementById('detail-title')||{}).textContent||'';
+  var html='<p>Hi '+info.name+',</p><p>Your Arivo setup link has been regenerated. Click below to set your password and access your dashboard:</p><p><a href="'+setupUrl+'">Set up your account</a></p><p>This link expires in 72 hours.</p>';
+  var res=await fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:info.email,subject:'Arivo — Your dashboard setup link',html:html})});
+  if(res.ok){toast('Setup email sent to '+info.email);}
+  else{
+    // email failed — copy link instead
+    navigator.clipboard.writeText(setupUrl).then(function(){toast('Email failed. Setup link copied to clipboard instead!');}).catch(function(){toast('Setup link: '+setupUrl);});
+  }
+}
+
+async function copyManagerSetupLink(){
+  if(!_detailHotelId){toast('No hotel selected','err');return;}
+  toast('Generating link...');
+  var info=await _freshManagerToken(_detailHotelId);
+  if(!info){toast('No manager found','err');return;}
+  var setupUrl=window.location.origin+'/account-setup.html?token='+info.token;
+  navigator.clipboard.writeText(setupUrl).then(function(){toast('Setup link copied to clipboard!');}).catch(function(){
+    prompt('Copy this setup link:',setupUrl);
+  });
 }
 
 // ── PASSWORD HASH (SHA-256 via Web Crypto) ──
