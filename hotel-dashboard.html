@@ -777,6 +777,19 @@ function loadAll() {
   loadFac();
   loadStaff();
   subscribeToStaffMessages();
+  loadUnreadGuestMsgCount();
+}
+
+function loadUnreadGuestMsgCount() {
+  if (!db) return;
+  db.from('messages').select('id', {count: 'exact', head: true})
+    .eq('hotel_id', HOTEL_ID).eq('direction', 'guest_to_hotel').eq('read', false)
+    .then(function(r) {
+      var n = r.count || 0;
+      _guestMsgCount = n;
+      var badge = document.getElementById('guest-msg-badge');
+      if (badge) { badge.textContent = n; badge.style.display = n ? 'inline-block' : 'none'; }
+    });
 }
 
 // ── GUESTS ──
