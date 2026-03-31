@@ -300,7 +300,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
   <div class="stats">
     <div class="stat" onclick="go('guests',null);setBN('bn2')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Active Guests</div><div class="stat-v" id="sg">0</div><div class="stat-n">Registered via app</div></div>
     <div class="stat" onclick="go('req',null);setBN('bn1')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Open Requests</div><div class="stat-v bad" id="sr">0</div><div class="stat-n bad">Awaiting action</div></div>
-    <div class="stat" onclick="go('logs',null);setBN('bn4')" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Avg Rating</div><div class="stat-v" style="color:var(--gold)" id="savg">-</div><div class="stat-n up">&#11088; Today</div></div>
+    <div class="stat" onclick="openRatingsModal()" style="cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><div class="stat-l">Avg Rating</div><div class="stat-v" style="color:var(--gold)" id="savg">-</div><div class="stat-n up">&#11088; Overall</div></div>
   </div>
   <div class="card">
     <div class="ch"><div class="ct">Live Requests</div><div class="ca" onclick="go('req',null)">View all &rarr;</div></div>
@@ -361,6 +361,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
         <div id="msgs-thread-name" style="font-size:14px;font-weight:600;color:var(--tx);">Guest</div>
         <div id="msgs-thread-room" style="font-size:11px;color:var(--tx3);">Room</div>
       </div>
+      <button onclick="deleteGuestConversation()" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:600;cursor:pointer;padding:4px 8px;font-family:inherit;opacity:.7;" title="Delete conversation">&#128465; Delete</button>
     </div>
     <div id="msgs-thread-body" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;"></div>
     <div style="padding:12px 16px;border-top:1px solid var(--bor);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;">
@@ -553,6 +554,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mrec"><div class="modal"><div class="mhdr"><div class="mt">Add Place</div><div class="mclose" onclick="closeM('mrec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Place Name</label><input class="fi" id="arn" placeholder="e.g. The Blue Anchor"></div><div class="fg"><label class="fl">Category &amp; Details</label><input class="fi" id="arc" placeholder="e.g. Pub &middot; 5 min walk"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="are" placeholder="e.g. &#127867;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRec()">Add</button><button class="btn btn-s" onclick="closeM('mrec')">Cancel</button></div></div></div>
 <div class="mov" id="mfac"><div class="modal"><div class="mhdr"><div class="mt">Add Facility</div><div class="mclose" onclick="closeM('mfac')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Facility Name</label><input class="fi" id="afn" placeholder="e.g. Rooftop Terrace"></div><div class="fg"><label class="fl">Details</label><input class="fi" id="afd" placeholder="e.g. May-Sept &middot; 10am-8pm"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="afe" placeholder="e.g. &#127968;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addFac()">Add</button><button class="btn btn-s" onclick="closeM('mfac')">Cancel</button></div></div></div>
 <div class="mov" id="mlink"><div class="modal"><div class="mhdr"><div class="mt">Generate Pre-arrival Link</div><div class="mclose" onclick="closeM('mlink')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="gln" placeholder="e.g. Marcus Webb"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="glr" placeholder="e.g. 6" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="glc" type="date"></div><div id="glres" style="display:none;margin-top:12px;background:var(--sur2);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--tx3);margin-bottom:6px">Generated link</div><div style="font-family:monospace;font-size:11px;color:var(--blu);word-break:break-all" id="glurl"></div><div style="margin-top:8px"><button class="btn btn-g" style="font-size:11px" onclick="navigator.clipboard.writeText(document.getElementById('glurl').textContent);toast('Copied!')">&#128203; Copy</button></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="genLink()">Generate</button><button class="btn btn-s" onclick="closeM('mlink')">Close</button></div></div></div>
+<div class="mov" id="mratings"><div class="modal" style="max-width:500px;max-height:85vh;display:flex;flex-direction:column"><div class="mhdr"><div class="mt">Guest Ratings</div><div class="mclose" onclick="closeM('mratings')">&#10005;</div></div><div style="flex:1;overflow-y:auto" id="mratings-body"><div style="padding:16px;text-align:center;color:var(--tx3);font-size:12px;">Loading...</div></div></div></div>
 <div class="mov" id="mqr"><div class="modal" style="max-width:340px"><div class="mhdr"><div class="mt" id="mqr-room">Room QR Code</div><div class="mclose" onclick="closeM('mqr')">&#10005;</div></div><div class="mbdy" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px"><img id="mqr-img" src="" alt="QR Code" style="width:260px;height:260px;border-radius:8px;border:1px solid var(--bor);display:block"><div style="font-size:10px;color:var(--tx3);text-align:center;word-break:break-all;max-width:260px" id="mqr-url"></div><div style="display:flex;gap:8px;width:100%"><button class="btn btn-g" style="flex:1" onclick="copyRoomUrl(document.getElementById('mqr-url').textContent)">&#128279; Copy URL</button><button class="btn btn-s" style="flex:1" onclick="printRoomQR()">&#128438; Print</button></div></div><div class="mftr"><button class="btn btn-s btn-w" onclick="closeM('mqr')">Close</button></div></div></div>
 <div class="mov" id="mguest-history"><div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column"><div class="mhdr"><div class="mt" id="gh-name">Guest History</div><div class="mclose" onclick="closeM('mguest-history')">&#10005;</div></div>
   <div style="flex:1;overflow-y:auto">
@@ -695,7 +697,7 @@ function loadStaffMsgThread() {
   db.from('messages')
     .select('id,body,created_at,sender_name,direction')
     .eq('hotel_id', HOTEL_ID)
-    .in('direction', ['staff_to_hotel', 'hotel_to_staff'])
+    .in('direction', ['staff_to_hotel', 'hotel_to_staff', 'admin_to_hotel'])
     .order('created_at', {ascending: true})
     .limit(100)
     .then(function(r) {
@@ -710,12 +712,17 @@ function loadStaffMsgThread() {
       thread.innerHTML = '';
       r.data.forEach(function(msg) {
         var isHotel = msg.direction === 'hotel_to_staff';
+        var isAdmin = msg.direction === 'admin_to_hotel';
         var wrap = document.createElement('div');
         wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;align-items:' + (isHotel ? 'flex-end' : 'flex-start') + ';';
         var d = new Date(msg.created_at);
         var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
         var dateStr = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
-        if (!isHotel) {
+        if (isAdmin) {
+          wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">&#128081; Arivo Admin</div>'
+            + '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-left-radius:4px;background:rgba(184,147,63,.12);border:1px solid rgba(184,147,63,.4);color:var(--tx);font-size:13px;line-height:1.4;">' + msg.body + '</div>'
+            + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
+        } else if (!isHotel) {
           wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">' + (msg.sender_name || 'Staff') + '</div>'
             + '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-left-radius:4px;background:var(--sur2);border:1px solid var(--bor);color:var(--tx);font-size:13px;line-height:1.4;">' + msg.body + '</div>'
             + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
@@ -750,7 +757,7 @@ function subscribeToStaffMessages() {
   db.channel('dash-staff-msgs-' + HOTEL_ID)
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'messages',
       filter: 'hotel_id=eq.' + HOTEL_ID}, function(payload) {
-      if (payload.new.direction === 'staff_to_hotel') {
+      if (payload.new.direction === 'staff_to_hotel' || payload.new.direction === 'admin_to_hotel') {
         incrementStaffMsgBadge();
         // Reload thread if currently viewing it
         var sec = document.getElementById('s-staffmsgs');
@@ -769,6 +776,30 @@ function subscribeToStaffMessages() {
     }).subscribe();
 }
 
+function subscribeToGuestMessages() {
+  if (!db) return;
+  db.channel('dash-guest-msgs-' + HOTEL_ID)
+    .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'messages',
+      filter: 'hotel_id=eq.' + HOTEL_ID}, function(payload) {
+      if (payload.new.direction !== 'guest_to_hotel') return;
+      toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
+      notify('mgr', '&#128172; New Message from Guest', payload.new.body, payload.new.sender_name, 15000);
+      bellPlay();
+      // If this guest's thread is open, reload it and mark read
+      if (_activeGuestId && _activeGuestId === payload.new.guest_id) {
+        loadGuestThread(_activeGuestId);
+        db.from('messages').update({read: true, read_at: new Date().toISOString()})
+          .eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId).eq('direction', 'guest_to_hotel')
+          .or('read.is.null,read.eq.false').then(function(){});
+      } else {
+        incrementMsgAlert();
+        // Refresh conversation list if currently viewing it
+        var msgsec = document.getElementById('s-msgs');
+        if (msgsec && msgsec.classList.contains('on') && !_activeGuestId) loadGuestConversations();
+      }
+    }).subscribe();
+}
+
 
 function loadAll() {
   if (!db) { setTimeout(loadAll, 300); return; }
@@ -781,6 +812,7 @@ function loadAll() {
   loadFac();
   loadStaff();
   subscribeToStaffMessages();
+  subscribeToGuestMessages();
   loadUnreadGuestMsgCount();
 }
 
@@ -1341,6 +1373,45 @@ function loadAvgRating() {
   });
 }
 
+function openRatingsModal() {
+  openM('mratings');
+  if (!db) return;
+  var body = document.getElementById('mratings-body');
+  body.innerHTML = '<div style="padding:16px;text-align:center;color:var(--tx3);font-size:12px;">Loading...</div>';
+  db.from('ratings').select('id,stars,created_at,guest_id,priority_alert').eq('hotel_id', HOTEL_ID)
+    .order('created_at', {ascending: false}).then(function(r) {
+    if (!r.data || !r.data.length) {
+      body.innerHTML = '<div style="padding:32px;text-align:center;color:var(--tx3);font-size:13px;">No ratings yet.</div>';
+      return;
+    }
+    var guestIds = [...new Set(r.data.map(function(x){return x.guest_id;}).filter(Boolean))];
+    var guestMap = {};
+    var fetchGuests = guestIds.length
+      ? db.from('guests').select('id,name,room').in('id', guestIds).then(function(gr){
+          (gr.data||[]).forEach(function(g){guestMap[g.id]=g;});
+        })
+      : Promise.resolve();
+    fetchGuests.then(function() {
+      var stars = ['&#11088;','&#11088;&#11088;','&#11088;&#11088;&#11088;','&#11088;&#11088;&#11088;&#11088;','&#11088;&#11088;&#11088;&#11088;&#11088;'];
+      body.innerHTML = r.data.map(function(rt) {
+        var g = guestMap[rt.guest_id];
+        var gname = g ? g.name : 'Anonymous';
+        var groom = g ? ' \u00b7 Room ' + g.room : '';
+        var d = new Date(rt.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+        var col = rt.stars <= 2 ? 'var(--red)' : rt.stars === 3 ? 'var(--amber)' : 'var(--green)';
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bor);">'
+          + '<div style="font-size:22px;line-height:1;color:' + col + ';">' + (stars[rt.stars-1]||'') + '</div>'
+          + '<div style="flex:1;">'
+          +   '<div style="font-size:13px;font-weight:500;color:var(--tx);">' + gname + groom + '</div>'
+          +   '<div style="font-size:11px;color:var(--tx3);margin-top:2px;">' + d + (rt.priority_alert ? ' \u00b7 <span style="color:var(--red);font-weight:600;">Priority alert</span>' : '') + '</div>'
+          + '</div>'
+          + '<div style="font-size:20px;font-weight:700;color:' + col + ';">' + rt.stars + '</div>'
+          + '</div>';
+      }).join('');
+    });
+  });
+}
+
 // ── REAL-TIME ──
 function subscribeToAll() {
   if (!db) { setTimeout(subscribeToAll, 300); return; }
@@ -1370,24 +1441,6 @@ function subscribeToAll() {
       db.from('ratings').select('stars').eq('hotel_id', HOTEL_ID).then(function(r) {
         if (r.data && r.data.length) document.getElementById('savg').textContent = (r.data.reduce(function(s, x) { return s + x.stars; }, 0) / r.data.length).toFixed(1);
       });    })
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:'hotel_id=eq.' + HOTEL_ID}, function(payload) {
-      if (payload.new.direction === 'guest_to_hotel') {
-        toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
-        notify('mgr', '&#128172; New Message from Guest', payload.new.body, payload.new.sender_name, 15000);
-        bellPlay();
-        // If thread for this guest is open, reload it and mark read; else badge the inbox
-        if (_activeGuestId && _activeGuestId === payload.new.guest_id) {
-          loadGuestThread(_activeGuestId);
-          if (db) db.from('messages').update({read: true, read_at: new Date().toISOString()})
-            .eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId).eq('direction', 'guest_to_hotel').or('read.is.null,read.eq.false').then(function(){});
-        } else {
-          incrementMsgAlert();
-          // Refresh conversation list if it's visible
-          var msgsec = document.getElementById('s-msgs');
-          if (msgsec && msgsec.classList.contains('on') && !_activeGuestId) loadGuestConversations();
-        }
-      }
-    })
     .subscribe();
 }
 
@@ -1485,33 +1538,99 @@ function closeGuestThread() {
   loadGuestConversations();
 }
 
+function deleteGuestConversation() {
+  if (!_activeGuestId || !db) return;
+  var name = document.getElementById('msgs-thread-name').textContent;
+  if (!confirm('Delete all messages with ' + name + '?\n\nThis cannot be undone.')) return;
+  db.from('messages').delete().eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId)
+    .then(function(r) {
+      if (r.error) { toast('Delete failed: ' + r.error.message, 'err'); return; }
+      toast('Conversation deleted');
+      closeGuestThread();
+    });
+}
+
+var _threadPage = 0;
+var _threadAllLoaded = false;
+var _threadLoadingMore = false;
+var PAGE_SIZE = 10;
+
+function _renderThreadMessages(msgs, prepend) {
+  var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
+  var frag = document.createDocumentFragment();
+  msgs.forEach(function(msg) {
+    var isHotel = msg.direction === 'hotel_to_guest';
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;align-items:' + (isHotel ? 'flex-end' : 'flex-start') + ';';
+    var d = new Date(msg.created_at);
+    var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    var dateStr = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+    if (!isHotel) {
+      wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">' + (msg.sender_name||'Guest') + '</div>'
+        + '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-left-radius:4px;background:var(--sur2);border:1px solid var(--bor);color:var(--tx);font-size:13px;line-height:1.4;">' + msg.body + '</div>'
+        + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
+    } else {
+      wrap.innerHTML = '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-right-radius:4px;background:var(--forest);color:#FDFCF9;font-size:13px;line-height:1.4;">' + msg.body + '</div>'
+        + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;text-align:right;">' + timeStr + '</div>';
+    }
+    frag.appendChild(wrap);
+  });
+  if (prepend) {
+    var prevHeight = thread.scrollHeight;
+    thread.insertBefore(frag, thread.firstChild);
+    thread.scrollTop = thread.scrollHeight - prevHeight;
+  } else {
+    thread.appendChild(frag);
+    thread.scrollTop = thread.scrollHeight;
+  }
+}
+
 function loadGuestThread(guestId) {
   if (!db) return;
+  _threadPage = 0;
+  _threadAllLoaded = false;
+  var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
+  thread.innerHTML = '';
+  thread.onscroll = function() {
+    if (thread.scrollTop === 0 && !_threadAllLoaded && !_threadLoadingMore) {
+      _loadMoreThreadMessages(guestId);
+    }
+  };
   db.from('messages').select('*').eq('hotel_id', HOTEL_ID).eq('guest_id', guestId)
     .in('direction', ['guest_to_hotel','hotel_to_guest'])
-    .order('created_at', {ascending: true}).limit(200)
+    .order('created_at', {ascending: false}).range(0, PAGE_SIZE - 1)
     .then(function(r) {
-      var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
-      thread.innerHTML = '';
-      if (!r.data || !r.data.length) { thread.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tx3);font-size:12px;">No messages yet.</div>'; return; }
-      r.data.forEach(function(msg) {
-        var isHotel = msg.direction === 'hotel_to_guest';
-        var wrap = document.createElement('div');
-        wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;align-items:' + (isHotel ? 'flex-end' : 'flex-start') + ';';
-        var d = new Date(msg.created_at);
-        var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-        var dateStr = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
-        if (!isHotel) {
-          wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">' + (msg.sender_name||'Guest') + '</div>'
-            + '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-left-radius:4px;background:var(--sur2);border:1px solid var(--bor);color:var(--tx);font-size:13px;line-height:1.4;">' + msg.body + '</div>'
-            + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
-        } else {
-          wrap.innerHTML = '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-right-radius:4px;background:var(--forest);color:#FDFCF9;font-size:13px;line-height:1.4;">' + msg.body + '</div>'
-            + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;text-align:right;">' + timeStr + '</div>';
-        }
-        thread.appendChild(wrap);
-      });
-      thread.scrollTop = thread.scrollHeight;
+      if (!r.data || !r.data.length) {
+        thread.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tx3);font-size:12px;">No messages yet.</div>';
+        return;
+      }
+      if (r.data.length < PAGE_SIZE) _threadAllLoaded = true;
+      _threadPage = 1;
+      _renderThreadMessages(r.data.slice().reverse(), false);
+    });
+}
+
+function _loadMoreThreadMessages(guestId) {
+  if (!db || _threadAllLoaded || _threadLoadingMore) return;
+  _threadLoadingMore = true;
+  var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
+  // Show "loading" indicator at top
+  var loader = document.createElement('div');
+  loader.id = 'thread-load-more';
+  loader.style.cssText = 'text-align:center;padding:8px;font-size:11px;color:var(--tx3);';
+  loader.textContent = 'Loading older messages...';
+  thread.insertBefore(loader, thread.firstChild);
+  db.from('messages').select('*').eq('hotel_id', HOTEL_ID).eq('guest_id', guestId)
+    .in('direction', ['guest_to_hotel','hotel_to_guest'])
+    .order('created_at', {ascending: false}).range(_threadPage * PAGE_SIZE, (_threadPage + 1) * PAGE_SIZE - 1)
+    .then(function(r) {
+      _threadLoadingMore = false;
+      var loaderEl = document.getElementById('thread-load-more');
+      if (loaderEl) loaderEl.remove();
+      if (!r.data || !r.data.length) { _threadAllLoaded = true; return; }
+      if (r.data.length < PAGE_SIZE) _threadAllLoaded = true;
+      _threadPage++;
+      _renderThreadMessages(r.data.slice().reverse(), true);
     });
 }
 
