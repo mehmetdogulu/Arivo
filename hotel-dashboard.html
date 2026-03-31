@@ -553,6 +553,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mrec"><div class="modal"><div class="mhdr"><div class="mt">Add Place</div><div class="mclose" onclick="closeM('mrec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Place Name</label><input class="fi" id="arn" placeholder="e.g. The Blue Anchor"></div><div class="fg"><label class="fl">Category &amp; Details</label><input class="fi" id="arc" placeholder="e.g. Pub &middot; 5 min walk"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="are" placeholder="e.g. &#127867;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRec()">Add</button><button class="btn btn-s" onclick="closeM('mrec')">Cancel</button></div></div></div>
 <div class="mov" id="mfac"><div class="modal"><div class="mhdr"><div class="mt">Add Facility</div><div class="mclose" onclick="closeM('mfac')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Facility Name</label><input class="fi" id="afn" placeholder="e.g. Rooftop Terrace"></div><div class="fg"><label class="fl">Details</label><input class="fi" id="afd" placeholder="e.g. May-Sept &middot; 10am-8pm"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="afe" placeholder="e.g. &#127968;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addFac()">Add</button><button class="btn btn-s" onclick="closeM('mfac')">Cancel</button></div></div></div>
 <div class="mov" id="mlink"><div class="modal"><div class="mhdr"><div class="mt">Generate Pre-arrival Link</div><div class="mclose" onclick="closeM('mlink')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="gln" placeholder="e.g. Marcus Webb"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="glr" placeholder="e.g. 6" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="glc" type="date"></div><div id="glres" style="display:none;margin-top:12px;background:var(--sur2);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--tx3);margin-bottom:6px">Generated link</div><div style="font-family:monospace;font-size:11px;color:var(--blu);word-break:break-all" id="glurl"></div><div style="margin-top:8px"><button class="btn btn-g" style="font-size:11px" onclick="navigator.clipboard.writeText(document.getElementById('glurl').textContent);toast('Copied!')">&#128203; Copy</button></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="genLink()">Generate</button><button class="btn btn-s" onclick="closeM('mlink')">Close</button></div></div></div>
+<div class="mov" id="mqr"><div class="modal" style="max-width:340px"><div class="mhdr"><div class="mt" id="mqr-room">Room QR Code</div><div class="mclose" onclick="closeM('mqr')">&#10005;</div></div><div class="mbdy" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px"><img id="mqr-img" src="" alt="QR Code" style="width:260px;height:260px;border-radius:8px;border:1px solid var(--bor);display:block"><div style="font-size:10px;color:var(--tx3);text-align:center;word-break:break-all;max-width:260px" id="mqr-url"></div><div style="display:flex;gap:8px;width:100%"><button class="btn btn-g" style="flex:1" onclick="copyRoomUrl(document.getElementById('mqr-url').textContent)">&#128279; Copy URL</button><button class="btn btn-s" style="flex:1" onclick="printRoomQR()">&#128438; Print</button></div></div><div class="mftr"><button class="btn btn-s btn-w" onclick="closeM('mqr')">Close</button></div></div></div>
 <div class="mov" id="mguest-history"><div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column"><div class="mhdr"><div class="mt" id="gh-name">Guest History</div><div class="mclose" onclick="closeM('mguest-history')">&#10005;</div></div>
   <div style="flex:1;overflow-y:auto">
     <div style="padding:12px 16px;border-bottom:1px solid var(--bor)"><div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Requests</div><div id="gh-requests"></div></div>
@@ -861,7 +862,7 @@ function renderGuests(guests) {
              + '<div class="sav" style="background:var(--gdim);color:var(--gold)">' + ini + '</div>'
              + '<div class="sin"><div class="sn">' + g.name + ' \u2014 ' + g.room + '</div><div class="ss">Checkout ' + co + '</div></div>'
              + '<div class="sact">Active</div>'
-             + '<button class="btn btn-r" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="killSess(\'' + g.name.replace(/'/g,'') + '\',\'' + g.id + '\')">Kill</button>'
+             + '<button class="btn btn-r" style="margin-left:8px;font-size:11px;padding:5px 9px" onclick="killSess(\'' + g.name.replace(/'/g,'') + '\',\'' + g.id + '\',\'' + (g.room||'').replace(/'/g,'') + '\')">Kill</button>'
              + '</div>';
     });
     sesslist.innerHTML = shtml;
@@ -1644,8 +1645,8 @@ function loadTpl(t) {
 }
 
 // ── SESSIONS ──
-function killSess(n, guestId) {
-  if (!confirm('Kill session for ' + n + '?')) return;
+function killSess(n, guestId, room) {
+  if (!confirm('Kill session for ' + n + '?' + (room ? '\n\nThis will also invalidate the QR code for ' + room + '.' : ''))) return;
   if (!db || !guestId) { toast('Cannot kill session - not connected', 'err'); return; }
   // Mark guest as checked out in Supabase
   db.from('guests').update({checked_out:true}).eq('id', guestId).then(function(r) {
@@ -1659,8 +1660,14 @@ function killSess(n, guestId) {
     killed: true,
     killed_at: new Date().toISOString()
   }, {onConflict: 'guest_id'}).then(function(){});
+  // Delete room token so the QR code is invalidated
+  if (room) {
+    db.from('room_tokens').delete().eq('hotel_id', HOTEL_ID).eq('room', room).then(function(r) {
+      if (!r.error) loadRoomTokens();
+    });
+  }
   toast('Session killed for ' + n);
-  logEvent('session_kill', 'Session killed: ' + n, 'Manager', '-');
+  logEvent('session_kill', 'Session killed: ' + n, 'Manager', room || '-');
 }
 function genBypass() {
   var name = document.getElementById('bpg').value.trim(); var room = document.getElementById('bpr').value.trim();
@@ -2196,7 +2203,8 @@ function loadRoomTokens() {
         + '<div style="display:flex;gap:8px;align-items:center;">'
         + (hasToken ? '<span style="font-size:10px;color:var(--green);font-weight:600;">&#10003; Active</span>' : '<span style="font-size:10px;color:var(--tx3);">No token</span>')
         + '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">' + (hasToken ? '&#8635; Regen' : '+ Generate') + '</button>'
-        + (hasToken ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
+        + (hasToken ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="showRoomQR(\'' + url.replace(/'/g, "\\'") + '\',\'' + room.replace(/'/g, "\\'") + '\')">&#9641; QR Code</button>' : '')
+        + (hasToken ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
         + '</div></div>';
     }).join('');
   });
@@ -2223,6 +2231,28 @@ async function generateRoomToken(room) {
 
 function copyRoomUrl(url) {
   navigator.clipboard.writeText(url).then(function() { toast('URL copied to clipboard'); }).catch(function() { prompt('Copy this URL:', url); });
+}
+
+function showRoomQR(url, room) {
+  document.getElementById('mqr-room').textContent = 'Room ' + room;
+  document.getElementById('mqr-url').textContent = url;
+  var encoded = encodeURIComponent(url);
+  document.getElementById('mqr-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encoded + '&bgcolor=FDFCF9&color=1E3A2F&margin=10';
+  openM('mqr');
+}
+
+function printRoomQR() {
+  var room = document.getElementById('mqr-room').textContent;
+  var url = document.getElementById('mqr-url').textContent;
+  var imgSrc = document.getElementById('mqr-img').src;
+  var w = window.open('', '_blank');
+  w.document.write('<html><head><title>QR - ' + room + '</title><style>body{font-family:sans-serif;text-align:center;padding:40px;}h2{margin-bottom:8px;}p{font-size:12px;color:#666;word-break:break-all;max-width:300px;margin:8px auto 0;}@media print{button{display:none;}}</style></head><body>');
+  w.document.write('<h2>' + room + '</h2>');
+  w.document.write('<img src="' + imgSrc + '" style="width:260px;height:260px;">');
+  w.document.write('<p>' + url + '</p>');
+  w.document.write('<br><button onclick="window.print()">Print</button>');
+  w.document.write('</body></html>');
+  w.document.close();
 }
 
 // ── SIMULATE ──
