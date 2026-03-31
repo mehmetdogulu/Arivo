@@ -1103,24 +1103,74 @@ function renderInfoStrip(hi){
   });
 }
 
+var _chatPage=0,_chatAllLoaded=false,_chatLoadingMore=false,_chatGuestId=null;
+var CHAT_PAGE=10;
+
+function _appendChatBubbles(msgs,prepend){
+  var thread=document.getElementById('chat-thread');if(!thread)return;
+  var frag=document.createDocumentFragment();
+  msgs.forEach(function(msg){
+    var isGuest=msg.direction==='guest_to_hotel';
+    var wrap=document.createElement('div');wrap.className='bubble-wrap '+(isGuest?'guest':'hotel');
+    var d=new Date(msg.created_at);
+    var timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    var dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    if(!isGuest){wrap.innerHTML='<div class="bubble-sender">'+(msg.sender_name||'Hotel Team')+'</div><div class="bubble hotel">'+msg.body+'</div><div class="bubble-meta">'+dateStr+', '+timeStr+'</div>';}
+    else{wrap.innerHTML='<div class="bubble guest">'+msg.body+'</div><div class="bubble-meta" style="text-align:right">'+timeStr+'</div>';}
+    frag.appendChild(wrap);
+  });
+  if(prepend){var ph=thread.scrollHeight;thread.insertBefore(frag,thread.firstChild);thread.scrollTop=thread.scrollHeight-ph;}
+  else{thread.appendChild(frag);thread.scrollTop=thread.scrollHeight;scrollToLatestMessage();}
+}
+
 function loadMessagesFromSupabase(){
   if(!db)return;
   function fetchAndRender(id){
-    // Only fetch messages addressed to THIS guest - no broadcasts
+    _chatGuestId=id;_chatPage=0;_chatAllLoaded=false;
+    var thread=document.getElementById('chat-thread');
+    var empty=document.getElementById('chat-empty');
+    if(thread)thread.innerHTML='';
+    thread.onscroll=function(){
+      if(thread.scrollTop===0&&!_chatAllLoaded&&!_chatLoadingMore)_loadMoreChatMessages();
+    };
     db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
-      .eq('hotel_id',HOTEL_ID)
-      .eq('guest_id',id)
-      .order('created_at',{ascending:true})
-      .limit(100)
+      .eq('hotel_id',HOTEL_ID).eq('guest_id',id)
+      .order('created_at',{ascending:false}).range(0,CHAT_PAGE-1)
       .then(function(result){
-        var msgs = result.data || [];
-        renderChatThread(msgs);
+        var msgs=result.data||[];
+        if(!msgs.length){if(empty)empty.style.display='block';return;}
+        if(empty)empty.style.display='none';
+        if(msgs.length<CHAT_PAGE)_chatAllLoaded=true;
+        _chatPage=1;
+        _appendChatBubbles(msgs.slice().reverse(),false);
       });
   }
   if(guestId){fetchAndRender(guestId);}
   else if(state.name&&state.room){
     db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',state.name).eq('room',state.room).eq('checked_out',false).single().then(function(r){if(r.data){guestId=r.data.id;fetchAndRender(r.data.id);}});
   } else {setTimeout(loadMessagesFromSupabase,500);}
+}
+
+function _loadMoreChatMessages(){
+  if(!db||_chatAllLoaded||_chatLoadingMore||!_chatGuestId)return;
+  _chatLoadingMore=true;
+  var thread=document.getElementById('chat-thread');if(!thread)return;
+  var loader=document.createElement('div');loader.id='chat-load-more';
+  loader.style.cssText='text-align:center;padding:8px;font-size:11px;color:var(--muted);';
+  loader.textContent='Loading older messages...';
+  thread.insertBefore(loader,thread.firstChild);
+  db.from('messages').select('id,body,created_at,sender_name,direction,guest_id')
+    .eq('hotel_id',HOTEL_ID).eq('guest_id',_chatGuestId)
+    .order('created_at',{ascending:false}).range(_chatPage*CHAT_PAGE,(_chatPage+1)*CHAT_PAGE-1)
+    .then(function(result){
+      _chatLoadingMore=false;
+      var loaderEl=document.getElementById('chat-load-more');if(loaderEl)loaderEl.remove();
+      var msgs=result.data||[];
+      if(!msgs.length){_chatAllLoaded=true;return;}
+      if(msgs.length<CHAT_PAGE)_chatAllLoaded=true;
+      _chatPage++;
+      _appendChatBubbles(msgs.slice().reverse(),true);
+    });
 }
 
 function renderChatThread(msgs){
@@ -1130,18 +1180,7 @@ function renderChatThread(msgs){
   if(!msgs.length){if(empty)empty.style.display='block';return;}
   if(empty)empty.style.display='none';
   thread.innerHTML='';
-  msgs.forEach(function(msg){
-    var isGuest=msg.direction==='guest_to_hotel';
-    var wrap=document.createElement('div');wrap.className='bubble-wrap '+(isGuest?'guest':'hotel');
-    var d=new Date(msg.created_at);
-    var timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    var dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    if(!isGuest){wrap.innerHTML='<div class="bubble-sender">'+(msg.sender_name||'Hotel Team')+'</div><div class="bubble hotel">'+msg.body+'</div><div class="bubble-meta">'+dateStr+', '+timeStr+'</div>';}
-    else{wrap.innerHTML='<div class="bubble guest">'+msg.body+'</div><div class="bubble-meta" style="text-align:right">'+timeStr+'</div>';}
-    thread.appendChild(wrap);
-  });
-  thread.scrollTop=thread.scrollHeight;
-  scrollToLatestMessage();
+  _appendChatBubbles(msgs,false);
 }
 
 function scrollToLatestMessage(){

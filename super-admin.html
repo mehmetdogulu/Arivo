@@ -1135,12 +1135,26 @@ function exportAdminLogs(){
 }
 
 // ── BROADCAST ──
-function sendBroadcast(){
+async function sendBroadcast(){
   var audience=document.getElementById('msg-audience').value;
   var subject=document.getElementById('msg-subject').value.trim();
   var body=document.getElementById('msg-body').value.trim();
   if(!subject||!body){toast('Please fill in subject and message','err');return;}
-  toast('Message sent to: '+audience);
+  if(!db){toast('Not connected','err');return;}
+  // Fetch target hotel IDs based on audience
+  var query=db.from('hotels').select('id,plan,status');
+  if(audience==='Paying hotels only') query=query.eq('status','active');
+  else if(audience==='Trial hotels only') query=query.eq('status','trial');
+  else if(audience==='Starter plan') query=query.eq('plan','starter');
+  else if(audience==='Professional plan') query=query.eq('plan','professional');
+  else if(audience==='Complete plan') query=query.eq('plan','complete');
+  var r=await query;
+  if(r.error||!r.data||!r.data.length){toast('No hotels found for this audience','err');return;}
+  var fullBody=subject+'\n\n'+body;
+  var inserts=r.data.map(function(h){return{hotel_id:h.id,direction:'admin_to_hotel',sender_name:'Arivo Admin',body:fullBody};});
+  var ins=await db.from('messages').insert(inserts);
+  if(ins.error){toast('Send failed: '+ins.error.message,'err');return;}
+  toast('Message sent to '+r.data.length+' hotel(s)');
   document.getElementById('msg-subject').value='';
   document.getElementById('msg-body').value='';
 }
