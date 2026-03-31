@@ -335,10 +335,8 @@ var _roomToken=_urlParams.get('token')||null;
     <span class="cb-text" id="checkout-banner-text">Your checkout is in 2 hours. Please ensure your belongings are ready.</span>
     <button class="cb-close" onclick="document.getElementById('checkout-banner').classList.remove('show')">&#10005;</button>
   </div>
-  <div class="info-strip">
-    <div class="ii"><div class="ii-lbl">Check-out</div><div class="ii-val" id="info-checkout-time">11:00</div></div>
-    <div class="ii"><div class="ii-lbl">Breakfast</div><div class="ii-val">8-10</div></div>
-    <div class="ii"><div class="ii-lbl">Bar</div><div class="ii-val">5pm-12</div></div>
+  <div class="info-strip" id="info-strip-dynamic">
+    <div class="ii"><div class="ii-lbl">Check-out</div><div class="ii-val" id="info-checkout-time">—</div></div>
   </div>
   <div class="tab-nav">
     <div class="tab active" onclick="showTab('hotel',this)"><span class="tab-ico">&#127968;</span>Hotel</div>
@@ -1022,34 +1020,53 @@ function viewInMessages(){document.getElementById('notif-banner-overlay').classL
 // Default icons for known section IDs; falls back to ℹ️ for custom sections
 var _secIcons={'sec-wifi':'&#128246;','sec-times':'&#128336;','sec-rules':'&#128203;','sec-contact':'&#128222;'};
 
+// Strip leading emoji/non-ASCII chars from dashboard-saved titles (e.g. "📶WiFi" → "WiFi")
+function _cleanTitle(t){
+  var i=0;
+  while(i<t.length&&t.charCodeAt(i)>127)i++;
+  var clean=t.slice(i).trim();
+  return clean||t.trim();
+}
+
+// Normalise row: handles {k,v} (dashboard) and {key,value} (onboarding)
+function _rowKV(row){
+  return {k:(row.k!==undefined?row.k:(row.key||'')),v:(row.v!==undefined?row.v:(row.value||''))};
+}
+
 function renderHotelInfoSections(hi){
   var container=document.getElementById('hotel-info-sections');
   if(!container)return;
   container.innerHTML='';
-  // Render sections in the order they appear in the object
   Object.keys(hi).forEach(function(secId){
     var sec=hi[secId];
     if(!sec||!sec.rows||!sec.rows.length)return;
-    // Normalise both {k,v} (dashboard format) and {key,value} (onboarding format)
-    var validRows=sec.rows.filter(function(row){
-      var k=row.k!==undefined?row.k:(row.key||'');
-      var v=row.v!==undefined?row.v:(row.value||'');
-      return k&&k!=='undefined'&&(v&&v!=='undefined');
-    });
+    var validRows=sec.rows.map(_rowKV).filter(function(r){return r.k&&r.k!=='undefined'&&r.v&&r.v!=='undefined';});
     if(!validRows.length)return;
     var icon=_secIcons[secId]||'&#8505;&#65039;';
-    // Strip emoji from saved title if present, fallback to secId
-    var rawTitle=sec.title||secId;
-    // title may start with an emoji char — keep as-is, it looks fine
-    var rowsHtml=validRows.map(function(row){
-      var k=row.k!==undefined?row.k:(row.key||'');
-      var v=row.v!==undefined?row.v:(row.value||'');
-      return '<div class="ir"><span class="ir-lbl">'+k+'</span><span class="ir-val">'+v+'</span></div>';
+    var title=_cleanTitle(sec.title||secId);
+    var rowsHtml=validRows.map(function(r){
+      return '<div class="ir"><span class="ir-lbl">'+r.k+'</span><span class="ir-val">'+r.v+'</span></div>';
     }).join('');
-    var card=document.createElement('div');
-    card.className='ic';
-    card.innerHTML='<div class="ic-hdr"><div class="ic-ico">'+icon+'</div><div class="ic-ttl">'+rawTitle+'</div></div>'+rowsHtml;
+    var card=document.createElement('div');card.className='ic';
+    card.innerHTML='<div class="ic-hdr"><div class="ic-ico">'+icon+'</div><div class="ic-ttl">'+title+'</div></div>'+rowsHtml;
     container.appendChild(card);
+  });
+  // Also update topbar from Key Times section
+  renderInfoStrip(hi);
+}
+
+function renderInfoStrip(hi){
+  var strip=document.getElementById('info-strip-dynamic');
+  if(!strip)return;
+  var timesSec=hi['sec-times'];
+  if(!timesSec||!timesSec.rows)return;
+  var rows=timesSec.rows.map(_rowKV).filter(function(r){return r.k&&r.k!=='undefined'&&r.v&&r.v!=='undefined';});
+  if(!rows.length)return;
+  strip.innerHTML='';
+  rows.slice(0,4).forEach(function(r){
+    var d=document.createElement('div');d.className='ii';
+    d.innerHTML='<div class="ii-lbl">'+r.k+'</div><div class="ii-val">'+r.v+'</div>';
+    strip.appendChild(d);
   });
 }
 
@@ -1445,9 +1462,14 @@ function subscribeToUpdates(){
   db.channel('guest-messages-'+guestId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'guest_id=eq.'+guestId},function(payload){
     if(payload.new.direction==='hotel_to_guest'){showHotelMessage(payload.new.body);incrementMsgBadge();if(_activeTab==='messages')loadMessagesFromSupabase();}
   }).subscribe();
-  // Broadcast channel removed - all messages now addressed to specific guests by guest_id
   db.channel('guest-sessions-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:'guest_id=eq.'+guestId},function(payload){if(payload.new.killed)expireGuestSession();}).subscribe();
   db.channel('guest-requests-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'requests',filter:'guest_id=eq.'+guestId},function(payload){updateRequestStatus(payload.new.id,payload.new.status,null);}).subscribe();
+  // Live-sync hotel info when manager saves changes in dashboard
+  if(HOTEL_ID) db.channel('guest-hotel-settings-'+HOTEL_ID)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'hotel_settings',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
+      if(payload.new.hotel_info) renderHotelInfoSections(payload.new.hotel_info);
+      if(payload.new.checkout_time){var el=document.getElementById('info-checkout-time');if(el)el.textContent=payload.new.checkout_time;}
+    }).subscribe();
 }
 
 // localStorage messaging removed - using Supabase realtime only for session kills
