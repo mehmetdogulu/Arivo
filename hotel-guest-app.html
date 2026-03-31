@@ -235,6 +235,7 @@ try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catc
 var _urlParams=new URLSearchParams(window.location.search);
 var HOTEL_ID=_urlParams.get('hotel')||null;
 var _roomToken=_urlParams.get('token')||null;
+var _lockedRoom=null; // Set when entry is via room QR token — cannot be overridden by guest
 </script>
 </head>
 <body>
@@ -498,22 +499,36 @@ function resolveRoomToken(token){
     }
     HOTEL_ID=r.data.hotel_id;
     var preRoom=r.data.room;
-    initGuestApp();
-    // Pre-select the room once the dropdown loads
-    var waitRoom=setInterval(function(){
-      var sel=document.getElementById('reg-room');
-      if(sel&&sel.options.length>1){
-        clearInterval(waitRoom);
-        sel.value=preRoom;
-        // Also hide the room selector and show it as read-only
-        var roomFg=sel.closest('.fg');
-        if(roomFg){
-          roomFg.innerHTML='<label class="fl">Room</label>'
-            +'<div class="fi" style="background:rgba(30,58,47,0.06);border-color:rgba(30,58,47,0.2);color:var(--forest);font-weight:500;">'+preRoom+'</div>'
-            +'<input type="hidden" id="reg-room" value="'+preRoom+'">';
-        }
+    // FIX 4: Check if room already has an active guest before allowing registration
+    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',preRoom).eq('checked_out',false).limit(1).then(function(occ){
+      if(occ.data&&occ.data.length>0){
+        // Room is occupied — ask guest to identify themselves or contact reception
+        var sc=document.getElementById('screen-consent');
+        if(sc)sc.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;">'
+          +'<div style="font-size:48px;margin-bottom:24px;">&#128718;</div>'
+          +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Room already occupied</div>'
+          +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">'+preRoom+' already has a registered guest.<br>If you are '+occ.data[0].name+', please open your original link.<br>Otherwise please contact reception.</div>'
+          +'</div>';
+        return;
       }
-    },100);
+      // Room is free — FIX 1: clear any saved session so token always starts fresh
+      sessionStorage.removeItem('arivo_guest_state');
+      // FIX 2: lock the room at token level, not just DOM level
+      _lockedRoom=preRoom;
+      initGuestApp();
+      // Replace room selector with a locked read-only display
+      var waitRoom=setInterval(function(){
+        var fg=document.getElementById('new-guest-fields');
+        if(fg&&document.getElementById('reg-room')){
+          clearInterval(waitRoom);
+          var roomFg=document.getElementById('reg-room').closest('.fg');
+          if(roomFg){
+            roomFg.innerHTML='<label class="fl">Room</label>'
+              +'<div class="fi" style="background:rgba(30,58,47,0.06);border-color:rgba(30,58,47,0.2);color:var(--forest);font-weight:500;">'+preRoom+' <span style="font-size:11px;color:var(--muted);">(assigned from QR)</span></div>';
+          }
+        }
+      },100);
+    });
   });
 }
 
@@ -685,7 +700,8 @@ function submitReg(){
     return;
   }
   // New guest — validate room and checkout
-  var room=document.getElementById('reg-room').value;
+  // FIX 2: always use _lockedRoom if entry was via QR token
+  var room=_lockedRoom||(document.getElementById('reg-room')?document.getElementById('reg-room').value:'');
   var co=document.getElementById('reg-checkout').value;
   var ok=true;
   if(!room){document.getElementById('err-room').classList.add('show');ok=false;}
@@ -723,6 +739,23 @@ function doRegisterNewGuest(name,room,co){
 
 function doRegisterNewGuest_db(name,room,co){
   if(!db){setTimeout(function(){doRegisterNewGuest_db(name,room,co);},500);return;}
+  // FIX 3: check for a different active guest already in this room
+  db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',room).eq('checked_out',false).then(function(occ){
+    var others=(occ.data||[]).filter(function(g){return g.name.toLowerCase()!==name.toLowerCase();});
+    if(others.length>0){
+      // Room taken by someone else — undo the optimistic UI and show error
+      sessionStorage.removeItem('arivo_guest_state');
+      showScreen('screen-reg');
+      var errEl=document.getElementById('err-room');
+      if(errEl){errEl.textContent=room+' is already occupied by another guest. Please contact reception.';errEl.classList.add('show');}
+      return;
+    }
+    // Safe to proceed
+    _doRegisterNewGuest_insert(name,room,co);
+  });
+}
+function _doRegisterNewGuest_insert(name,room,co){
+  if(!db){setTimeout(function(){_doRegisterNewGuest_insert(name,room,co);},500);return;}
   db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
     .ilike('name',name).eq('room',room).single()
     .then(function(r){
