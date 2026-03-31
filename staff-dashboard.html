@@ -221,8 +221,8 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
       <div class="header-logo">Ari<em>vo</em></div>
       <div class="staff-av" id="staff-av" onclick="showTab('profile',document.querySelectorAll('.tab')[2])">MR</div>
     </div>
-    <div class="hotel-name">The Maison Collective</div>
-    <div class="staff-name-hdr" id="staff-name-hdr">Maria Rodriguez</div>
+    <div class="hotel-name" id="staff-hotel-name"></div>
+    <div class="staff-name-hdr" id="staff-name-hdr"></div>
     <div class="staff-role-hdr" id="staff-role-hdr">Housekeeping &middot; On shift</div>
   </div>
 
@@ -276,15 +276,15 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);heigh
     </div>
   </div>
 
-  <div id="tab-profile">
+  <div class="tc" id="tab-profile">
     <div class="profile-card">
       <div class="profile-av" id="profile-av">MR</div>
-      <div class="profile-name" id="profile-name">Maria Rodriguez</div>
-      <div class="profile-role" id="profile-role">Housekeeping</div>
+      <div class="profile-name" id="profile-name"></div>
+      <div class="profile-role" id="profile-role">Staff</div>
     </div>
     <div class="profile-section">
       <div class="profile-row"><div class="profile-lbl">Shift status</div><div class="profile-val" style="color:var(--green)">On shift</div></div>
-      <div class="profile-row"><div class="profile-lbl">Hotel</div><div class="profile-val">The Maison Collective</div></div>
+      <div class="profile-row"><div class="profile-lbl">Hotel</div><div class="profile-val" id="profile-hotel-name"></div></div>
     </div>
     <div class="profile-section">
       <div class="sec-lbl" style="padding:0 0 12px">Change Password</div>
@@ -499,6 +499,14 @@ function enterStaffApp(s) {
   document.getElementById('profile-av').textContent     = ini;
   document.getElementById('profile-name').textContent   = s.name;
   document.getElementById('profile-role').textContent   = s.role || 'Staff';
+  // Load hotel name from DB
+  if (db && HOTEL_ID) {
+    db.from('hotels').select('name').eq('id', HOTEL_ID).single().then(function(r) {
+      var name = r.data ? r.data.name : '';
+      var hn = document.getElementById('staff-hotel-name'); if (hn) hn.textContent = name;
+      var phn = document.getElementById('profile-hotel-name'); if (phn) phn.textContent = name;
+    });
+  }
   initPing();
   loadTasks();
   subscribeToRequests();
