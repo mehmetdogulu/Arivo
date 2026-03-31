@@ -782,8 +782,10 @@ function loadAll() {
 
 function loadUnreadGuestMsgCount() {
   if (!db) return;
+  // Use or() to catch both NULL and false — new messages have read=NULL by default
   db.from('messages').select('id', {count: 'exact', head: true})
-    .eq('hotel_id', HOTEL_ID).eq('direction', 'guest_to_hotel').eq('read', false)
+    .eq('hotel_id', HOTEL_ID).eq('direction', 'guest_to_hotel')
+    .or('read.is.null,read.eq.false')
     .then(function(r) {
       var n = r.count || 0;
       _guestMsgCount = n;
@@ -1370,7 +1372,7 @@ function subscribeToAll() {
         if (_activeGuestId && _activeGuestId === payload.new.guest_id) {
           loadGuestThread(_activeGuestId);
           if (db) db.from('messages').update({read: true, read_at: new Date().toISOString()})
-            .eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId).eq('direction', 'guest_to_hotel').eq('read', false).then(function(){});
+            .eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId).eq('direction', 'guest_to_hotel').or('read.is.null,read.eq.false').then(function(){});
         } else {
           incrementMsgAlert();
           // Refresh conversation list if it's visible
@@ -1466,7 +1468,7 @@ function openGuestThread(guestId, name, room) {
   document.getElementById('msgs-thread-room').textContent = 'Room ' + (room || '?');
   loadGuestThread(guestId);
   if (db) db.from('messages').update({read: true, read_at: new Date().toISOString()})
-    .eq('hotel_id', HOTEL_ID).eq('guest_id', guestId).eq('direction', 'guest_to_hotel').eq('read', false).then(function(){});
+    .eq('hotel_id', HOTEL_ID).eq('guest_id', guestId).eq('direction', 'guest_to_hotel').or('read.is.null,read.eq.false').then(function(){});
 }
 
 function closeGuestThread() {
