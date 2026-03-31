@@ -343,16 +343,28 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div class="sec" id="s-msgs">
-  <div class="sech"><div class="sect">Message Guests</div><div class="secs">Send messages to guest apps in real time</div></div>
-  <div class="card"><div class="ch"><div class="ct">New Message</div></div><div class="cb">
-    <div class="fg"><label class="fl">Send to</label><select class="fi" id="msgto"><option>All guests</option></select></div>
-    <div class="fg"><label class="fl">Message</label><textarea class="msgin" id="msgbody" placeholder="e.g. Your welcome drink is available at The Cellar Bar until 9pm tonight."></textarea></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-g" onclick="sendMsg()">&#128172; Send Message</button>
-      <button class="btn btn-s" onclick="loadTpl('checkout')">&#8635; Checkout Reminder</button>
-      <button class="btn btn-s" onclick="loadTpl('welcome')">&#8635; Welcome</button>
+  <!-- Conversation list view -->
+  <div id="msgs-list-view">
+    <div class="sech"><div class="secr"><div><div class="sect">Guest Messages</div><div class="secs">Tap a conversation to reply</div></div><button class="btn btn-s" onclick="openM('mbroadcast')">&#128172; Broadcast</button></div></div>
+    <div id="msgs-convlist">
+      <div id="msgs-convempty" style="text-align:center;padding:48px 24px;color:var(--tx3);font-size:13px;">No guest messages yet.<br><span style="font-size:11px;margin-top:6px;display:block;">Guests can message you from the app.</span></div>
     </div>
-  </div></div>
+  </div>
+  <!-- Thread view (hidden until guest selected) -->
+  <div id="msgs-thread-view" style="display:none;flex-direction:column;height:calc(100vh - 120px);">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bor);background:var(--sur);flex-shrink:0;">
+      <button onclick="closeGuestThread()" style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;font-family:inherit;">&#8592; Conversations</button>
+      <div style="flex:1;">
+        <div id="msgs-thread-name" style="font-size:14px;font-weight:600;color:var(--tx);">Guest</div>
+        <div id="msgs-thread-room" style="font-size:11px;color:var(--tx3);">Room</div>
+      </div>
+    </div>
+    <div id="msgs-thread-body" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div style="padding:12px 16px;border-top:1px solid var(--bor);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;">
+      <textarea id="msgs-reply-input" style="flex:1;background:var(--sur2);border:1.5px solid var(--bor);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:13px;color:var(--tx);outline:none;resize:none;min-height:38px;max-height:80px;" placeholder="Reply to guest..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGuestReply();}"></textarea>
+      <button onclick="sendGuestReply()" style="width:38px;height:38px;background:var(--forest);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;flex-shrink:0;">&#8593;</button>
+    </div>
+  </div>
 </div>
 
 <div class="sec" id="s-staffmsgs">
@@ -549,6 +561,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mextend"><div class="modal"><div class="mhdr"><div class="mt">Extend Stay</div><div class="mclose" onclick="closeM('mextend')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Guest: <strong id="extend-guest-name" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">New Checkout Date</label><input class="fi" id="extend-date" type="date"><div style="font-size:11px;color:var(--tx3);margin-top:4px">Current: <span id="extend-current-date">—</span></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveExtension()">Save Extension</button><button class="btn btn-s" onclick="closeM('mextend')">Cancel</button></div></div></div>
 <div class="mov" id="mmove"><div class="modal"><div class="mhdr"><div class="mt">Move Room</div><div class="mclose" onclick="closeM('mmove')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Guest: <strong id="move-guest-name" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Current Room</label><div style="font-size:14px;font-weight:500;color:var(--tx);padding:8px 0" id="move-current-room">—</div></div><div class="fg"><label class="fl">New Room</label><select class="fi" id="move-room-select"></select></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveMoveRoom()">Move Guest</button><button class="btn btn-s" onclick="closeM('mmove')">Cancel</button></div></div></div>
 <div class="mov" id="mmsg"><div class="modal"><div class="mhdr"><div class="mt">Message Guest</div><div class="mclose" onclick="closeM('mmsg')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">To: <strong id="msgto2" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Message</label><textarea class="msgin" id="msgb2" placeholder="Type your message..."></textarea></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="sendMsgM()">Send</button><button class="btn btn-s" onclick="closeM('mmsg')">Cancel</button></div></div></div>
+<div class="mov" id="mbroadcast"><div class="modal"><div class="mhdr"><div class="mt">&#128172; Broadcast Message</div><div class="mclose" onclick="closeM('mbroadcast')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Send to</label><select class="fi" id="msgto"><option value="All guests">All active guests</option></select></div><div class="fg"><label class="fl">Message</label><textarea class="msgin" id="msgbody" placeholder="e.g. Your welcome drink is ready at the bar."></textarea></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;"><button class="btn btn-s" onclick="loadTpl('checkout')">&#8635; Checkout Reminder</button><button class="btn btn-s" onclick="loadTpl('welcome')">&#8635; Welcome</button></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="sendMsg();closeM('mbroadcast')">Send Message</button><button class="btn btn-s" onclick="closeM('mbroadcast')">Cancel</button></div></div></div>
 <div class="mov" id="mstaff"><div class="modal"><div class="mhdr"><div class="mt">Add Staff Member</div><div class="mclose" onclick="closeM('mstaff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="sfr"><option value="staff">Staff</option><option value="housekeeping">Housekeeping</option><option value="front_desk">Front Desk</option><option value="concierge">Concierge</option><option value="maintenance">Maintenance</option><option value="manager">Manager</option></select></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sfe" type="email" placeholder="staff@hotel.com"><div style="font-size:11px;color:var(--tx3);margin-top:4px;">An invitation email will be sent to this address</div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addStaff()">Send Invitation</button><button class="btn btn-s" onclick="closeM('mstaff')">Cancel</button></div></div></div>
 <div class="mov" id="medit-staff"><div class="modal"><div class="mhdr"><div class="mt">Edit Staff Member</div><div class="mclose" onclick="closeM('medit-staff')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="edit-sfn" placeholder="e.g. Maria Rodriguez"></div><div class="fg"><label class="fl">Role</label><select class="fi" id="edit-sfr"><option>Housekeeping</option><option>Front Desk</option><option>Concierge</option><option>Maintenance</option><option>Manager</option></select></div><div class="fg"><label class="fl">Status</label><select class="fi" id="edit-sfs"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div></div><div class="mftr" style="flex-direction:column;gap:8px;"><div style="display:flex;gap:8px;width:100%;"><button class="btn btn-g btn-w" style="flex:1;" onclick="saveStaffEdit()">Save Changes</button><button class="btn btn-r" onclick="removeStaffById()">Remove Staff</button></div><button class="btn" style="width:100%;background:var(--surface,#2a2a2a);color:var(--tx2,#aaa);font-size:12px;" onclick="copyStaffInviteLink()">&#128279; Copy invite link (if no email received)</button></div></div></div>
 
@@ -1339,8 +1352,18 @@ function subscribeToAll() {
       if (payload.new.direction === 'guest_to_hotel') {
         toast(payload.new.sender_name + ': ' + payload.new.body.slice(0, 40), 'warn');
         notify('mgr', '&#128172; New Message from Guest', payload.new.body, payload.new.sender_name, 15000);
-        incrementMsgAlert();
         bellPlay();
+        // If thread for this guest is open, reload it and mark read; else badge the inbox
+        if (_activeGuestId && _activeGuestId === payload.new.guest_id) {
+          loadGuestThread(_activeGuestId);
+          if (db) db.from('messages').update({read: true, read_at: new Date().toISOString()})
+            .eq('hotel_id', HOTEL_ID).eq('guest_id', _activeGuestId).eq('direction', 'guest_to_hotel').eq('read', false).then(function(){});
+        } else {
+          incrementMsgAlert();
+          // Refresh conversation list if it's visible
+          var msgsec = document.getElementById('s-msgs');
+          if (msgsec && msgsec.classList.contains('on') && !_activeGuestId) loadGuestConversations();
+        }
       }
     })
     .subscribe();
@@ -1361,6 +1384,126 @@ function clearMsgAlert(){
   _guestMsgCount = 0;
   var badge = document.getElementById('guest-msg-badge');
   if(badge){ badge.style.display = 'none'; badge.textContent = ''; }
+}
+
+// ── GUEST MESSAGING INBOX ──
+var _activeGuestId = null;
+
+function loadGuestConversations() {
+  if (!db) return;
+  db.from('messages').select('id,guest_id,body,created_at,direction,read,sender_name')
+    .eq('hotel_id', HOTEL_ID).in('direction', ['guest_to_hotel','hotel_to_guest'])
+    .order('created_at', {ascending: false}).limit(500)
+    .then(function(r) {
+      if (!r.data || !r.data.length) return;
+      var byGuest = {};
+      r.data.forEach(function(msg) {
+        if (!msg.guest_id) return;
+        if (!byGuest[msg.guest_id]) byGuest[msg.guest_id] = {latest: msg, unread: 0};
+        else if (new Date(msg.created_at) > new Date(byGuest[msg.guest_id].latest.created_at)) byGuest[msg.guest_id].latest = msg;
+        if (msg.direction === 'guest_to_hotel' && !msg.read) byGuest[msg.guest_id].unread++;
+      });
+      var guestIds = Object.keys(byGuest);
+      if (!guestIds.length) return;
+      db.from('guests').select('id,name,room,checked_out').in('id', guestIds).then(function(gr) {
+        if (!gr.data) return;
+        var list = document.getElementById('msgs-convlist'); if (!list) return;
+        list.innerHTML = '';
+        var sorted = gr.data.slice().sort(function(a,b) {
+          return new Date(byGuest[b.id].latest.created_at) - new Date(byGuest[a.id].latest.created_at);
+        });
+        sorted.forEach(function(g) {
+          var info = byGuest[g.id]; if (!info) return;
+          var unread = info.unread;
+          var lastMsg = info.latest;
+          var preview = lastMsg.body.slice(0, 55) + (lastMsg.body.length > 55 ? '...' : '');
+          var d = new Date(lastMsg.created_at);
+          var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+          var ini = g.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bor);cursor:pointer;' + (unread ? 'background:var(--gdim);' : '');
+          row.onclick = function(){ openGuestThread(g.id, g.name, g.room); };
+          row.innerHTML = '<div style="width:40px;height:40px;border-radius:50%;background:var(--sur2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold);flex-shrink:0;">' + ini + '</div>'
+            + '<div style="flex:1;min-width:0;">'
+            +   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">'
+            +     '<div style="font-size:13px;font-weight:' + (unread ? '700' : '500') + ';color:var(--tx);">' + g.name + '</div>'
+            +     '<div style="display:flex;align-items:center;gap:6px;">'
+            +       (unread ? '<span style="background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;">' + unread + '</span>' : '')
+            +       '<span style="font-size:10px;color:var(--tx3);">' + timeStr + '</span>'
+            +     '</div>'
+            +   '</div>'
+            +   '<div style="font-size:12px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div>'
+            +   '<div style="font-size:10px;color:var(--tx3);margin-top:2px;">Room ' + (g.room||'?') + (g.checked_out ? ' · Checked out' : '') + '</div>'
+            + '</div>'
+            + '<div style="color:var(--tx3);font-size:16px;">&#8250;</div>';
+          list.appendChild(row);
+        });
+        if (!list.children.length) {
+          list.innerHTML = '<div style="text-align:center;padding:48px 24px;color:var(--tx3);font-size:13px;">No guest messages yet.</div>';
+        }
+      });
+    });
+}
+
+function openGuestThread(guestId, name, room) {
+  _activeGuestId = guestId;
+  document.getElementById('msgs-list-view').style.display = 'none';
+  var tv = document.getElementById('msgs-thread-view'); tv.style.display = 'flex';
+  document.getElementById('msgs-thread-name').textContent = name;
+  document.getElementById('msgs-thread-room').textContent = 'Room ' + (room || '?');
+  loadGuestThread(guestId);
+  if (db) db.from('messages').update({read: true, read_at: new Date().toISOString()})
+    .eq('hotel_id', HOTEL_ID).eq('guest_id', guestId).eq('direction', 'guest_to_hotel').eq('read', false).then(function(){});
+}
+
+function closeGuestThread() {
+  _activeGuestId = null;
+  document.getElementById('msgs-thread-view').style.display = 'none';
+  document.getElementById('msgs-list-view').style.display = 'block';
+  loadGuestConversations();
+}
+
+function loadGuestThread(guestId) {
+  if (!db) return;
+  db.from('messages').select('*').eq('hotel_id', HOTEL_ID).eq('guest_id', guestId)
+    .in('direction', ['guest_to_hotel','hotel_to_guest'])
+    .order('created_at', {ascending: true}).limit(200)
+    .then(function(r) {
+      var thread = document.getElementById('msgs-thread-body'); if (!thread) return;
+      thread.innerHTML = '';
+      if (!r.data || !r.data.length) { thread.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tx3);font-size:12px;">No messages yet.</div>'; return; }
+      r.data.forEach(function(msg) {
+        var isHotel = msg.direction === 'hotel_to_guest';
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;align-items:' + (isHotel ? 'flex-end' : 'flex-start') + ';';
+        var d = new Date(msg.created_at);
+        var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+        var dateStr = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+        if (!isHotel) {
+          wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">' + (msg.sender_name||'Guest') + '</div>'
+            + '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-left-radius:4px;background:var(--sur2);border:1px solid var(--bor);color:var(--tx);font-size:13px;line-height:1.4;">' + msg.body + '</div>'
+            + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
+        } else {
+          wrap.innerHTML = '<div style="max-width:80%;padding:9px 13px;border-radius:16px;border-bottom-right-radius:4px;background:var(--forest);color:#FDFCF9;font-size:13px;line-height:1.4;">' + msg.body + '</div>'
+            + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;text-align:right;">' + timeStr + '</div>';
+        }
+        thread.appendChild(wrap);
+      });
+      thread.scrollTop = thread.scrollHeight;
+    });
+}
+
+function sendGuestReply() {
+  if (!_activeGuestId || !db) return;
+  var input = document.getElementById('msgs-reply-input');
+  var txt = input ? input.value.trim() : '';
+  if (!txt) return;
+  input.value = '';
+  db.from('messages').insert({hotel_id: HOTEL_ID, guest_id: _activeGuestId, direction: 'hotel_to_guest', sender_name: 'Hotel Team', body: txt})
+    .then(function(r) {
+      if (r.error) { toast('Send failed', 'err'); return; }
+      loadGuestThread(_activeGuestId);
+    });
 }
 
 // ── MESSAGING ──
@@ -2071,7 +2214,7 @@ function simReq() {
 }
 
 // ── NAV ──
-function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local'){loadRecs();loadAiRecs();}if(name==='fac')loadFac();if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();}if(name==='qr')loadRoomTokens(); }
+function go(name, el) { document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var sec=document.getElementById('s-'+name);if(sec)sec.classList.add('on');if(el)el.classList.add('on');document.getElementById('ttl').textContent=TITLES[name]||name;closeSidebar();window.scrollTo(0,0);if(name==='logs')renderLogReport();if(name==='local'){loadRecs();loadAiRecs();}if(name==='fac')loadFac();if(name==='staffmsgs'){clearStaffMsgBadge();loadStaffMsgThread();}if(name==='msgs'){clearMsgAlert();loadGuestConversations();}if(name==='qr')loadRoomTokens(); }
 function setBN(id) { document.querySelectorAll('.bnitem').forEach(function(b){b.classList.remove('on');});document.getElementById(id).classList.add('on'); }
 function openSidebar()  { document.getElementById('sbar').classList.add('open');    document.getElementById('ov').classList.add('on'); }
 function closeSidebar() { document.getElementById('sbar').classList.remove('open'); document.getElementById('ov').classList.remove('on'); }
