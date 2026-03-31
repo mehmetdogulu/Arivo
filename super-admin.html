@@ -254,48 +254,6 @@ textarea.fi{resize:vertical;min-height:80px;}
   .mrr-card{flex-direction:column;gap:16px;}
 }
 
-function loadHotelLogs(){
-  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
-  var container = document.getElementById('admin-log-entries');
-  if(!container) return;
-  if(!logs.length){
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:#7A7060;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
-    return;
-  }
-  container.innerHTML = '';
-  logs.forEach(function(log){
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #EDE6D6;font-size:12px;';
-    var d = new Date(log.ts);
-    var timeStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    var srcColors = {'guest_app':'#B8933F','staff_app':'#2563EB','dashboard':'#16A34A'};
-    var srcColor = srcColors[log.source] || '#7A7060';
-    row.innerHTML =
-      '<div style="flex-shrink:0;width:90px;color:#7A7060;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
-      '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
-      '<div style="flex:1;min-width:0;">'+
-        '<div style="color:#1A1A1A;font-weight:500;">'+log.detail+'</div>'+
-        '<div style="color:#7A7060;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
-      '</div>';
-    container.appendChild(row);
-  });
-}
-
-function exportAdminLogs(){
-  var logs = JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
-  if(!logs.length){alert('No logs to export.');return;}
-  var csv = 'Timestamp,Action,Detail,User,Room,Source
-';
-  logs.forEach(function(l){
-    csv += [l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'
-';
-  });
-  var blob = new Blob([csv],{type:'text/csv'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'arivo-admin-log-'+new Date().toISOString().split('T')[0]+'.csv';
-  a.click();
-}
 
 @media(min-width:901px) and (max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}}
 @media(min-width:1201px){.stats{grid-template-columns:repeat(4,1fr);}}
@@ -351,7 +309,7 @@ function exportAdminLogs(){
     <div class="ni active" onclick="go('overview',this)"><span class="ni-ico">&#9646;&#9646;</span>Overview</div>
     <div class="ni" onclick="go('hotels',this)"><span class="ni-ico">&#127968;</span>All Hotels<span class="ni-badge green" id="sb-hotel-count">5</span></div>
     <div class="ni" onclick="go('revenue',this)"><span class="ni-ico">&#128178;</span>Revenue</div>
-    <div class="ni" onclick="go('trials',this)"><span class="ni-ico">&#9203;</span>Trials<span class="ni-badge amber">3</span></div>
+    <div class="ni" onclick="go('trials',this)"><span class="ni-ico">&#9203;</span>Trials<span class="ni-badge amber" id="trials-nav-badge">0</span></div>
     <div class="nav-lbl">Operations</div>
     <div class="ni" onclick="go('activity',this)"><span class="ni-ico">&#9881;</span>Activity Log</div>
     <div class="ni" onclick="go('messages',this)"><span class="ni-ico">&#128172;</span>Broadcast</div>
@@ -388,22 +346,22 @@ function exportAdminLogs(){
         <div class="mrr-card">
           <div class="mrr-main">
             <div class="mrr-lbl">Monthly Recurring Revenue</div>
-            <div class="mrr-val">£1,296</div>
-            <div class="mrr-sub" style="color:var(--green);">&#8593; Growing · 5 active subscribers</div>
+            <div class="mrr-val" id="mrr-total">£0</div>
+            <div class="mrr-sub" id="mrr-sub-overview">Loading...</div>
           </div>
           <div class="mrr-breakdown">
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--blue);">2</div><div class="mrr-item-lbl">Starter<br>£198/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--gold);">2</div><div class="mrr-item-lbl">Professional<br>£598/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--purple);">1</div><div class="mrr-item-lbl">Complete<br>£499/mo</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">3</div><div class="mrr-item-lbl">On Trial<br>£0/mo</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--blue);" id="mrr-starter-count">0</div><div class="mrr-item-lbl">Starter<br><span id="mrr-starter-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--gold);" id="mrr-pro-count">0</div><div class="mrr-item-lbl">Professional<br><span id="mrr-pro-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--purple);" id="mrr-complete-count">0</div><div class="mrr-item-lbl">Complete<br><span id="mrr-complete-val">£0/mo</span></div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);" id="mrr-trial-count">0</div><div class="mrr-item-lbl">On Trial<br>£0/mo</div></div>
           </div>
         </div>
 
         <div class="stats">
-          <div class="stat green"><div class="stat-lbl">Active Hotels</div><div class="stat-val">5</div><div class="stat-note up">&#8593; 2 this month</div></div>
-          <div class="stat amber"><div class="stat-lbl">On Free Trial</div><div class="stat-val">3</div><div class="stat-note warn">1 expires in 3 days</div></div>
-          <div class="stat gold"><div class="stat-lbl">Total Guests</div><div class="stat-val">312</div><div class="stat-note up">&#8593; Across all hotels</div></div>
-          <div class="stat blue"><div class="stat-lbl">Requests Today</div><div class="stat-val">47</div><div class="stat-note up">&#8593; Platform-wide</div></div>
+          <div class="stat green"><div class="stat-lbl">Active Hotels</div><div class="stat-val" id="stat-active">0</div><div class="stat-note up">Paying subscribers</div></div>
+          <div class="stat amber"><div class="stat-lbl">On Free Trial</div><div class="stat-val" id="stat-trial">0</div><div class="stat-note warn">Free trial accounts</div></div>
+          <div class="stat gold"><div class="stat-lbl">Total Guests</div><div class="stat-val" id="stat-guests">0</div><div class="stat-note up">&#8593; Across all hotels</div></div>
+          <div class="stat blue"><div class="stat-lbl">Requests Today</div><div class="stat-val" id="stat-requests">0</div><div class="stat-note up">&#8593; Platform-wide</div></div>
         </div>
 
         <div class="two-col">
@@ -413,11 +371,7 @@ function exportAdminLogs(){
               <div class="card-title">Recent Activity <span class="notif"></span></div>
               <div class="card-action" onclick="go('activity',null)">View all →</div>
             </div>
-            <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">The Larkspur House signed up</div><div class="act-sub">Starter plan · Cornwall, UK</div></div><div class="act-time">2 min ago</div></div>
-            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £299</div><div class="act-sub">The Anchor Hotel · Professional</div></div><div class="act-time">1 hr ago</div></div>
-            <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expires in 3 days</div><div class="act-sub">Briarwood Inn · Not yet converted</div></div><div class="act-time">Auto alert</div></div>
-            <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel logged in</div><div class="act-sub">The Maison Collective · Bath</div></div><div class="act-time">3 hrs ago</div></div>
-            <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment received — £499</div><div class="act-sub">Clifton Manor Hotel · Complete</div></div><div class="act-time">Yesterday</div></div>
+            <div id="overview-activity"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
           </div>
 
           <!-- Trial Expirations -->
@@ -426,21 +380,7 @@ function exportAdminLogs(){
               <div class="card-title">Trial Expirations</div>
               <div class="card-action" onclick="go('trials',null)">Manage →</div>
             </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds · Signed up 27 Feb · No payment method</div></div>
-              <span class="days-badge urgent">3 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Chase</button>
-            </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow · Signed up 5 Mar</div></div>
-              <span class="days-badge soon">10 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
-            </div>
-            <div class="trial-row">
-              <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Signed up 10 Mar</div></div>
-              <span class="days-badge ok">15 days</span>
-              <button class="btn btn-s" style="margin-left:8px;font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Chase</button>
-            </div>
+            <div id="overview-trials"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
           </div>
         </div>
       </div>
@@ -449,7 +389,7 @@ function exportAdminLogs(){
       <div class="sec" id="s-hotels">
         <div class="sec-hdr">
           <div class="sec-row">
-            <div><div class="sec-title">All Hotels</div><div class="sec-sub">8 properties · 5 paying · 3 on trial</div></div>
+            <div><div class="sec-title">All Hotels</div><div class="sec-sub" id="hotels-sub">Loading...</div></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-s" onclick="toast('Export CSV downloading...')">&#8659; Export CSV</button>
               <button class="btn btn-g" onclick="openModal('modal-add-hotel')">+ Add Hotel</button>
@@ -487,12 +427,12 @@ function exportAdminLogs(){
         <div class="mrr-card" style="margin-bottom:16px;">
           <div class="mrr-main">
             <div class="mrr-lbl">Current MRR</div>
-            <div class="mrr-val">£1,296</div>
-            <div class="mrr-sub">ARR equivalent: <strong style="color:var(--white);">£15,552</strong></div>
+            <div class="mrr-val" id="rev-mrr-total">£0</div>
+            <div class="mrr-sub">ARR equivalent: <strong style="color:var(--white);" id="rev-arr">£0</strong></div>
           </div>
           <div class="mrr-breakdown">
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--green);">£1,296</div><div class="mrr-item-lbl">Collected<br>this month</div></div>
-            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--amber);">£897</div><div class="mrr-item-lbl">Potential<br>(trials convert)</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--green);" id="rev-collected">£0</div><div class="mrr-item-lbl">Collected<br>this month</div></div>
+            <div class="mrr-item"><div class="mrr-item-val" style="color:var(--amber);" id="rev-potential">£0</div><div class="mrr-item-lbl">Potential<br>(trials convert)</div></div>
             <div class="mrr-item"><div class="mrr-item-val" style="color:var(--text2);">0%</div><div class="mrr-item-lbl">Churn<br>this month</div></div>
           </div>
         </div>
@@ -506,12 +446,7 @@ function exportAdminLogs(){
         <div class="two-col">
           <div class="card">
             <div class="card-hdr"><div class="card-title">Revenue by Plan</div></div>
-            <div class="card-body" style="padding:12px 18px;">
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter (2 hotels)</span><span style="color:var(--white);font-weight:600;">£198/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional (2 hotels)</span><span style="color:var(--white);font-weight:600;">£598/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete (1 hotel)</span><span style="color:var(--white);font-weight:600;">£499/mo</span></div>
-              <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£1,295/mo</span></div>
-            </div>
+            <div class="card-body" id="revenue-by-plan" style="padding:12px 18px;"></div>
           </div>
           <div class="card">
             <div class="card-hdr"><div class="card-title">Stripe Payouts</div></div>
@@ -527,38 +462,14 @@ function exportAdminLogs(){
       <div class="sec" id="s-trials">
         <div class="sec-hdr">
           <div class="sec-title">Trial Management</div>
-          <div class="sec-sub">3 hotels currently on free trial</div>
+          <div class="sec-sub" id="trials-sub">Loading...</div>
         </div>
         <div class="card">
           <div class="card-hdr">
             <div class="card-title">Active Trials</div>
             <div class="card-action" onclick="toast('Sending chase emails to all expiring trials...')">&#9993; Chase all expiring</div>
           </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">Briarwood Inn</div><div class="trial-sub">Cotswolds, UK · Starter plan interest · Signed up 27 Feb 2026 · No card added yet</div></div>
-            <span class="days-badge urgent">3 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent to Briarwood Inn')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Briarwood Inn')">+ Extend</button>
-              <button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast('Trial ended for Briarwood Inn')">End trial</button>
-            </div>
-          </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">The Harbour Arms</div><div class="trial-sub">Padstow, Cornwall · Professional plan interest · Signed up 5 Mar 2026</div></div>
-            <span class="days-badge soon">10 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('The Harbour Arms')">+ Extend</button>
-            </div>
-          </div>
-          <div class="trial-row" style="min-height:70px;">
-            <div class="trial-info"><div class="trial-name">Oakwood Guesthouse</div><div class="trial-sub">Lake District · Starter plan · Signed up 10 Mar 2026 · Very active (34 scans)</div></div>
-            <span class="days-badge ok">15 days left</span>
-            <div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;">
-              <button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="toast('Email sent')">&#9993; Email</button>
-              <button class="btn btn-blu" style="font-size:11px;padding:5px 10px;" onclick="openExtendModal('Oakwood Guesthouse')">+ Extend</button>
-            </div>
-          </div>
+          <div id="trials-list"><div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">Loading trials...</div></div>
         </div>
       </div>
 
@@ -569,13 +480,7 @@ function exportAdminLogs(){
           <div class="sec-sub">Platform-wide events in real time</div>
         </div>
         <div class="card" id="activity-log">
-          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — The Larkspur House</div><div class="act-sub">Starter plan · Mousehole, Cornwall · via landing page</div></div><div class="act-time">2 min ago</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £299</div><div class="act-sub">The Anchor Hotel · Monthly renewal · Stripe</div></div><div class="act-time">1 hr ago</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Maison Collective</div><div class="act-sub">Bath · James Mitchell · Chrome on iPhone</div></div><div class="act-time">3 hrs ago</div></div>
-          <div class="activity-row"><div class="act-ico trial">&#9203;</div><div class="act-info"><div class="act-title">Trial expiry alert sent — Briarwood Inn</div><div class="act-sub">Auto email: 3 days remaining</div></div><div class="act-time">6 hrs ago</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128178;</div><div class="act-info"><div class="act-title">Payment successful — £499</div><div class="act-sub">Clifton Manor Hotel · Monthly renewal</div></div><div class="act-time">Yesterday</div></div>
-          <div class="activity-row"><div class="act-ico signup">&#127968;</div><div class="act-info"><div class="act-title">New hotel signed up — Oakwood Guesthouse</div><div class="act-sub">Starter trial · Ambleside, Lake District</div></div><div class="act-time">11 Mar</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128100;</div><div class="act-info"><div class="act-title">Hotel dashboard login — The Harbour Arms</div><div class="act-sub">Padstow · First login since signup</div></div><div class="act-time">10 Mar</div></div>
+          <div id="activity-log-rows"><div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">Loading...</div></div>
         </div>
         <!-- Hotel-level log viewer -->
         <div class="card" style="margin-top:14px;">
@@ -604,12 +509,12 @@ function exportAdminLogs(){
             <div class="fg">
               <label class="fl">Send to</label>
               <select class="fi" id="msg-audience">
-                <option>All hotels (8)</option>
-                <option>Paying hotels only (5)</option>
-                <option>Trial hotels only (3)</option>
-                <option>Starter plan (2)</option>
-                <option>Professional plan (2)</option>
-                <option>Complete plan (1)</option>
+                <option id="bc-opt-all">All hotels</option>
+                <option id="bc-opt-paying">Paying hotels only</option>
+                <option id="bc-opt-trial">Trial hotels only</option>
+                <option id="bc-opt-starter">Starter plan</option>
+                <option id="bc-opt-pro">Professional plan</option>
+                <option id="bc-opt-complete">Complete plan</option>
               </select>
             </div>
             <div class="fg">
@@ -628,8 +533,7 @@ function exportAdminLogs(){
         </div>
         <div class="card">
           <div class="card-hdr"><div class="card-title">Previous Messages</div></div>
-          <div class="activity-row"><div class="act-ico login">&#128172;</div><div class="act-info"><div class="act-title">Welcome to Arivo — Getting started guide</div><div class="act-sub">Sent to all hotels · 8 recipients · 100% opened</div></div><div class="act-time">15 Mar</div></div>
-          <div class="activity-row"><div class="act-ico payment">&#128172;</div><div class="act-info"><div class="act-title">New feature: Pre-arrival guest links</div><div class="act-sub">Sent to Professional + Complete · 3 recipients</div></div><div class="act-time">10 Mar</div></div>
+          <div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">No previous broadcasts yet.</div>
         </div>
       </div>
 
@@ -700,7 +604,9 @@ function exportAdminLogs(){
         <div class="fg"><label class="fl">City</label><input class="fi" id="ah-city" placeholder="e.g. Bath"></div>
         <div class="fg"><label class="fl">Country</label><input class="fi" id="ah-country" value="United Kingdom"></div>
       </div>
+      <div class="fg"><label class="fl">Manager Name</label><input class="fi" id="ah-mgr-name" placeholder="e.g. James Mitchell"></div>
       <div class="fg"><label class="fl">Manager Email</label><input class="fi" id="ah-email" type="email" placeholder="manager@hotel.com"></div>
+      <div class="fg"><label class="fl">Manager Password</label><input class="fi" id="ah-mgr-pass" type="password" placeholder="Temporary password (min. 8 chars)"></div>
       <div class="fg"><label class="fl">Plan</label>
         <select class="fi" id="ah-plan">
           <option value="trial">Free Trial (30 days)</option>
@@ -785,29 +691,21 @@ function exportAdminLogs(){
 <div id="toast"></div><script>
 const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
-// Hotel ID — read from URL ?hotel= param, fallback to default
 var _urlParams = new URLSearchParams(window.location.search);
-var HOTEL_ID = _urlParams.get('hotel') || '00000000-0000-0000-0000-000000000001';
+var HOTEL_ID = _urlParams.get('hotel') || null;
 var db = null;
+var _hotelData = [];
 document.addEventListener('DOMContentLoaded', function(){
   try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
-// ── DATA ──
-var hotels = [
-  {id:1,name:'The Maison Collective',loc:'Bath, UK',plan:'pro',status:'active',mrr:299,since:'1 Feb 2026',lastActive:'3 hrs ago',scans:312,guests:47},
-  {id:2,name:'The Anchor Hotel',loc:'Lyme Regis, UK',plan:'pro',status:'active',mrr:299,since:'8 Feb 2026',lastActive:'Yesterday',scans:188,guests:31},
-  {id:3,name:'Clifton Manor Hotel',loc:'Bristol, UK',plan:'complete',status:'active',mrr:499,since:'15 Feb 2026',lastActive:'2 days ago',scans:421,guests:68},
-  {id:4,name:'The Larkspur House',loc:'Mousehole, UK',plan:'starter',status:'active',mrr:99,since:'19 Feb 2026',lastActive:'2 min ago',scans:94,guests:14},
-  {id:5,name:'The Salcombe',loc:'Devon, UK',plan:'starter',status:'active',mrr:99,since:'24 Feb 2026',lastActive:'Today',scans:76,guests:12},
-  {id:6,name:'Briarwood Inn',loc:'Cotswolds, UK',plan:'trial',status:'trial',mrr:0,since:'27 Feb 2026',lastActive:'4 days ago',scans:22,guests:3},
-  {id:7,name:'The Harbour Arms',loc:'Padstow, UK',plan:'trial',status:'trial',mrr:0,since:'5 Mar 2026',lastActive:'Yesterday',scans:45,guests:7},
-  {id:8,name:'Oakwood Guesthouse',loc:'Lake District, UK',plan:'trial',status:'trial',mrr:0,since:'10 Mar 2026',lastActive:'Today',scans:34,guests:5}
-];
-
 var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',settings:'Platform Settings'};
 var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
 var PLAN_MRR = {starter:'£99/mo',pro:'£299/mo',complete:'£499/mo',trial:'Free trial'};
+
+// ── UTIL ──
+function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},3000);}
 
 // ── LOGIN ──
 function doLogin(){
@@ -831,8 +729,9 @@ function enterAdmin(){
   var now=new Date();
   var el=document.getElementById('overview-date');
   if(el) el.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  renderHotels();
+  loadHotels();
   renderRevChart();
+  loadOverview();
 }
 
 document.getElementById('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
@@ -865,6 +764,9 @@ function go(name,el){
   document.getElementById('ttitle').textContent=TITLES[name]||name;
   closeSidebar();
   window.scrollTo(0,0);
+  if(name==='overview') loadOverview();
+  if(name==='trials') loadTrials();
+  if(name==='activity') loadActivityRows('activity-log-rows',50);
 }
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
@@ -874,60 +776,237 @@ function openModal(id){document.getElementById(id).classList.add('open');documen
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 document.querySelectorAll('.modal-ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)closeModal(o.id);});});
 
-// ── RENDER HOTELS TABLE ──
-function renderHotels(){
-  var tbody=document.getElementById('hotels-tbody');
-  if(!tbody)return;
-  tbody.innerHTML='';
-  hotels.forEach(function(h){
-    var tr=document.createElement('tr');
-    var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':h.plan==='trial'?'':'starter';
-    var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
-    var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
-    var mrrStr=h.mrr>0?'&pound;'+h.mrr:'-';
-    tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+h.loc+'</div></td>'+
-      '<td><span class="plan-tag '+planCls+'">'+PLAN_LABELS[h.plan]+'</span></td>'+
-      '<td><span class="status-dot '+statusCls+'">'+statusLbl+'</span></td>'+
-      '<td style="color:var(--gold);font-weight:600;">'+mrrStr+'</td>'+
-      '<td style="color:var(--text3);">'+h.since+'</td>'+
-      '<td style="color:var(--text3);">'+h.lastActive+'</td>'+
-      '<td><div class="h-actions">'+
-        '<div class="ic-btn ok" title="View details" onclick="openHotelDetail('+h.id+')">&#128065;</div>'+
-        '<div class="ic-btn warn" title="Suspend" onclick="toast(\''+h.name+' suspended\')">&#9940;</div>'+
-        '<div class="ic-btn danger" title="Delete" onclick="toast(\'Are you sure? This cannot be undone.\')">&#128465;</div>'+
-      '</div></td>';
-    tbody.appendChild(tr);
-  });
-}
-
+// ── OPEN HOTEL DETAIL ──
 function openHotelDetail(id){
-  var h=hotels.find(function(x){return x.id===id;});
+  var h=_hotelData.find(function(x){return x.id===id;});
   if(!h)return;
   document.getElementById('detail-title').textContent=h.name;
-  document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan];
-  document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':'Overdue';
+  document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan]||h.plan;
+  document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':h.status;
   document.getElementById('detail-status').style.color=h.status==='active'?'var(--green)':h.status==='trial'?'var(--amber)':'var(--red)';
-  document.getElementById('detail-mrr').textContent=h.mrr>0?'£'+h.mrr+'/mo':'Free trial';
-  document.getElementById('detail-since').textContent=h.since;
+  var mrr={starter:99,pro:299,complete:499,trial:0};
+  document.getElementById('detail-mrr').textContent=h.status==='trial'?'Free trial':'£'+(mrr[h.plan]||0)+'/mo';
+  document.getElementById('detail-since').textContent=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
   var sel=document.getElementById('detail-plan-select');
-  sel.value=h.plan;
+  if(sel) sel.value=h.plan;
   openModal('modal-hotel-detail');
 }
 
+// ── PASSWORD HASH (SHA-256 via Web Crypto) ──
+async function hashPassword(password){
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
 // ── ADD HOTEL ──
-function addHotel(){
-  var name=document.getElementById('ah-name').value.trim();
-  var city=document.getElementById('ah-city').value.trim();
-  var country=document.getElementById('ah-country').value.trim();
-  var plan=document.getElementById('ah-plan').value;
+async function addHotel(){
+  var name    = document.getElementById('ah-name').value.trim();
+  var city    = document.getElementById('ah-city').value.trim();
+  var country = document.getElementById('ah-country').value.trim();
+  var plan    = document.getElementById('ah-plan').value;
+  var mgrName = document.getElementById('ah-mgr-name').value.trim();
+  var mgrEmail= document.getElementById('ah-email').value.trim().toLowerCase();
+  var mgrPass = document.getElementById('ah-mgr-pass').value;
   if(!name){toast('Please enter a hotel name','err');return;}
-  var newHotel={id:hotels.length+1,name:name,loc:(city?city+', ':'')+country,plan:plan,status:plan==='trial'?'trial':'active',mrr:plan==='starter'?99:plan==='pro'?299:plan==='complete'?499:0,since:'Today',lastActive:'Just now',scans:0,guests:0};
-  hotels.push(newHotel);
-  renderHotels();
-  document.getElementById('sb-hotel-count').textContent=hotels.length;
-  closeModal('modal-add-hotel');
-  document.getElementById('ah-name').value='';document.getElementById('ah-city').value='';
-  toast('Hotel added — welcome email sent to manager');
+  if(!mgrEmail){toast('Please enter manager email','err');return;}
+  if(!mgrPass||mgrPass.length<8){toast('Manager password must be at least 8 characters','err');return;}
+  if(!db){toast('Not connected','err');return;}
+  var addBtn=document.querySelector('#modal-add-hotel .modal-footer .btn-primary');
+  if(addBtn){addBtn.textContent='Creating...';addBtn.disabled=true;}
+  try{
+    var slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    var hotelRes=await db.from('hotels').insert({name:name,slug:slug,city:city,country:country,plan:plan,status:plan==='trial'?'trial':'active'}).select('id').single();
+    if(hotelRes.error)throw hotelRes.error;
+    var hotelId=hotelRes.data.id;
+    await db.from('hotel_settings').insert({hotel_id:hotelId,rooms:[],address:{name:name,city:city,postcode:''},hotel_info:{}});
+    var hash=await hashPassword(mgrPass);
+    var staffRes=await db.from('staff').insert({hotel_id:hotelId,name:mgrName||'Manager',email:mgrEmail,password_hash:hash,role:'manager',active:true});
+    if(staffRes.error)throw staffRes.error;
+    closeModal('modal-add-hotel');
+    ['ah-name','ah-city','ah-mgr-name','ah-email','ah-mgr-pass'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    toast('Hotel created — manager can now log in at hotel-dashboard.html?hotel='+hotelId);
+    loadHotels();
+    loadOverview();
+  }catch(err){
+    toast('Error: '+(err.message||'Unknown error'),'err');
+    console.error('addHotel error:',err);
+  }finally{
+    if(addBtn){addBtn.textContent='Add Hotel';addBtn.disabled=false;}
+  }
+}
+
+// ── LOAD HOTELS FROM DB ──
+function loadHotels(){
+  if(!db)return;
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').order('created_at',{ascending:false}).then(function(r){
+    if(r.error||!r.data)return;
+    _hotelData = r.data;
+    var tbody=document.getElementById('hotels-tbody');if(!tbody)return;
+    tbody.innerHTML='';
+    r.data.forEach(function(h){
+      var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+      var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':'starter';
+      var planLabel=PLAN_LABELS[h.plan]||h.plan||'—';
+      var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
+      var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
+      var mrrVal={starter:99,pro:299,complete:499}[h.plan];
+      var mrrStr=h.status==='active'&&mrrVal?'£'+mrrVal:'-';
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+(h.city||'')+(h.country?', '+h.country:'')+'</div></td>'+
+        '<td><span class="plan-tag '+planCls+'">'+planLabel+'</span></td>'+
+        '<td><span class="status-dot '+statusCls+'">'+statusLbl+'</span></td>'+
+        '<td style="color:var(--gold);font-weight:600;">'+mrrStr+'</td>'+
+        '<td style="color:var(--text3);">'+since+'</td>'+
+        '<td style="color:var(--text3);">—</td>'+
+        '<td><div class="h-actions">'+
+          '<div class="ic-btn ok" title="View details" onclick="openHotelDetail(\''+h.id+'\')">&#128065;</div>'+
+          '<div class="ic-btn warn" title="Suspend" onclick="toast(\''+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' suspended\')">&#9940;</div>'+
+          '<div class="ic-btn danger" title="Delete" onclick="toast(\'Are you sure? This cannot be undone.\')">&#128465;</div>'+
+        '</div></td>';
+      tbody.appendChild(tr);
+    });
+    var cnt=document.getElementById('sb-hotel-count');if(cnt)cnt.textContent=r.data.length;
+  });
+}
+
+// ── OVERVIEW ──
+function loadOverview(){
+  if(!db)return;
+  var MRR={starter:99,pro:299,complete:499,trial:0};
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').then(function(r){
+    if(!r.data)return;
+    var hotels=r.data;
+    var active=hotels.filter(function(h){return h.status==='active';});
+    var trials=hotels.filter(function(h){return h.status==='trial';});
+    var mrr=active.reduce(function(sum,h){return sum+(MRR[h.plan]||0);},0);
+    var starter=active.filter(function(h){return h.plan==='starter';});
+    var pro=active.filter(function(h){return h.plan==='pro';});
+    var complete=active.filter(function(h){return h.plan==='complete';});
+
+    // MRR banner
+    setEl('mrr-total',mrr>0?'£'+mrr.toLocaleString():'£0');
+    setEl('mrr-arr',mrr>0?'£'+(mrr*12).toLocaleString():'£0');
+    setEl('mrr-starter-count',starter.length);
+    setEl('mrr-starter-val','£'+(starter.length*99)+'/mo');
+    setEl('mrr-pro-count',pro.length);
+    setEl('mrr-pro-val','£'+(pro.length*299)+'/mo');
+    setEl('mrr-complete-count',complete.length);
+    setEl('mrr-complete-val','£'+(complete.length*499)+'/mo');
+    setEl('mrr-trial-count',trials.length);
+
+    // MRR sub text
+    var subEl=document.getElementById('mrr-sub-overview');
+    if(subEl) subEl.textContent=active.length>0?'ARR: £'+(mrr*12).toLocaleString()+' · '+active.length+' active subscriber'+(active.length!==1?'s':''):'No paying subscribers yet';
+
+    // Stats
+    setEl('stat-active',active.length);
+    setEl('stat-trial',trials.length);
+
+    // Sidebar badge
+    var badge=document.getElementById('trials-nav-badge');
+    if(badge){badge.textContent=trials.length;badge.style.display=trials.length>0?'':'none';}
+
+    // Hotels subtitle
+    setEl('hotels-sub',hotels.length+' properties · '+active.length+' paying · '+trials.length+' on trial');
+
+    // Revenue page
+    setEl('rev-mrr-total',mrr>0?'£'+mrr.toLocaleString():'£0');
+    setEl('rev-arr',mrr>0?'£'+(mrr*12).toLocaleString():'£0');
+    setEl('rev-collected',mrr>0?'£'+mrr.toLocaleString():'£0');
+    var potentialMrr=trials.reduce(function(sum,h){return sum+(MRR[h.plan]||MRR.starter);},0);
+    setEl('rev-potential','£'+potentialMrr);
+
+    // Revenue by plan
+    var rpEl=document.getElementById('revenue-by-plan');
+    if(rpEl){
+      if(active.length===0){
+        rpEl.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No paying hotels yet.</div>';
+      }else{
+        var rows='';
+        if(starter.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter ('+starter.length+' hotel'+(starter.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(starter.length*99)+'/mo</span></div>';
+        if(pro.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional ('+pro.length+' hotel'+(pro.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(pro.length*299)+'/mo</span></div>';
+        if(complete.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete ('+complete.length+' hotel'+(complete.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(complete.length*499)+'/mo</span></div>';
+        rows+='<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£'+mrr+'/mo</span></div>';
+        rpEl.innerHTML=rows;
+      }
+    }
+
+    // Trial expirations card (overview)
+    var trialCard=document.getElementById('overview-trials');
+    if(trialCard){
+      if(trials.length===0){
+        trialCard.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No active trials.</div>';
+      }else{
+        trialCard.innerHTML=trials.map(function(h){
+          var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
+          var loc=(h.city||'')+(h.country?', '+h.country:'');
+          return '<div class="trial-row"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown location')+' · Signed up '+since+'</div></div><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="go(\'trials\',null)">View</button></div>';
+        }).join('');
+      }
+    }
+
+    // Broadcast audience options
+    var selAll=document.getElementById('bc-opt-all');if(selAll)selAll.textContent='All hotels ('+hotels.length+')';
+    var selPaying=document.getElementById('bc-opt-paying');if(selPaying)selPaying.textContent='Paying hotels only ('+active.length+')';
+    var selTrial=document.getElementById('bc-opt-trial');if(selTrial)selTrial.textContent='Trial hotels only ('+trials.length+')';
+    var selS=document.getElementById('bc-opt-starter');if(selS)selS.textContent='Starter plan ('+starter.length+')';
+    var selP=document.getElementById('bc-opt-pro');if(selP)selP.textContent='Professional plan ('+pro.length+')';
+    var selC=document.getElementById('bc-opt-complete');if(selC)selC.textContent='Complete plan ('+complete.length+')';
+  });
+
+  // Guest count
+  db.from('guests').select('id',{count:'exact',head:true}).then(function(r){
+    setEl('stat-guests',r.count||0);
+  });
+
+  // Today's requests count
+  var today=new Date();today.setHours(0,0,0,0);
+  db.from('requests').select('id',{count:'exact',head:true}).gte('created_at',today.toISOString()).then(function(r){
+    setEl('stat-requests',r.count||0);
+  });
+
+  // Recent activity (overview)
+  loadActivityRows('overview-activity',5);
+}
+
+// ── ACTIVITY ROWS ──
+function loadActivityRows(containerId,limit){
+  if(!db)return;
+  var container=document.getElementById(containerId);
+  if(!container)return;
+  db.from('activity_log').select('action,detail,user_name,source,created_at').order('created_at',{ascending:false}).limit(limit||20).then(function(r){
+    if(!r.data||r.data.length===0){
+      container.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:var(--text3);">No activity yet.</div>';
+      return;
+    }
+    container.innerHTML=r.data.map(function(row){
+      var ico=row.source==='guest'?'&#128100;':row.action==='login'?'&#128100;':'&#9881;';
+      var icoClass=row.action==='login'?'login':'signup';
+      var time=row.created_at?new Date(row.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      return '<div class="activity-row"><div class="act-ico '+icoClass+'">'+ico+'</div><div class="act-info"><div class="act-title">'+(row.detail||row.action||'Event')+'</div><div class="act-sub">'+(row.user_name||'')+(row.source?' · '+row.source:'')+'</div></div><div class="act-time">'+time+'</div></div>';
+    }).join('');
+  });
+}
+
+// ── TRIALS ──
+function loadTrials(){
+  if(!db)return;
+  var container=document.getElementById('trials-list');
+  var subEl=document.getElementById('trials-sub');
+  if(!container)return;
+  db.from('hotels').select('id,name,city,country,plan,status,created_at').eq('status','trial').order('created_at',{ascending:false}).then(function(r){
+    var trials=r.data||[];
+    if(subEl)subEl.textContent=trials.length+' hotels currently on free trial';
+    if(trials.length===0){
+      container.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--text3);">No hotels on trial.</div>';
+      return;
+    }
+    container.innerHTML=trials.map(function(h){
+      var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+      var loc=(h.city||'')+(h.country?', '+h.country:'');
+      return '<div class="trial-row" style="min-height:70px;"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown')+' · Signed up '+since+'</div></div><div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;"><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">&#128065; View</button><button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast(\'Contact '+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' about their trial\')">&#9993; Chase</button></div></div>';
+    }).join('');
+  });
 }
 
 // ── EXTEND TRIAL ──
@@ -941,17 +1020,14 @@ function renderRevChart(){
   var container=document.getElementById('rev-bars');
   if(!container)return;
   var months=['Oct','Nov','Dec','Jan','Feb','Mar'];
-  var values=[0,0,299,598,897,1296];
-  var max=Math.max.apply(null,values)||1;
+  var values=[0,0,0,0,0,0];
   container.innerHTML='';
   months.forEach(function(m,i){
     var wrap=document.createElement('div');
     wrap.className='rev-bar-wrap';
     var bar=document.createElement('div');
     bar.className='rev-bar'+(i===months.length-1?' current':'');
-    bar.style.height=Math.max(4,Math.round((values[i]/max)*75))+'px';
-    bar.title=m+': £'+values[i];
-    bar.onclick=function(){toast(m+' 2026: £'+values[i]+' MRR');};
+    bar.style.height='4px';
     var lbl=document.createElement('div');
     lbl.className='rev-bar-lbl';
     lbl.textContent=m;
@@ -961,6 +1037,48 @@ function renderRevChart(){
   });
 }
 
+// ── LOCAL HOTEL ACTIVITY LOG (device-based) ──
+function loadHotelLogs(){
+  var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]').reverse();
+  var container=document.getElementById('admin-log-entries');
+  if(!container)return;
+  if(!logs.length){
+    container.innerHTML='<div style="text-align:center;padding:24px;color:#7A7060;font-size:12px;">No activity logs found. Logs appear here once guests or staff use the hotel apps on this device.</div>';
+    return;
+  }
+  container.innerHTML='';
+  logs.forEach(function(log){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #EDE6D6;font-size:12px;';
+    var d=new Date(log.ts);
+    var timeStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var srcColors={'guest_app':'#B8933F','staff_app':'#2563EB','dashboard':'#16A34A'};
+    var srcColor=srcColors[log.source]||'#7A7060';
+    row.innerHTML=
+      '<div style="flex-shrink:0;width:90px;color:#7A7060;font-size:10px;padding-top:2px;">'+timeStr+'</div>'+
+      '<div style="flex-shrink:0;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.1);color:'+srcColor+';white-space:nowrap;text-transform:uppercase;">'+log.action.replace(/_/g,' ')+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="color:#1A1A1A;font-weight:500;">'+log.detail+'</div>'+
+        '<div style="color:#7A7060;margin-top:2px;">'+(log.user||'')+(log.room&&log.room!=='-'?' &middot; Room '+log.room:'')+(log.source?' &middot; '+log.source.replace(/_/g,' '):'')+'</div>'+
+      '</div>';
+    container.appendChild(row);
+  });
+}
+
+function exportAdminLogs(){
+  var logs=JSON.parse(localStorage.getItem('arivo_activity_log')||'[]');
+  if(!logs.length){alert('No logs to export.');return;}
+  var csv='Timestamp,Action,Detail,User,Room,Source\n';
+  logs.forEach(function(l){
+    csv+=[l.ts,l.action,'"'+(l.detail||'').replace(/"/g,'""')+'"',l.user||'',l.room||'',l.source||''].join(',')+'\n';
+  });
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='arivo-admin-log-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
 // ── BROADCAST ──
 function sendBroadcast(){
   var audience=document.getElementById('msg-audience').value;
@@ -968,9 +1086,8 @@ function sendBroadcast(){
   var body=document.getElementById('msg-body').value.trim();
   if(!subject||!body){toast('Please fill in subject and message','err');return;}
   toast('Message sent to: '+audience);
-  document.getElement('modal-broadcast').style.display='none';
-  document.getElementById('bc-subject').value='';
-  document.getElementById('bc-body').value='';
+  document.getElementById('msg-subject').value='';
+  document.getElementById('msg-body').value='';
 }
 </script>
 </body>

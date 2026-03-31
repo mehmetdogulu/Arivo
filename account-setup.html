@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arivo — Set Up Your Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--forest:#1E3A2F;--gold:#B8933F;--gold-light:#D4AF6A;--cream:#F5F0E8;--white:#FDFCF9;--charcoal:#1A1A1A;--muted:#7A7060;--red:#DC2626;--green:#16A34A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--forest);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;}
+body::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(184,147,63,0.08);pointer-events:none;}
+body::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;border-radius:50%;background:rgba(184,147,63,0.06);pointer-events:none;}
+.card{background:var(--white);border-radius:24px;padding:40px 36px;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:28px;}
+.eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:8px;}
+.title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--charcoal);line-height:1.15;margin-bottom:6px;}
+.sub{font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:28px;}
+.name-badge{background:rgba(30,58,47,0.06);border:1px solid rgba(30,58,47,0.12);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--forest);font-weight:500;margin-bottom:24px;display:flex;align-items:center;gap:8px;}
+.name-badge span{font-weight:300;color:var(--muted);font-size:12px;}</span>
+.fg{margin-bottom:18px;}
+.fl{display:block;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.fi{width:100%;background:var(--cream);border:1.5px solid #EDE6D6;border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--charcoal);outline:none;transition:border-color 0.15s;}
+.fi:focus{border-color:var(--forest);}
+.f-err{font-size:11px;color:var(--red);margin-top:5px;display:none;}
+.f-err.show{display:block;}
+.f-hint{font-size:11px;color:var(--muted);margin-top:5px;font-weight:300;}
+.btn{width:100%;background:var(--forest);color:var(--white);border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:opacity 0.15s;margin-top:8px;}
+.btn:hover{opacity:0.9;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.state{text-align:center;padding:20px 0;}
+.state-icon{font-size:48px;margin-bottom:16px;}
+.state-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--charcoal);margin-bottom:8px;}
+.state-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+.strength{height:3px;border-radius:2px;margin-top:6px;transition:all 0.3s;background:#EDE6D6;}
+.strength.weak{background:var(--red);width:33%;}
+.strength.ok{background:var(--gold);width:66%;}
+.strength.strong{background:var(--green);width:100%;}
+</style>
+</head>
+<body>
+<div class="card" id="main-card">
+  <div class="logo">Arivo</div>
+  <div id="state-loading" class="state">
+    <div class="state-icon">⏳</div>
+    <div class="state-title">Verifying your link…</div>
+    <div class="state-sub">Just a moment.</div>
+  </div>
+  <div id="state-invalid" class="state" style="display:none;">
+    <div class="state-icon">🔒</div>
+    <div class="state-title">Link expired or invalid</div>
+    <div class="state-sub">This setup link has expired or already been used. Please contact your administrator for a new one.</div>
+  </div>
+  <div id="state-form" style="display:none;">
+    <div class="eyebrow" id="form-eyebrow">Welcome to Arivo</div>
+    <div class="title" id="form-title">Set up your<br><em style="font-style:italic;color:var(--gold);">account</em></div>
+    <p class="sub" id="form-sub">Create a password to access your dashboard.</p>
+    <div class="name-badge" id="name-badge">👤 <span id="badge-name">Loading…</span> &nbsp;<span id="badge-email"></span></div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fi" id="pw1" type="password" placeholder="At least 8 characters" oninput="checkStrength()">
+      <div class="strength" id="pw-strength"></div>
+      <div class="f-err" id="err-pw1">Please enter a password (min 8 characters)</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Confirm Password</label>
+      <input class="fi" id="pw2" type="password" placeholder="Repeat your password">
+      <div class="f-err" id="err-pw2">Passwords do not match</div>
+    </div>
+    <button class="btn" id="submit-btn" onclick="submitSetup()">Activate my account</button>
+  </div>
+  <div id="state-success" class="state" style="display:none;">
+    <div class="state-icon">✅</div>
+    <div class="state-title">You're all set!</div>
+    <div class="state-sub" id="success-msg">Redirecting you to your dashboard…</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://htisbhrvnwzvmkjhqgcr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aXNiaHJ2bnd6dm1ramhxZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTQ3MTksImV4cCI6MjA4OTg3MDcxOX0.KVdaVKjnOkInme4PnANXIEr4v32uT0N4baiAOTeIikQ';
+var db = null;
+var _staffRecord = null;
+
+async function hashPassword(password) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+function show(id) {
+  ['state-loading','state-invalid','state-form','state-success'].forEach(function(s){
+    document.getElementById(s).style.display = s === id ? '' : 'none';
+  });
+}
+
+function checkStrength() {
+  var pw = document.getElementById('pw1').value;
+  var el = document.getElementById('pw-strength');
+  if (!pw) { el.className = 'strength'; return; }
+  if (pw.length < 8) { el.className = 'strength weak'; return; }
+  var strong = /[A-Z]/.test(pw) && /[0-9]/.test(pw);
+  el.className = strong ? 'strength strong' : 'strength ok';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('token');
+  if (!token) { show('state-invalid'); return; }
+  validateToken(token);
+});
+
+async function validateToken(token) {
+  if (!db) { show('state-invalid'); return; }
+  var r = await db.from('staff')
+    .select('id,name,email,role,hotel_id,invite_expires_at,invite_used')
+    .eq('invite_token', token)
+    .single();
+  if (r.error || !r.data) { show('state-invalid'); return; }
+  var s = r.data;
+  if (s.invite_used) { show('state-invalid'); return; }
+  if (s.invite_expires_at && new Date(s.invite_expires_at) < new Date()) { show('state-invalid'); return; }
+  _staffRecord = s;
+  document.getElementById('badge-name').textContent = s.name;
+  document.getElementById('badge-email').textContent = s.email;
+  var isManager = s.role === 'manager' || s.role === 'admin';
+  document.getElementById('form-eyebrow').textContent = isManager ? 'Hotel Manager Account' : 'Staff Account';
+  document.getElementById('form-title').innerHTML = 'Set up your<br><em style="font-style:italic;color:var(--gold);">account</em>';
+  document.getElementById('form-sub').textContent = isManager
+    ? 'Create a password to access your hotel dashboard.'
+    : 'Create a password to access the staff app.';
+  show('state-form');
+}
+
+async function submitSetup() {
+  var pw1 = document.getElementById('pw1').value;
+  var pw2 = document.getElementById('pw2').value;
+  var ok = true;
+  document.getElementById('err-pw1').classList.remove('show');
+  document.getElementById('err-pw2').classList.remove('show');
+  if (!pw1 || pw1.length < 8) { document.getElementById('err-pw1').classList.add('show'); ok = false; }
+  if (pw1 !== pw2) { document.getElementById('err-pw2').classList.add('show'); ok = false; }
+  if (!ok) return;
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Activating…';
+  try {
+    var hash = await hashPassword(pw1);
+    var r = await db.from('staff').update({
+      password_hash: hash,
+      invite_used: true,
+      password_set: true,
+      invite_token: null,
+      invite_expires_at: null
+    }).eq('id', _staffRecord.id);
+    if (r.error) throw r.error;
+    var isManager = _staffRecord.role === 'manager' || _staffRecord.role === 'admin';
+    document.getElementById('success-msg').textContent = isManager
+      ? 'Redirecting you to your dashboard…'
+      : 'Redirecting you to the staff app…';
+    show('state-success');
+    var dest = isManager
+      ? 'hotel-dashboard.html?hotel=' + _staffRecord.hotel_id
+      : 'staff-dashboard.html?hotel=' + _staffRecord.hotel_id;
+    setTimeout(function() { window.location.href = dest; }, 2000);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Activate my account';
+    alert('Something went wrong: ' + e.message);
+  }
+}
+</script>
+</body>
+</html>
