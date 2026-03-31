@@ -559,9 +559,6 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="spick">
       <span class="spickl">Assign to staff (optional)</span>
       <div class="schips" id="schips">
-        <div class="schap" onclick="pickStaff(this)">Maria R.</div>
-        <div class="schap" onclick="pickStaff(this)">Tom K.</div>
-        <div class="schap" onclick="pickStaff(this)">Lena P.</div>
         <div class="schap" onclick="pickStaff(this)">Myself</div>
       </div>
     </div>
@@ -1106,6 +1103,7 @@ function openETA(btn, reqId, taskTitle) {
   var row = btn.closest('.row');
   document.getElementById('etalbl').textContent = row ? row.querySelector('.rt').textContent : (taskTitle || 'Request');
   renderEtaOpts();
+  renderStaffChips();
   document.getElementById('etapop').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
@@ -1937,13 +1935,15 @@ function buildStaffInviteEmail(name, setupUrl) {
     + '</div></body></html>';
 }
 
+var _staffCache = [];
 function loadStaff() {
   if (!db) return;
   db.from('staff').select('*').eq('hotel_id', HOTEL_ID).eq('active', true).order('created_at', {ascending: true}).then(function(r) {
+    _staffCache = (r.data || []);
     var list = document.getElementById('stafflist'); if (!list) return;
-    if (!r.data || !r.data.length) { list.innerHTML = '<div id="staff-empty" style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No staff added yet.</div>'; return; }
+    if (!_staffCache.length) { list.innerHTML = '<div id="staff-empty" style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No staff added yet.</div>'; return; }
     list.innerHTML = '';
-    r.data.forEach(function(s) {
+    _staffCache.forEach(function(s) {
       var ini = s.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var row = document.createElement('div'); row.className = 'srow'; row.dataset.staffId = s.id;
       row.innerHTML = '<div class="sav" style="background:var(--gdim);color:var(--gold)">' + ini + '</div>'
@@ -1952,6 +1952,18 @@ function loadStaff() {
       list.appendChild(row);
     });
   });
+}
+
+function renderStaffChips() {
+  var chips = document.getElementById('schips'); if (!chips) return;
+  chips.innerHTML = '';
+  _staffCache.forEach(function(s) {
+    var short = s.name.split(' ')[0] + (s.name.split(' ')[1] ? ' ' + s.name.split(' ')[1][0] + '.' : '');
+    var c = document.createElement('div'); c.className = 'schap'; c.textContent = short;
+    c.onclick = function(){ pickStaff(c); }; chips.appendChild(c);
+  });
+  var me = document.createElement('div'); me.className = 'schap'; me.textContent = 'Myself';
+  me.onclick = function(){ pickStaff(me); }; chips.appendChild(me);
 }
 
 // ── CREDENTIALS ──
