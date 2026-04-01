@@ -861,14 +861,33 @@ function restoreSession(){
   enterApp();
   function initAfterDb(){
     if(!db){setTimeout(initAfterDb,300);return;}
-    db.from('guests').select('id,checked_out').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('room',s.room).single().then(function(r){
-      if(r.data&&r.data.checked_out===true){
+    // Query by guestId if known, otherwise by name — never by room (it may have changed)
+    var query = s.guestId
+      ? db.from('guests').select('id,room,checkout_date,checked_out').eq('id',s.guestId).single()
+      : db.from('guests').select('id,room,checkout_date,checked_out').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('checked_out',false).order('registered_at',{ascending:false}).limit(1).single();
+    query.then(function(r){
+      if(!r.data){loadMessagesFromSupabase();return;}
+      if(r.data.checked_out===true){
         sessionStorage.removeItem('arivo_session');
         localStorage.removeItem('arivo_session');
         expireGuestSession();
         return;
       }
-      if(r.data&&r.data.id){guestId=r.data.id;s.guestId=guestId;sessionStorage.setItem('arivo_session',JSON.stringify(s));localStorage.setItem('arivo_session',JSON.stringify(s));subscribeToUpdates();}
+      guestId=r.data.id;
+      // Sync any room or checkout changes the manager made
+      if(r.data.room&&r.data.room!==state.room){
+        state.room=r.data.room;
+        var re=document.getElementById('app-room');if(re)re.textContent=r.data.room;
+      }
+      var freshCo=r.data.checkout_date?r.data.checkout_date.split('T')[0]:'';
+      if(freshCo&&freshCo!==state.checkout){
+        state.checkout=freshCo;
+        var d=new Date(freshCo).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+        var ce=document.getElementById('app-co');if(ce)ce.textContent='Out '+d;
+        startCheckoutReminders(freshCo);
+      }
+      saveGuestSession();
+      subscribeToUpdates();
       loadMessagesFromSupabase();
     });
   }
