@@ -553,17 +553,59 @@ function resolveAccessToken(token){
     startCheckoutReminders(co);
     subscribeToUpdates();
     loadMessagesFromSupabase();
-    // Load hotel settings and then enter the app
-    db.from('hotel_settings').select('*').eq('hotel_id',HOTEL_ID).single().then(function(hs){
-      if(hs.data){
-        hotelSettings=hs.data;
-        if(hs.data.hotel_info)renderHotelInfoSections(hs.data.hotel_info);
-        if(hs.data.checkout_time)hotelSettings.checkoutTime=hs.data.checkout_time;
-      }
-      enterApp();
-      showScreen('screen-welcome');
+
+    var consentKey  = 'arivo_consent_'  + g.id;
+    var welcomedKey = 'arivo_welcomed_' + g.id;
+
+    // Load hotel name for consent/welcome screens, then hotel settings, then route
+    db.from('hotels').select('name,city').eq('id',HOTEL_ID).single().then(function(hr){
+      var hn=(hr.data&&hr.data.name)||'Your Hotel';
+      var city=(hr.data&&hr.data.city)||'';
+      var label=hn+(city?' \u00b7 '+city:'');
+      var ce=document.getElementById('consent-hotel-name'); if(ce)ce.textContent=label;
+      var we=document.getElementById('w-hotel-eyebrow');    if(we)we.textContent=label;
+
+      db.from('hotel_settings').select('*').eq('hotel_id',HOTEL_ID).single().then(function(hs){
+        if(hs.data){
+          hotelSettings=hs.data;
+          if(hs.data.hotel_info)renderHotelInfoSections(hs.data.hotel_info);
+          if(hs.data.checkout_time)hotelSettings.checkoutTime=hs.data.checkout_time;
+        }
+
+        if(localStorage.getItem(welcomedKey)){
+          // Already fully onboarded — skip straight to dashboard
+          enterApp();
+        } else if(localStorage.getItem(consentKey)){
+          // Consent done, welcome pending
+          _atHookWelcome(welcomedKey);
+          showScreen('screen-welcome');
+        } else {
+          // First visit — show consent
+          _atHookConsent(consentKey, welcomedKey);
+          showScreen('screen-consent');
+        }
+      });
     });
   });
+}
+
+function _atHookConsent(consentKey, welcomedKey){
+  var btn=document.querySelector('#screen-consent .btn-primary');
+  if(!btn)return;
+  btn.onclick=function(){
+    localStorage.setItem(consentKey,'1');
+    _atHookWelcome(welcomedKey);
+    showScreen('screen-welcome');
+  };
+}
+
+function _atHookWelcome(welcomedKey){
+  var btn=document.querySelector('#screen-welcome .w-btn');
+  if(!btn)return;
+  btn.onclick=function(){
+    localStorage.setItem(welcomedKey,'1');
+    enterApp();
+  };
 }
 
 function initGuestApp(){
