@@ -313,6 +313,7 @@ textarea.fi{resize:vertical;min-height:80px;}
     <div class="nav-lbl">Operations</div>
     <div class="ni" onclick="go('activity',this)"><span class="ni-ico">&#9881;</span>Activity Log</div>
     <div class="ni" onclick="go('messages',this)"><span class="ni-ico">&#128172;</span>Broadcast</div>
+    <div class="ni" onclick="go('support',this);loadSupportTickets()"><span class="ni-ico">&#128587;</span>Support Inbox<span id="support-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;"></span></div>
     <div class="nav-lbl">System</div>
     <div class="ni" onclick="go('settings',this)"><span class="ni-ico">&#9881;&#65039;</span>Platform Settings</div>
     <div class="sb-footer">
@@ -537,6 +538,15 @@ textarea.fi{resize:vertical;min-height:80px;}
         </div>
       </div>
 
+      <!-- ═══ SUPPORT INBOX ═══ -->
+      <div class="sec" id="s-support">
+        <div class="sec-hdr">
+          <div class="sec-title">Support Inbox</div>
+          <div class="sec-sub">Tickets submitted by hotel managers</div>
+        </div>
+        <div id="support-list"><div style="padding:32px;text-align:center;font-size:13px;color:var(--text3);">Loading...</div></div>
+      </div>
+
       <!-- ═══ PLATFORM SETTINGS ═══ -->
       <div class="sec" id="s-settings">
         <div class="sec-hdr">
@@ -702,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function(){
   try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase init error:', e); }
 });
 
-var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',settings:'Platform Settings'};
+var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',support:'Support Inbox',settings:'Platform Settings'};
 var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
 var PLAN_MRR = {starter:'£99/mo',pro:'£299/mo',complete:'£499/mo',trial:'Free trial'};
 
@@ -1157,6 +1167,44 @@ async function sendBroadcast(){
   toast('Message sent to '+r.data.length+' hotel(s)');
   document.getElementById('msg-subject').value='';
   document.getElementById('msg-body').value='';
+}
+
+// ── SUPPORT INBOX ──
+async function loadSupportTickets() {
+  var list = document.getElementById('support-list'); if (!list) return;
+  list.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--text3);">Loading...</div>';
+  if (!db) return;
+  var r = await db.from('messages').select('id,hotel_id,sender_name,body,created_at').eq('direction','support_ticket').order('created_at',{ascending:false});
+  if (r.error || !r.data || !r.data.length) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--text3);">No support tickets yet.</div>';
+    document.getElementById('support-badge').style.display = 'none';
+    return;
+  }
+  // Fetch hotel names
+  var hotelIds = [...new Set(r.data.map(function(m){return m.hotel_id;}).filter(Boolean))];
+  var hotelMap = {};
+  if (hotelIds.length) {
+    var hr = await db.from('hotels').select('id,name').in('id', hotelIds);
+    (hr.data||[]).forEach(function(h){ hotelMap[h.id] = h.name; });
+  }
+  list.innerHTML = r.data.map(function(ticket) {
+    var parsed = {}; try { parsed = JSON.parse(ticket.body); } catch(e) { parsed = {message: ticket.body}; }
+    var hotelName = hotelMap[ticket.hotel_id] || 'Unknown Hotel';
+    var d = new Date(ticket.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var tfBadge = parsed.timeframe ? '<span style="background:rgba(184,147,63,.15);color:#B8933F;font-size:10px;font-weight:600;border-radius:6px;padding:2px 8px;">Response: '+parsed.timeframe+'</span>' : '';
+    var shotHtml = parsed.screenshot ? '<div style="margin-top:10px;"><img src="'+parsed.screenshot+'" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--card-border);cursor:pointer;object-fit:contain;" onclick="this.style.maxHeight=this.style.maxHeight===\'none\'?\'200px\':\'none\';" title="Click to expand"></div>' : '';
+    return '<div style="background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:12px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">'
+      +   '<div style="font-size:13px;font-weight:600;color:var(--text);">&#127968; ' + hotelName + ' <span style="font-weight:400;color:var(--text3);">· ' + ticket.sender_name + '</span></div>'
+      +   '<div style="display:flex;align-items:center;gap:8px;">' + tfBadge + '<span style="font-size:11px;color:var(--text3);">' + d + '</span></div>'
+      + '</div>'
+      + '<div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;">' + (parsed.message||'').replace(/</g,'&lt;') + '</div>'
+      + shotHtml
+      + '</div>';
+  }).join('');
+  // Update badge
+  var badge = document.getElementById('support-badge');
+  if (badge) { badge.textContent = r.data.length; badge.style.display = 'inline-block'; }
 }
 </script>
 </body>

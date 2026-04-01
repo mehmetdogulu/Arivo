@@ -280,6 +280,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     </div>
     <div class="sfooter">
       <div class="urow"><div class="uav" id="uav">HM</div><div><div class="uname" id="uname">Hotel Manager</div><div class="urole">Hotel Manager</div></div></div>
+      <button class="btn btn-s" style="width:100%;margin-bottom:6px;font-size:12px;" onclick="openM('msupport')">&#128587; Help &amp; Support</button>
       <button class="logoutbtn" onclick="logout()">Sign out</button>
     </div>
   </div>
@@ -554,6 +555,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div class="mov" id="mrec"><div class="modal"><div class="mhdr"><div class="mt">Add Place</div><div class="mclose" onclick="closeM('mrec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Place Name</label><input class="fi" id="arn" placeholder="e.g. The Blue Anchor"></div><div class="fg"><label class="fl">Category &amp; Details</label><input class="fi" id="arc" placeholder="e.g. Pub &middot; 5 min walk"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="are" placeholder="e.g. &#127867;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRec()">Add</button><button class="btn btn-s" onclick="closeM('mrec')">Cancel</button></div></div></div>
 <div class="mov" id="mfac"><div class="modal"><div class="mhdr"><div class="mt">Add Facility</div><div class="mclose" onclick="closeM('mfac')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Facility Name</label><input class="fi" id="afn" placeholder="e.g. Rooftop Terrace"></div><div class="fg"><label class="fl">Details</label><input class="fi" id="afd" placeholder="e.g. May-Sept &middot; 10am-8pm"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="afe" placeholder="e.g. &#127968;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addFac()">Add</button><button class="btn btn-s" onclick="closeM('mfac')">Cancel</button></div></div></div>
 <div class="mov" id="mlink"><div class="modal"><div class="mhdr"><div class="mt">Generate Pre-arrival Link</div><div class="mclose" onclick="closeM('mlink')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="gln" placeholder="e.g. Marcus Webb"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="glr" placeholder="e.g. 6" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="glc" type="date"></div><div id="glres" style="display:none;margin-top:12px;background:var(--sur2);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--tx3);margin-bottom:6px">Generated link</div><div style="font-family:monospace;font-size:11px;color:var(--blu);word-break:break-all" id="glurl"></div><div style="margin-top:8px"><button class="btn btn-g" style="font-size:11px" onclick="navigator.clipboard.writeText(document.getElementById('glurl').textContent);toast('Copied!')">&#128203; Copy</button></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="genLink()">Generate</button><button class="btn btn-s" onclick="closeM('mlink')">Close</button></div></div></div>
+<div class="mov" id="msupport"><div class="modal" style="max-width:480px"><div class="mhdr"><div class="mt">&#128587; Help &amp; Support</div><div class="mclose" onclick="closeM('msupport')">&#10005;</div></div><div class="mbdy"><div style="font-size:12px;color:var(--tx3);margin-bottom:16px;line-height:1.5;">Our team will review your request and get back to you within the selected timeframe.</div><div class="fg"><label class="fl">What do you need help with?</label><textarea class="fi" id="sup-msg" rows="4" placeholder="Describe your issue or question..." style="resize:vertical;min-height:90px;"></textarea></div><div class="fg"><label class="fl">Response Time</label><select class="fi" id="sup-timeframe"><option value="24h">Within 24 hours</option><option value="48h">Within 48 hours</option></select></div><div class="fg"><label class="fl">Screenshot (optional)</label><input type="file" accept="image/*" id="sup-screenshot" onchange="previewSupportShot(this)" style="width:100%;font-size:12px;"><div id="sup-preview" style="display:none;margin-top:8px;"><img id="sup-preview-img" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--bor);object-fit:contain;"></div><div id="sup-shot-warn" style="display:none;font-size:11px;color:var(--red);margin-top:4px;"></div></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="submitSupportTicket()">&#128172; Send Ticket</button><button class="btn btn-s" onclick="closeM('msupport')">Cancel</button></div></div></div>
 <div class="mov" id="mratings"><div class="modal" style="max-width:500px;max-height:85vh;display:flex;flex-direction:column"><div class="mhdr"><div class="mt">Guest Ratings</div><div class="mclose" onclick="closeM('mratings')">&#10005;</div></div><div style="flex:1;overflow-y:auto" id="mratings-body"><div style="padding:16px;text-align:center;color:var(--tx3);font-size:12px;">Loading...</div></div></div></div>
 <div class="mov" id="mqr"><div class="modal" style="max-width:340px"><div class="mhdr"><div class="mt" id="mqr-room">Room QR Code</div><div class="mclose" onclick="closeM('mqr')">&#10005;</div></div><div class="mbdy" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px"><img id="mqr-img" src="" alt="QR Code" style="width:260px;height:260px;border-radius:8px;border:1px solid var(--bor);display:block"><div style="font-size:10px;color:var(--tx3);text-align:center;word-break:break-all;max-width:260px" id="mqr-url"></div><div style="display:flex;gap:8px;width:100%"><button class="btn btn-g" style="flex:1" onclick="copyRoomUrl(document.getElementById('mqr-url').textContent)">&#128279; Copy URL</button><button class="btn btn-s" style="flex:1" onclick="printRoomQR()">&#128438; Print</button></div></div><div class="mftr"><button class="btn btn-s btn-w" onclick="closeM('mqr')">Close</button></div></div></div>
 <div class="mov" id="mguest-history"><div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column"><div class="mhdr"><div class="mt" id="gh-name">Guest History</div><div class="mclose" onclick="closeM('mguest-history')">&#10005;</div></div>
@@ -1372,6 +1374,51 @@ function loadAvgRating() {
       document.getElementById('savg').textContent = '-';
     }
   });
+}
+
+// ── SUPPORT TICKETS ──
+function previewSupportShot(input) {
+  var warn = document.getElementById('sup-shot-warn');
+  var preview = document.getElementById('sup-preview');
+  if (!input.files || !input.files[0]) { preview.style.display='none'; return; }
+  var file = input.files[0];
+  if (file.size > 5 * 1024 * 1024) { warn.textContent = 'Image too large (max 5MB). Please resize before uploading.'; warn.style.display='block'; input.value=''; preview.style.display='none'; return; }
+  warn.style.display = 'none';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Compress via canvas
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var scale = Math.min(800/img.width, 800/img.height, 1);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('sup-preview-img').src = dataUrl;
+      preview.style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitSupportTicket() {
+  var msg = document.getElementById('sup-msg').value.trim();
+  var timeframe = document.getElementById('sup-timeframe').value;
+  if (!msg) { toast('Please describe your issue', 'err'); return; }
+  if (!db) { toast('Not connected', 'err'); return; }
+  var shotImg = document.getElementById('sup-preview-img');
+  var screenshot = (shotImg && shotImg.src && shotImg.src.startsWith('data:')) ? shotImg.src : null;
+  var body = JSON.stringify({message: msg, timeframe: timeframe, screenshot: screenshot, hotel_id: HOTEL_ID, sent_at: new Date().toISOString()});
+  var r = await db.from('messages').insert({hotel_id: HOTEL_ID, direction: 'support_ticket', sender_name: document.getElementById('uname').textContent || 'Manager', body: body});
+  if (r.error) { toast('Failed to send: ' + r.error.message, 'err'); return; }
+  toast('Support ticket sent — we\'ll respond within ' + timeframe);
+  closeM('msupport');
+  document.getElementById('sup-msg').value = '';
+  document.getElementById('sup-preview').style.display = 'none';
+  document.getElementById('sup-preview-img').src = '';
+  document.getElementById('sup-screenshot').value = '';
 }
 
 function openRatingsModal() {
