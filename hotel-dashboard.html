@@ -2424,7 +2424,24 @@ function rmETA(btn) { btn.closest('.etarow').remove(); }
 function saveEtaOpts() { toast('ETA options saved'); }
 
 // ── QR ──
-function genLink() { var n=document.getElementById('gln').value.trim();var r=document.getElementById('glr').value.trim();var c=document.getElementById('glc').value;if(!n||!r){toast('Fill in name and room','err');return;}var base=window.location.origin+'/hotel-guest-app.html';var url=base+'?hotel='+HOTEL_ID+'&name='+encodeURIComponent(n)+'&room='+encodeURIComponent(r)+(c?'&checkout='+c:'');document.getElementById('glurl').textContent=url;document.getElementById('glres').style.display='block'; }
+function genLink() {
+  var n=document.getElementById('gln').value.trim();
+  var r=document.getElementById('glr').value.trim();
+  var c=document.getElementById('glc').value;
+  if(!n||!r){toast('Fill in name and room','err');return;}
+  if(!db||!HOTEL_ID){toast('Not connected','err');return;}
+  var token=crypto.randomUUID();
+  var base=window.location.origin+'/hotel-guest-app.html';
+  var url=base+'?token='+token;
+  // Upsert token into room_tokens so it appears in Room QR section
+  db.from('room_tokens').upsert({hotel_id:HOTEL_ID,room:r,token:token},{onConflict:'hotel_id,room'}).then(function(res){
+    if(res.error){toast('Error saving token: '+res.error.message,'err');return;}
+    document.getElementById('glurl').textContent=url;
+    document.getElementById('glres').style.display='block';
+    loadRoomTokens();
+    toast('Link generated for '+r);
+  });
+}
 
 function loadRoomTokens() {
   if (!db) return;
@@ -2452,9 +2469,9 @@ function loadRoomTokens() {
         + '<div style="font-size:13px;font-weight:500;color:var(--tx);">' + room + '</div>'
         + '<div style="display:flex;gap:8px;align-items:center;">'
         + (isOccupied ? '<span style="font-size:11px;color:var(--green);font-weight:600;background:rgba(22,163,74,.1);padding:3px 8px;border-radius:20px;">&#128101; Occupied</span>' : '<span style="font-size:11px;color:var(--tx3);font-weight:600;background:var(--bg2,#f5f0e8);padding:3px 8px;border-radius:20px;">Vacant</span>')
-        + (isOccupied ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">&#8635; Regen</button>' : '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">+ Generate</button>')
-        + (isOccupied ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="showRoomQR(\'' + url.replace(/'/g, "\\'") + '\',\'' + room.replace(/'/g, "\\'") + '\')">&#9641; QR Code</button>' : '')
-        + (isOccupied ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
+        + (hasToken ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">&#8635; Regen</button>' : '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">+ Generate</button>')
+        + (hasToken ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="showRoomQR(\'' + url.replace(/'/g, "\\'") + '\',\'' + room.replace(/'/g, "\\'") + '\')">&#9641; QR Code</button>' : '')
+        + (hasToken ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
         + '</div></div>';
     }).join('');
   });
