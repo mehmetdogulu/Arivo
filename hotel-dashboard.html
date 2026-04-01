@@ -295,7 +295,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="tbl"><div class="mbtn" onclick="openSidebar()">&#9776;</div><div class="ttl" id="ttl">Overview</div></div>
       <div class="tbr">
         <div class="btn btn-s tbhide" onclick="simReq()" style="border-color:var(--amb);color:var(--amb)">&#128718; Simulate</div>
-        <div class="btn btn-g" onclick="openM('mag')">+ Add Guest</div>
+        <div class="btn btn-g" onclick="openAddGuest()">+ Add Guest</div>
       </div>
     </div>
     <div class="cnt">
@@ -334,7 +334,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div class="sec" id="s-guests">
-  <div class="sech"><div class="secr"><div><div class="sect">Guests</div><div class="secs">Registered via app</div></div><button class="btn btn-g" onclick="openM('mag')">+ Add Guest</button></div></div>
+  <div class="sech"><div class="secr"><div><div class="sect">Guests</div><div class="secs">Registered via app</div></div><button class="btn btn-g" onclick="openAddGuest()">+ Add Guest</button></div></div>
   <div class="card" id="glist"><div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No guests registered yet.</div></div>
 </div>
 
@@ -563,7 +563,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 
 <div class="mov" id="medit-rec"><div class="modal"><div class="mhdr"><div class="mt" id="edit-rec-title">Edit</div><div class="mclose" onclick="closeM('medit-rec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Emoji</label><input class="fi" id="edit-rec-emoji" maxlength="2" placeholder="e.g. &#127968;"></div><div class="fg"><label class="fl">Name</label><input class="fi" id="edit-rec-name" placeholder="Name"></div><div class="fg"><label class="fl">Details</label><input class="fi" id="edit-rec-detail" placeholder="e.g. Restaurant &middot; 7am&ndash;10pm"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="saveRecEdit()">Save Changes</button><button class="btn btn-s" onclick="closeM('medit-rec')">Cancel</button></div></div></div>
 
-<div class="mov" id="mag"><div class="modal"><div class="mhdr"><div class="mt">Add Guest</div><div class="mclose" onclick="closeM('mag')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="agn" placeholder="e.g. Sarah Chen"></div><div class="fg"><label class="fl">Room Number</label><input class="fi" id="agr" placeholder="e.g. 7" inputmode="numeric"></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="agc" type="date"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addGuest()">Add Guest</button><button class="btn btn-s" onclick="closeM('mag')">Cancel</button></div></div></div>
+<div class="mov" id="mag"><div class="modal" style="max-width:480px"><div class="mhdr"><div class="mt">Add Guest</div><div class="mclose" onclick="closeM('mag')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Guest Name</label><input class="fi" id="agn" placeholder="e.g. Sarah Chen"></div><div class="fg"><label class="fl">Room</label><select class="fi" id="agr" style="cursor:pointer"><option value="">Select a room…</option></select></div><div class="fg"><label class="fl">Check-out Date</label><input class="fi" id="agc" type="date"></div><div id="ag-link-wrap" style="display:none;margin-top:14px;background:var(--sur2);border-radius:10px;padding:14px;"><div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">&#128279; Guest Access Link</div><div style="font-size:12px;color:var(--forest);font-family:monospace;word-break:break-all;line-height:1.5;" id="ag-link-text"></div><div style="margin-top:10px;display:flex;gap:8px;"><button class="btn btn-g" style="font-size:11px;" onclick="navigator.clipboard.writeText(document.getElementById('ag-link-text').textContent);toast('Link copied!')">&#128203; Copy Link</button><button class="btn btn-s" style="font-size:11px;" onclick="closeM('mag')">Done</button></div></div></div><div class="mftr" id="ag-form-ftr"><button class="btn btn-g btn-w" onclick="addGuest()">Add Guest</button><button class="btn btn-s" onclick="closeM('mag')">Cancel</button></div></div></div>
 <div class="mov" id="msec"><div class="modal"><div class="mhdr"><div class="mt">Add Section</div><div class="mclose" onclick="closeM('msec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Title</label><input class="fi" id="nst" placeholder="e.g. Spa &amp; Wellness"></div><div class="fg"><label class="fl">Icon (emoji)</label><input class="fi" id="nsi" placeholder="e.g. &#129498;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addSec()">Create</button><button class="btn btn-s" onclick="closeM('msec')">Cancel</button></div></div></div>
 <div class="mov" id="marow"><div class="modal"><div class="mhdr"><div class="mt">Add Row</div><div class="mclose" onclick="closeM('marow')">&#10005;</div></div><div class="mbdy"><p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Adding to: <strong id="arsl" style="color:var(--tx)"></strong></p><div class="fg"><label class="fl">Label</label><input class="fi" id="ark" placeholder="e.g. Pool hours"></div><div class="fg"><label class="fl">Value</label><input class="fi" id="arv" placeholder="e.g. 7am - 9pm"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRow()">Add Row</button><button class="btn btn-s" onclick="closeM('marow')">Cancel</button></div></div></div>
 <div class="mov" id="mrec"><div class="modal"><div class="mhdr"><div class="mt">Add Place</div><div class="mclose" onclick="closeM('mrec')">&#10005;</div></div><div class="mbdy"><div class="fg"><label class="fl">Place Name</label><input class="fi" id="arn" placeholder="e.g. The Blue Anchor"></div><div class="fg"><label class="fl">Category &amp; Details</label><input class="fi" id="arc" placeholder="e.g. Pub &middot; 5 min walk"></div><div class="fg"><label class="fl">Emoji</label><input class="fi" id="are" placeholder="e.g. &#127867;" maxlength="2"></div></div><div class="mftr"><button class="btn btn-g btn-w" onclick="addRec()">Add</button><button class="btn btn-s" onclick="closeM('mrec')">Cancel</button></div></div></div>
@@ -886,7 +886,7 @@ function loadUnreadGuestMsgCount() {
 // ── GUESTS ──
 function loadGuests() {
   if (!db) return;
-  db.from('guests').select('*').eq('hotel_id', HOTEL_ID).eq('checked_out', false)
+  db.from('guests').select('*').eq('hotel_id', HOTEL_ID).is('checked_out_at', null)
     .order('registered_at', {ascending: false}).then(function(r) {
     if (r.error || !r.data) return;
     renderGuests(r.data);
@@ -1005,16 +1005,67 @@ function showGuestHistory(guestId, guestName) {
   });
 }
 
+function openAddGuest() {
+  // Reset modal state
+  document.getElementById('agn').value = '';
+  document.getElementById('agr').value = '';
+  document.getElementById('agc').value = '';
+  document.getElementById('ag-link-wrap').style.display = 'none';
+  document.getElementById('ag-form-ftr').style.display = '';
+  // Populate available rooms from rooms table, excluding those with active guests
+  if (!db) { openM('mag'); return; }
+  Promise.all([
+    db.from('rooms').select('id,name,type').eq('hotel_id', HOTEL_ID).order('name', {ascending: true}),
+    db.from('guests').select('room_id').eq('hotel_id', HOTEL_ID).is('checked_out_at', null)
+  ]).then(function(res) {
+    var allRooms = res[0].data || [];
+    var takenIds = {};
+    (res[1].data || []).forEach(function(g) { if (g.room_id) takenIds[g.room_id] = true; });
+    var sel = document.getElementById('agr');
+    sel.innerHTML = '<option value="">Select a room…</option>';
+    allRooms.filter(function(r) { return !takenIds[r.id]; }).forEach(function(r) {
+      var opt = document.createElement('option');
+      opt.value = r.id;
+      opt.dataset.name = r.name;
+      opt.textContent = r.name + (r.type ? ' — ' + r.type : '');
+      sel.appendChild(opt);
+    });
+    openM('mag');
+  });
+}
+
+function generateAccessToken() {
+  var arr = new Uint8Array(48); // 48 bytes → 96 hex chars
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
 function addGuest() {
-  var name = document.getElementById('agn').value.trim();
-  var room = document.getElementById('agr').value.trim();
-  var co   = document.getElementById('agc').value;
-  if (!name || !room) { toast('Please fill in name and room', 'err'); return; }
+  var name   = document.getElementById('agn').value.trim();
+  var roomId = document.getElementById('agr').value;
+  var roomEl = document.getElementById('agr');
+  var roomName = roomId ? roomEl.options[roomEl.selectedIndex].dataset.name : '';
+  var co     = document.getElementById('agc').value;
+  if (!name || !roomId) { toast('Please fill in name and select a room', 'err'); return; }
   if (!db) { toast('Not connected', 'err'); return; }
-  db.from('guests').insert({hotel_id:HOTEL_ID, name:name, room:room, checkout_date:co||null, source:'manual'}).then(function(r) {
-    if (r.error) { toast('Error adding guest', 'err'); return; }
-    toast(name + ' added'); closeM('mag'); loadGuests();
-    logEvent('guest_added', 'Guest added: ' + name + ', ' + room, 'Manager', room);
+  var token = generateAccessToken();
+  db.from('guests').insert({
+    hotel_id: HOTEL_ID,
+    name: name,
+    room: roomName,
+    room_id: roomId,
+    checkout_date: co || null,
+    source: 'manual',
+    access_token: token
+  }).then(function(r) {
+    if (r.error) { toast('Error adding guest: ' + r.error.message, 'err'); return; }
+    var link = 'https://myarivo.pages.dev/hotel-guest-app.html?access_token=' + token;
+    document.getElementById('ag-link-text').textContent = link;
+    document.getElementById('ag-link-wrap').style.display = 'block';
+    document.getElementById('ag-form-ftr').style.display = 'none';
+    toast(name + ' added');
+    loadGuests(); loadRoomTokens();
+    logEvent('guest_added', 'Guest added: ' + name + ', ' + roomName, 'Manager', roomName);
   });
 }
 
@@ -1578,7 +1629,7 @@ function loadGuestConversations() {
       });
       var guestIds = Object.keys(byGuest);
       if (!guestIds.length) return;
-      db.from('guests').select('id,name,room,checked_out').in('id', guestIds).then(function(gr) {
+      db.from('guests').select('id,name,room,checked_out_at').in('id', guestIds).then(function(gr) {
         if (!gr.data) return;
         var list = document.getElementById('msgs-convlist'); if (!list) return;
         list.innerHTML = '';
@@ -1606,7 +1657,7 @@ function loadGuestConversations() {
             +     '</div>'
             +   '</div>'
             +   '<div style="font-size:12px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div>'
-            +   '<div style="font-size:10px;color:var(--tx3);margin-top:2px;">Room ' + (g.room||'?') + (g.checked_out ? ' · Checked out' : '') + '</div>'
+            +   '<div style="font-size:10px;color:var(--tx3);margin-top:2px;">Room ' + (g.room||'?') + (g.checked_out_at ? ' · Checked out' : '') + '</div>'
             + '</div>'
             + '<div style="color:var(--tx3);font-size:16px;">&#8250;</div>';
           list.appendChild(row);
@@ -1753,7 +1804,7 @@ function sendMsg() {
   if (!db) return;
   if (!targetGuestId) {
     // "All guests" - send individual message to each active guest
-    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('checked_out',false).then(function(r) {
+    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).is('checked_out_at',null).then(function(r) {
       if (!r.data || !r.data.length) { toast('No active guests', 'err'); return; }
       r.data.forEach(function(guest) {
         db.from('messages').insert({hotel_id:HOTEL_ID, guest_id:guest.id, direction:'hotel_to_guest', sender_name:'Hotel Team', body:b}).then(function() {});
@@ -1868,7 +1919,7 @@ function killSess(n, guestId, room) {
   if (!confirm('Kill session for ' + n + '?' + (room ? '\n\nThis will also invalidate the QR code for ' + room + '.' : ''))) return;
   if (!db || !guestId) { toast('Cannot kill session - not connected', 'err'); return; }
   // Mark guest as checked out in Supabase
-  db.from('guests').update({checked_out:true}).eq('id', guestId).then(function(r) {
+  db.from('guests').update({checked_out_at: new Date().toISOString()}).eq('id', guestId).then(function(r) {
     if (r.error) { toast('Error: ' + r.error.message, 'err'); return; }
     loadGuests();
   });
@@ -1905,11 +1956,11 @@ async function processAutoCheckouts() {
   // Only run after checkout time has passed today
   if (now.getHours() < coHour || (now.getHours() === coHour && now.getMinutes() < coMin)) return;
   var today = now.toISOString().split('T')[0];
-  var r = await db.from('guests').select('id,name,room').eq('hotel_id', HOTEL_ID).eq('checkout_date', today).eq('checked_out', false);
+  var r = await db.from('guests').select('id,name,room').eq('hotel_id', HOTEL_ID).eq('checkout_date', today).is('checked_out_at', null);
   if (r.error || !r.data || !r.data.length) return;
   for (var i = 0; i < r.data.length; i++) {
     var g = r.data[i];
-    await db.from('guests').update({checked_out: true, checked_out_at: now.toISOString()}).eq('id', g.id);
+    await db.from('guests').update({checked_out_at: now.toISOString()}).eq('id', g.id);
     await db.from('room_tokens').delete().eq('hotel_id', HOTEL_ID).eq('room', g.room);
     await db.from('sessions').upsert({guest_id: g.id, hotel_id: HOTEL_ID, killed: true, killed_at: now.toISOString()}, {onConflict: 'guest_id'});
     logEvent('auto_checkout', 'Auto checked out at ' + coTimeStr + ': ' + g.name, 'System', g.room);
@@ -2454,7 +2505,7 @@ function loadRoomTokens() {
   Promise.all([
     db.from('rooms').select('name,type').eq('hotel_id', HOTEL_ID).order('name', {ascending: true}),
     db.from('room_tokens').select('room,token').eq('hotel_id', HOTEL_ID),
-    db.from('guests').select('room').eq('hotel_id', HOTEL_ID).eq('checked_out', false)
+    db.from('guests').select('room').eq('hotel_id', HOTEL_ID).is('checked_out_at', null)
   ]).then(function(results) {
     var rooms = (results[0].data || []).map(function(r) { return r.name; });
     var existing = {};
