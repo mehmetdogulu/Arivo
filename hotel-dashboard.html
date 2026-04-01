@@ -2452,9 +2452,9 @@ function loadRoomTokens() {
         + '<div style="font-size:13px;font-weight:500;color:var(--tx);">' + room + '</div>'
         + '<div style="display:flex;gap:8px;align-items:center;">'
         + (isOccupied ? '<span style="font-size:11px;color:var(--green);font-weight:600;background:rgba(22,163,74,.1);padding:3px 8px;border-radius:20px;">&#128101; Occupied</span>' : '<span style="font-size:11px;color:var(--tx3);font-weight:600;background:var(--bg2,#f5f0e8);padding:3px 8px;border-radius:20px;">Vacant</span>')
-        + '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">' + (hasToken ? '&#8635; Regen' : '+ Generate') + '</button>'
-        + (hasToken ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="showRoomQR(\'' + url.replace(/'/g, "\\'") + '\',\'' + room.replace(/'/g, "\\'") + '\')">&#9641; QR Code</button>' : '')
-        + (hasToken ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
+        + (isOccupied ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">&#8635; Regen</button>' : '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="generateRoomToken(\'' + room.replace(/'/g, "\\'") + '\')">+ Generate</button>')
+        + (isOccupied ? '<button class="btn btn-g" style="font-size:11px;padding:5px 10px;" onclick="showRoomQR(\'' + url.replace(/'/g, "\\'") + '\',\'' + room.replace(/'/g, "\\'") + '\')">&#9641; QR Code</button>' : '')
+        + (isOccupied ? '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="copyRoomUrl(\'' + url.replace(/'/g, "\\'") + '\')">&#128279; Copy URL</button>' : '')
         + '</div></div>';
     }).join('');
   });
