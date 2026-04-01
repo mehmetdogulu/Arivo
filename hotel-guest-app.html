@@ -239,6 +239,7 @@ try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catc
 var _urlParams=new URLSearchParams(window.location.search);
 var HOTEL_ID=_urlParams.get('hotel')||null;
 var _roomToken=_urlParams.get('token')||null;
+var _accessToken=_urlParams.get('access_token')||null;
 var _lockedRoom=null; // Set when entry is via room QR token — cannot be overridden by guest
 </script>
 </head>
@@ -489,7 +490,7 @@ function resolveRoomToken(token){
     HOTEL_ID=r.data.hotel_id;
     var preRoom=r.data.room;
     // FIX 4: Check if room already has an active guest before allowing registration
-    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',preRoom).eq('checked_out',false).limit(1).then(function(occ){
+    db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',preRoom).is('checked_out_at',null).limit(1).then(function(occ){
       if(occ.data&&occ.data.length>0){
         // Room is occupied — ask guest to identify themselves or contact reception
         var sc=document.getElementById('screen-consent');
@@ -517,6 +518,50 @@ function resolveRoomToken(token){
           }
         }
       },100);
+    });
+  });
+}
+
+function resolveAccessToken(token){
+  if(!db){setTimeout(function(){resolveAccessToken(token);},300);return;}
+  db.from('guests').select('*').eq('access_token',token).is('checked_out_at',null).single().then(function(r){
+    if(r.error||!r.data){
+      var sc=document.getElementById('screen-consent');
+      if(sc)sc.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;">'
+        +'<div style="font-size:48px;margin-bottom:24px;">&#128274;</div>'
+        +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Invalid or expired link</div>'
+        +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">This access link is no longer valid.<br>Please contact reception for a new link.</div>'
+        +'</div>';
+      return;
+    }
+    var g=r.data;
+    HOTEL_ID=g.hotel_id;
+    guestId=g.id;
+    var co=g.checkout_date?g.checkout_date.split('T')[0]:'';
+    state.name=g.name; state.room=g.room; state.checkout=co;
+    setGuestContext(g.name,g.room);
+    var fmt=co?new Date(co).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
+    var fn=g.name.split(' ')[0];
+    document.getElementById('w-name').textContent=fn;
+    document.getElementById('w-room').textContent=g.room||'';
+    document.getElementById('w-co').textContent='Checkout '+fmt;
+    document.getElementById('app-name').textContent=fn;
+    document.getElementById('app-room').textContent=g.room||'';
+    document.getElementById('app-co').textContent='Out '+fmt;
+    document.getElementById('chat-greeting').textContent='Hello '+fn+'! How can I help you today?';
+    saveSession(g.name,g.room,co,g.id);
+    startCheckoutReminders(co);
+    subscribeToUpdates();
+    loadMessagesFromSupabase();
+    // Load hotel settings and then enter the app
+    db.from('hotel_settings').select('*').eq('hotel_id',HOTEL_ID).single().then(function(hs){
+      if(hs.data){
+        hotelSettings=hs.data;
+        if(hs.data.hotel_info)renderHotelInfoSections(hs.data.hotel_info);
+        if(hs.data.checkout_time)hotelSettings.checkoutTime=hs.data.checkout_time;
+      }
+      enterApp();
+      showScreen('screen-welcome');
     });
   });
 }
@@ -558,7 +603,7 @@ function loadRoomDropdown(){
     if(!db){setTimeout(fetchFromSupabase,300);return;}
     Promise.all([
       db.from('hotel_settings').select('rooms').eq('hotel_id',HOTEL_ID).single(),
-      db.from('guests').select('room').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
+      db.from('guests').select('room').eq('hotel_id',HOTEL_ID).is('checked_out_at',null)
     ]).then(function(results){
       var rooms=(results[0].data&&results[0].data.rooms&&results[0].data.rooms.length)?results[0].data.rooms:defaultRooms;
       var occupied=(results[1].data||[]).map(function(g){return g.room;});
@@ -570,6 +615,11 @@ function loadRoomDropdown(){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(!db){try{if(window.supabase)db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}}
+  if(_accessToken){
+    // Access-token entry: fetch guest directly by access_token
+    resolveAccessToken(_accessToken);
+    return;
+  }
   if(_roomToken){
     // Token-based entry: resolve hotel+room from room_tokens table
     resolveRoomToken(_roomToken);
@@ -638,8 +688,8 @@ function markMessagesRead(){
 
 function lookupAndEnter(name,btn){
   if(!db){setTimeout(function(){lookupAndEnter(name,btn);},300);return;}
-  db.from('guests').select('id,name,room,checkout_date,checked_out')
-    .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
+  db.from('guests').select('id,name,room,checkout_date')
+    .eq('hotel_id',HOTEL_ID).is('checked_out_at',null).ilike('name',name)
     .then(function(r){
       if(btn){btn.disabled=false;btn.textContent='Continue →';}
       var guests=r.data||[];
@@ -729,7 +779,7 @@ function doRegisterNewGuest(name,room,co){
 function doRegisterNewGuest_db(name,room,co){
   if(!db){setTimeout(function(){doRegisterNewGuest_db(name,room,co);},500);return;}
   // FIX 3: check for a different active guest already in this room
-  db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',room).eq('checked_out',false).then(function(occ){
+  db.from('guests').select('id,name').eq('hotel_id',HOTEL_ID).eq('room',room).is('checked_out_at',null).then(function(occ){
     var others=(occ.data||[]).filter(function(g){return g.name.toLowerCase()!==name.toLowerCase();});
     if(others.length>0){
       // Room taken by someone else — undo the optimistic UI and show error
@@ -745,7 +795,7 @@ function doRegisterNewGuest_db(name,room,co){
 }
 function _doRegisterNewGuest_insert(name,room,co){
   if(!db){setTimeout(function(){_doRegisterNewGuest_insert(name,room,co);},500);return;}
-  db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('checked_out',false)
+  db.from('guests').select('id').eq('hotel_id',HOTEL_ID).is('checked_out_at',null)
     .ilike('name',name).eq('room',room).single()
     .then(function(r){
       if(r.data&&r.data.id){
@@ -756,7 +806,7 @@ function _doRegisterNewGuest_insert(name,room,co){
           subscribeToUpdates();
         });
       } else {
-        db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false})
+        db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr'})
           .select().then(function(result){
             if(result.data&&result.data[0]){
               guestId=result.data[0].id;
@@ -768,7 +818,7 @@ function _doRegisterNewGuest_insert(name,room,co){
       logEvent('guest_register','New guest: '+name+', Room '+room+', Checkout '+co,name,room);
     }).catch(function(){
       // If query fails just insert fresh
-      db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr',checked_out:false})
+      db.from('guests').insert({hotel_id:HOTEL_ID,name:name,room:room,checkout_date:co,source:'qr'})
         .select().then(function(result){
           if(result.data&&result.data[0]){
             guestId=result.data[0].id;
@@ -811,8 +861,8 @@ function debounceLookup(val){
 
 function lookupGuestByName(name){
   if(!db){setTimeout(function(){lookupGuestByName(name);},400);return;}
-  db.from('guests').select('id,name,room,checkout_date,checked_out')
-    .eq('hotel_id',HOTEL_ID).eq('checked_out',false).ilike('name',name)
+  db.from('guests').select('id,name,room,checkout_date')
+    .eq('hotel_id',HOTEL_ID).is('checked_out_at',null).ilike('name',name)
     .then(function(r){
       var guests=r.data||[];
       var nl=name.toLowerCase();
@@ -867,11 +917,11 @@ function restoreSession(){
     if(!db){setTimeout(initAfterDb,300);return;}
     // Query by guestId if known, otherwise by name — never by room (it may have changed)
     var query = s.guestId
-      ? db.from('guests').select('id,room,checkout_date,checked_out').eq('id',s.guestId).single()
-      : db.from('guests').select('id,room,checkout_date,checked_out').eq('hotel_id',HOTEL_ID).eq('name',s.name).eq('checked_out',false).order('registered_at',{ascending:false}).limit(1).single();
+      ? db.from('guests').select('id,room,checkout_date,checked_out_at').eq('id',s.guestId).single()
+      : db.from('guests').select('id,room,checkout_date,checked_out_at').eq('hotel_id',HOTEL_ID).eq('name',s.name).is('checked_out_at',null).order('registered_at',{ascending:false}).limit(1).single();
     query.then(function(r){
       if(!r.data){loadMessagesFromSupabase();return;}
-      if(r.data.checked_out===true){
+      if(r.data.checked_out_at){
         sessionStorage.removeItem('arivo_session');
         localStorage.removeItem('arivo_session');
         expireGuestSession();
@@ -1037,7 +1087,7 @@ function expireGuestSession(){
   if(document.getElementById('checkout-flow-overlay')) return; // Checkout flow already showing
   sessionStorage.removeItem('arivo_session');
   localStorage.removeItem('arivo_session');
-  if(db && guestId) db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){});
+  if(db && guestId) db.from('guests').update({checked_out_at:new Date().toISOString()}).eq('id',guestId).then(function(){});
   var overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:#1E3A2F;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;font-family:DM Sans,sans-serif;';
   overlay.innerHTML='<div style="font-size:40px;margin-bottom:16px">&#127964;</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;color:#fff;margin-bottom:8px">Your session has ended</div><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:24px;line-height:1.6">Thank you for staying with us.<br>We hope to welcome you back soon.</div><div style="font-size:12px;color:rgba(255,255,255,0.35)">Please return your key to reception.</div>';
@@ -1092,7 +1142,7 @@ async function finalizeCheckout(skipRating){
   }
   // DB cleanup
   if(db && guestId){
-    await db.from('guests').update({checked_out:true, checked_out_at:new Date().toISOString()}).eq('id',guestId);
+    await db.from('guests').update({checked_out_at:new Date().toISOString()}).eq('id',guestId);
     if(state.room) await db.from('room_tokens').delete().eq('hotel_id',HOTEL_ID).eq('room',state.room);
     await db.from('sessions').upsert({guest_id:guestId, hotel_id:HOTEL_ID, killed:true, killed_at:new Date().toISOString()},{onConflict:'guest_id'});
   }
@@ -1250,7 +1300,7 @@ function loadMessagesFromSupabase(){
   }
   if(guestId){fetchAndRender(guestId);}
   else if(state.name&&state.room){
-    db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',state.name).eq('room',state.room).eq('checked_out',false).single().then(function(r){if(r.data){guestId=r.data.id;fetchAndRender(r.data.id);}});
+    db.from('guests').select('id').eq('hotel_id',HOTEL_ID).eq('name',state.name).eq('room',state.room).is('checked_out_at',null).single().then(function(r){if(r.data){guestId=r.data.id;fetchAndRender(r.data.id);}});
   } else {setTimeout(loadMessagesFromSupabase,500);}
 }
 
