@@ -1386,7 +1386,6 @@ function previewSupportShot(input) {
   warn.style.display = 'none';
   var reader = new FileReader();
   reader.onload = function(e) {
-    // Compress via canvas
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
@@ -1420,6 +1419,7 @@ async function submitSupportTicket() {
   document.getElementById('sup-preview-img').src = '';
   document.getElementById('sup-screenshot').value = '';
 }
+
 
 function openRatingsModal() {
   openM('mratings');
