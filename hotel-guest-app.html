@@ -1089,9 +1089,30 @@ async function finalizeCheckout(skipRating){
   }
 }
 
-// Re-check checkout status when app comes back to foreground
+// Re-check checkout status and refresh guest profile when app comes back to foreground
 document.addEventListener('visibilitychange', function(){
-  if(!document.hidden && state.checkout && !document.getElementById('checkout-flow-overlay')){
+  if(document.hidden) return;
+  // Refresh guest data from DB to catch any missed realtime events (room move, extension)
+  if(guestId && db){
+    db.from('guests').select('room,checkout_date').eq('id', guestId).single().then(function(r){
+      if(r.error || !r.data) return;
+      var g = r.data; var msgs = [];
+      if(g.room && g.room !== state.room){
+        state.room = g.room;
+        var re = document.getElementById('app-room'); if(re) re.textContent = g.room;
+        msgs.push('room to ' + g.room);
+      }
+      if(g.checkout_date && g.checkout_date !== state.checkout){
+        state.checkout = g.checkout_date;
+        var d = new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+        var ce = document.getElementById('app-co'); if(ce) ce.textContent = 'Out ' + d;
+        startCheckoutReminders(g.checkout_date);
+        msgs.push('checkout to ' + d);
+      }
+      if(msgs.length) saveGuestSession();
+    });
+  }
+  if(state.checkout && !document.getElementById('checkout-flow-overlay')){
     var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) || '11:00';
     var parts = checkoutTimeStr.split(':');
     var coDate = new Date(state.checkout);
