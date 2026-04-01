@@ -2457,6 +2457,21 @@ function loadRoomTokens() {
     (results[1].data || []).forEach(function(rt) { existing[rt.room] = rt.token; });
     var occupiedRooms = {};
     (results[2].data || []).forEach(function(g) { if (g.room) occupiedRooms[g.room] = true; });
+    // One-time cleanup: remove legacy stale tokens (rooms with a token but no active guest)
+    var cleanKey = 'arivo_tokens_cleaned_' + HOTEL_ID;
+    if (!localStorage.getItem(cleanKey)) {
+      var staleRooms = Object.keys(existing).filter(function(r) { return !occupiedRooms[r]; });
+      if (staleRooms.length) {
+        db.from('room_tokens').delete().eq('hotel_id', HOTEL_ID).in('room', staleRooms).then(function() {
+          staleRooms.forEach(function(r) { delete existing[r]; });
+          localStorage.setItem(cleanKey, '1');
+          // Re-render after cleanup
+          loadRoomTokens();
+        });
+        return; // Wait for re-render
+      }
+      localStorage.setItem(cleanKey, '1');
+    }
     if (!rooms.length) {
       container.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--tx3);">No rooms configured. Add rooms in Settings first.</div>';
       return;
