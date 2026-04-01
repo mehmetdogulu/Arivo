@@ -2452,11 +2452,11 @@ function loadRoomTokens() {
   var container = document.getElementById('room-token-list');
   if (!container) return;
   Promise.all([
-    db.from('hotel_settings').select('rooms').eq('hotel_id', HOTEL_ID).single(),
+    db.from('rooms').select('name,type').eq('hotel_id', HOTEL_ID).order('name', {ascending: true}),
     db.from('room_tokens').select('room,token').eq('hotel_id', HOTEL_ID),
     db.from('guests').select('room').eq('hotel_id', HOTEL_ID).eq('checked_out', false)
   ]).then(function(results) {
-    var rooms = (results[0].data && results[0].data.rooms) ? results[0].data.rooms : [];
+    var rooms = (results[0].data || []).map(function(r) { return r.name; });
     var existing = {};
     (results[1].data || []).forEach(function(rt) { existing[rt.room] = rt.token; });
     var occupiedRooms = {};

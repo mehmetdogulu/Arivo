@@ -222,6 +222,14 @@ The anon key is a public key governed by Supabase RLS (Row Level Security) polic
 | `manager_email` | TEXT | |
 | `checkout_time` | TEXT | e.g. "11:00" |
 
+**`rooms`**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `hotel_id` | UUID | FK → hotels |
+| `name` | TEXT | Room display name/identifier |
+| `type` | TEXT | Room type (e.g. single, double, suite) |
+
 **`guests`**
 | Column | Type | Notes |
 |---|---|---|
