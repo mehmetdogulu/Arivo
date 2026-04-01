@@ -327,8 +327,6 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
       <span class="app-chip" id="app-room"></span>
       <span class="app-chip" id="app-co"></span>
     </div>
-    <button class="edit-btn" onclick="openEdit()">&#9999; Edit my details</button>
-    <div class="pending-chip" id="pending-chip">&#9203; Change pending hotel confirmation</div>
     <div class="powered-by">Powered by <span>Arivo</span></div>
   </div>
   <div class="checkout-banner" id="checkout-banner">
@@ -444,19 +442,6 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
 </div>
 
 <!-- EDIT PROFILE MODAL -->
-<div class="modal-ov" id="modal-ov" onclick="closeEditIfBg(event)">
-  <div class="modal-box">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Edit your details</div>
-    <div class="modal-sub">Changes require <strong>hotel confirmation</strong> before taking effect.</div>
-    <div class="m-fg"><label class="m-fl">Your Name</label><input class="m-fi" type="text" id="edit-name" placeholder="Your full name" autocomplete="name"></div>
-    <div class="m-fg"><label class="m-fl">Room Number</label><input class="m-fi" type="text" id="edit-room" placeholder="Room number" inputmode="numeric"></div>
-    <div class="m-fg"><label class="m-fl">Check-out Date</label><input class="m-fi" type="date" id="edit-co"></div>
-    <button class="m-sub-btn" onclick="submitEdit()">Request Changes</button>
-    <button class="m-can-btn" onclick="closeEdit()">Cancel</button>
-  </div>
-</div>
-
 <!-- HOTEL MESSAGE NOTIFICATION -->
 <div class="notif-banner-overlay" id="notif-banner-overlay">
   <div class="notif-banner-box">
@@ -1276,22 +1261,6 @@ function addMessageToTab(msgObj){
   thread.appendChild(wrap);thread.scrollTop=thread.scrollHeight;scrollToLatestMessage();
 }
 
-function openEdit(){document.getElementById('edit-name').value=state.name||'';document.getElementById('edit-room').value=state.room||'';document.getElementById('edit-co').value='';document.getElementById('modal-ov').classList.add('open');document.body.style.overflow='hidden';}
-function closeEdit(){document.getElementById('modal-ov').classList.remove('open');document.body.style.overflow='';}
-function closeEditIfBg(e){if(e.target===document.getElementById('modal-ov'))closeEdit();}
-function submitEdit(){
-  var nn=document.getElementById('edit-name').value.trim();var nr=document.getElementById('edit-room').value.trim();var nc=document.getElementById('edit-co').value;
-  var changes=[];if(nn&&nn!==state.name)changes.push('name');if(nr&&nr!==state.room)changes.push('room');if(nc)changes.push('checkout');
-  if(changes.length===0){toast('No changes detected');return;}
-  state.pending={name:nn||state.name,room:nr||state.room,checkout:nc||state.checkout};
-  document.getElementById('pending-chip').style.display='inline-flex';closeEdit();toast('Change requested - awaiting hotel confirmation');setTimeout(function(){applyEdit();},5000);
-}
-function applyEdit(){
-  if(!state.pending)return;state.name=state.pending.name;state.room=state.pending.room;if(state.pending.checkout)state.checkout=state.pending.checkout;
-  var fn=state.name.split(' ')[0];var d=state.checkout?new Date(state.checkout).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-  document.getElementById('app-name').textContent=fn;document.getElementById('app-room').textContent=state.room;document.getElementById('app-co').textContent='Out '+d;
-  document.getElementById('pending-chip').style.display='none';toast('Profile updated - confirmed by hotel');delete state.pending;
-}
 
 function rateStar(n){
   if(sessionStorage.getItem('arivo_rated'))return;
@@ -1603,6 +1572,12 @@ async function pushRequest(type,detail,photoData){
 }
 
 // FIX 3: No stray async, guard requires BOTH guestId AND db
+function saveGuestSession(){
+  var sess={name:state.name,room:state.room,checkout:state.checkout,guestId:guestId,ts:Date.now()};
+  try{sessionStorage.setItem('arivo_session',JSON.stringify(sess));}catch(e){}
+  try{localStorage.setItem('arivo_session',JSON.stringify(sess));}catch(e){}
+}
+
 function subscribeToUpdates(){
   if(!guestId||!db)return;
   db.channel('guest-messages-'+guestId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'guest_id=eq.'+guestId},function(payload){
@@ -1610,11 +1585,33 @@ function subscribeToUpdates(){
   }).subscribe();
   db.channel('guest-sessions-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:'guest_id=eq.'+guestId},function(payload){if(payload.new.killed)expireGuestSession();}).subscribe();
   db.channel('guest-requests-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'requests',filter:'guest_id=eq.'+guestId},function(payload){updateRequestStatus(payload.new.id,payload.new.status,null);}).subscribe();
-  // Live-sync hotel info when manager saves changes in dashboard
+  // Live-sync room or checkout changes when manager moves/extends guest
+  db.channel('guest-profile-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'guests',filter:'id=eq.'+guestId},function(payload){
+    var g=payload.new;var msgs=[];
+    if(g.room&&g.room!==state.room){
+      state.room=g.room;
+      var re=document.getElementById('app-room');if(re)re.textContent=g.room;
+      msgs.push('room to '+g.room);
+    }
+    if(g.checkout_date&&g.checkout_date!==state.checkout){
+      state.checkout=g.checkout_date;
+      var d=new Date(g.checkout_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      var ce=document.getElementById('app-co');if(ce)ce.textContent='Out '+d;
+      startCheckoutReminders(g.checkout_date);
+      msgs.push('checkout to '+d);
+    }
+    if(msgs.length){saveGuestSession();showHotelMessage('Your booking has been updated by the hotel: '+msgs.join(', ')+'.');}
+  }).subscribe();
+  // Live-sync hotel info and settings when manager saves
   if(HOTEL_ID) db.channel('guest-hotel-settings-'+HOTEL_ID)
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'hotel_settings',filter:'hotel_id=eq.'+HOTEL_ID},function(payload){
       if(payload.new.hotel_info) renderHotelInfoSections(payload.new.hotel_info);
-      if(payload.new.checkout_time){var el=document.getElementById('info-checkout-time');if(el)el.textContent=payload.new.checkout_time;}
+      if(payload.new.checkout_time){
+        hotelSettings.checkoutTime=payload.new.checkout_time;
+        var el=document.getElementById('info-checkout-time');if(el)el.textContent=payload.new.checkout_time;
+        // Restart reminders with new checkout time
+        if(state.checkout) startCheckoutReminders(state.checkout);
+      }
     }).subscribe();
 }
 
