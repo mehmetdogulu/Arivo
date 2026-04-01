@@ -227,8 +227,8 @@ The anon key is a public key governed by Supabase RLS (Row Level Security) polic
 |---|---|---|
 | `id` | UUID | Primary key |
 | `hotel_id` | UUID | FK → hotels |
-| `name` | TEXT | |
-| `type` | TEXT | |
+| `name` | TEXT | Room display name/identifier |
+| `type` | TEXT | Room type (e.g. single, double, suite) |
 
 **`guests`**
 | Column | Type | Notes |
