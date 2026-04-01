@@ -228,6 +228,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 #ptr-indicator .ptr-spinner{width:22px;height:22px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:ptrSpin .7s linear infinite;}
 #ptr-indicator .ptr-label{color:#fff;font-size:12px;font-weight:500;margin-left:10px;letter-spacing:.3px;}
 @keyframes ptrSpin{to{transform:rotate(360deg);}}
+#splash{position:fixed;inset:0;z-index:999999;background:var(--forest,#1E3A2F);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .45s ease;}
+#splash.hide{opacity:0;pointer-events:none;}
+.splash-logo{font-family:'Cormorant Garamond',serif;font-size:42px;color:#FDFCF9;letter-spacing:1px;line-height:1;}
+.splash-logo em{color:var(--gold,#B8933F);font-style:italic;}
+.splash-ring{width:36px;height:36px;border:2.5px solid rgba(255,255,255,.2);border-top-color:var(--gold,#B8933F);border-radius:50%;animation:splashSpin 1s linear infinite;}
+@keyframes splashSpin{to{transform:rotate(360deg);}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="console.log('Supabase CDN failed to load')"></script>
 <script>
@@ -244,6 +250,12 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
 </script>
 </head>
 <body>
+
+<!-- SPLASH LOADER -->
+<div id="splash">
+  <div class="splash-logo">Ari<em>vo</em></div>
+  <div class="splash-ring"></div>
+</div>
 
 <!-- SCREEN 1: CONSENT -->
 <div class="screen consent-screen active" id="screen-consent">
@@ -463,6 +475,17 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
 <div id="toast"></div>
 <script>
 var state={name:'',room:'',checkout:''};
+var _splashHidden=false;
+function hideSplash(){
+  if(_splashHidden)return;
+  _splashHidden=true;
+  var el=document.getElementById('splash');
+  if(!el)return;
+  el.classList.add('hide');
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},500);
+}
+// Safety fallback — never leave splash stuck
+setTimeout(hideSplash,6000);
 var carTimer=null;
 var carSeconds=600;
 var chatHistory=[];
@@ -485,7 +508,7 @@ function resolveRoomToken(token){
         +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Invalid QR code</div>'
         +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">This QR code is not recognised. Please ask reception for a new one.</div>'
         +'</div>';
-      return;
+      hideSplash(); return;
     }
     HOTEL_ID=r.data.hotel_id;
     var preRoom=r.data.room;
@@ -499,13 +522,14 @@ function resolveRoomToken(token){
           +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Room already occupied</div>'
           +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">'+preRoom+' already has a registered guest.<br>If you are '+occ.data[0].name+', please open your original link.<br>Otherwise please contact reception.</div>'
           +'</div>';
-        return;
+        hideSplash(); return;
       }
       // Room is free — FIX 1: clear any saved session so token always starts fresh
       sessionStorage.removeItem('arivo_guest_state');
       // FIX 2: lock the room at token level, not just DOM level
       _lockedRoom=preRoom;
       initGuestApp();
+      hideSplash();
       // Replace room selector with a locked read-only display
       var waitRoom=setInterval(function(){
         var fg=document.getElementById('new-guest-fields');
@@ -532,7 +556,7 @@ function resolveAccessToken(token){
         +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Invalid or expired link</div>'
         +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">This access link is no longer valid.<br>Please contact reception for a new link.</div>'
         +'</div>';
-      return;
+      hideSplash(); return;
     }
     var g=r.data;
     HOTEL_ID=g.hotel_id;
@@ -578,10 +602,12 @@ function resolveAccessToken(token){
         } else if(localStorage.getItem(consentKey)){
           // Consent done, welcome pending
           _atHookWelcome(welcomedKey);
+          hideSplash();
           showScreen('screen-welcome');
         } else {
           // First visit — show consent
           _atHookConsent(consentKey, welcomedKey);
+          hideSplash();
           showScreen('screen-consent');
         }
       });
@@ -674,7 +700,7 @@ document.addEventListener('DOMContentLoaded',function(){
       +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--forest);margin-bottom:12px;">Scan the QR code</div>'
       +'<div style="font-size:15px;color:var(--muted);line-height:1.6;">To access the guest app, please scan the QR code provided by your hotel reception.</div>'
       +'</div>';
-    return;
+    hideSplash(); return;
   }
   initGuestApp();
 });
@@ -997,6 +1023,7 @@ var _pendingLookupName=null; // queued if db not ready yet
 
 
 function enterApp(){
+  hideSplash();
   showScreen('screen-app');
   if(db){
     db.from('hotels').select('whatsapp,phone').eq('id',HOTEL_ID).single().then(function(hr){
