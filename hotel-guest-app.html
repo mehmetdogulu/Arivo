@@ -1002,7 +1002,6 @@ function submitBypass(){
 }
 
 function startCheckoutReminders(coDateStr){
-  // Use checkout time from hotel settings, fallback to 11:00
   var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) ? hotelSettings.checkoutTime : '11:00';
   var parts = checkoutTimeStr.split(':');
   var checkoutHour = parseInt(parts[0]) || 11;
@@ -1012,34 +1011,109 @@ function startCheckoutReminders(coDateStr){
   var now=new Date();
   var msUntilCheckout=coDate.getTime()-now.getTime();
   var msUntil2hr=msUntilCheckout-2*60*60*1000;
-  var msUntil1hr=msUntilCheckout-1*60*60*1000;
+  var msUntil1hr=msUntilCheckout-60*60*1000;
   var checkoutDisplay=checkoutTimeStr;
   if(msUntil2hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 2 hours ('+checkoutDisplay+'). Please ensure your belongings are ready.');showHotelMessage('Friendly reminder: your checkout is in 2 hours at '+checkoutDisplay+'. We hope you have had a wonderful stay!');},msUntil2hr);
   if(msUntil1hr>0)setTimeout(function(){showCheckoutBanner('Your checkout is in 1 hour ('+checkoutDisplay+'). Please drop your key at reception.');showHotelMessage('Your checkout is in 1 hour. Thank you for staying with us \u2014 we would love to see you again!');},msUntil1hr);
-  // Expire at checkout time + 1 hour grace period
-  var graceMs=60*60*1000;
-  var msUntilExpiry=msUntilCheckout+graceMs;
-  if(msUntilExpiry>0){
-    setTimeout(function(){expireGuestSession();},msUntilExpiry);
+  // At checkout time: show the checkout flow (rating + farewell)
+  if(msUntilCheckout>0){
+    setTimeout(showCheckoutFlow, msUntilCheckout);
   } else {
-    // Both checkout time and grace period have passed - expire immediately
-    expireGuestSession();
+    // Already past checkout time — show immediately
+    showCheckoutFlow();
   }
 }
 
+// Called when manager kills session remotely — no rating, simple message
 function expireGuestSession(){
-  // Clear session so guest cannot refresh back in
+  if(document.getElementById('checkout-flow-overlay')) return; // Checkout flow already showing
   sessionStorage.removeItem('arivo_session');
   localStorage.removeItem('arivo_session');
-  // Mark as checked out in Supabase so server-side check also blocks them
-  if(db && guestId){
-    db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){});
-  }
+  if(db && guestId) db.from('guests').update({checked_out:true}).eq('id',guestId).then(function(){});
   var overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:#1E3A2F;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;font-family:DM Sans,sans-serif;';
-  overlay.innerHTML='<div style="font-size:40px;margin-bottom:16px">&#127964;</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;color:#fff;margin-bottom:8px">Thank you for your stay</div><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:24px;line-height:1.6">Your checkout time has passed.<br>We hope to welcome you back soon.</div><div style="font-size:12px;color:rgba(255,255,255,0.35)">Please return your key to reception.</div>';
+  overlay.innerHTML='<div style="font-size:40px;margin-bottom:16px">&#127964;</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;color:#fff;margin-bottom:8px">Your session has ended</div><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:24px;line-height:1.6">Thank you for staying with us.<br>We hope to welcome you back soon.</div><div style="font-size:12px;color:rgba(255,255,255,0.35)">Please return your key to reception.</div>';
   document.body.appendChild(overlay);
 }
+
+// Called automatically at checkout time — shows rating then finalises
+var _checkoutStarSelected = 0;
+function showCheckoutFlow(){
+  if(document.getElementById('checkout-flow-overlay')) return;
+  var guestFirstName = state.name ? state.name.split(' ')[0] : 'there';
+  var hotelName = hotelSettings.name || 'us';
+  var overlay = document.createElement('div');
+  overlay.id = 'checkout-flow-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:#1E3A2F;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;font-family:DM Sans,sans-serif;overflow-y:auto;';
+  overlay.innerHTML = '<div style="max-width:340px;width:100%;">'
+    + '<div style="font-size:52px;margin-bottom:20px;">&#127968;</div>'
+    + '<div style="font-family:Cormorant Garamond,serif;font-size:30px;color:#fff;margin-bottom:8px;line-height:1.2;">Time to check out</div>'
+    + '<div style="font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:32px;line-height:1.6;">We hope you had a wonderful stay,<br><strong style="color:#fff;">' + guestFirstName + '</strong>.</div>'
+    + '<div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:24px 20px;margin-bottom:24px;">'
+    +   '<div style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:16px;letter-spacing:.3px;">How was your stay?</div>'
+    +   '<div id="checkout-stars" style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">'
+    +     '<span onclick="selectCheckoutStar(1)" style="font-size:38px;cursor:pointer;opacity:0.35;transition:opacity .15s;">&#11088;</span>'
+    +     '<span onclick="selectCheckoutStar(2)" style="font-size:38px;cursor:pointer;opacity:0.35;transition:opacity .15s;">&#11088;</span>'
+    +     '<span onclick="selectCheckoutStar(3)" style="font-size:38px;cursor:pointer;opacity:0.35;transition:opacity .15s;">&#11088;</span>'
+    +     '<span onclick="selectCheckoutStar(4)" style="font-size:38px;cursor:pointer;opacity:0.35;transition:opacity .15s;">&#11088;</span>'
+    +     '<span onclick="selectCheckoutStar(5)" style="font-size:38px;cursor:pointer;opacity:0.35;transition:opacity .15s;">&#11088;</span>'
+    +   '</div>'
+    +   '<div id="checkout-star-label" style="font-size:12px;color:rgba(255,255,255,0.4);min-height:18px;"></div>'
+    + '</div>'
+    + '<button onclick="finalizeCheckout(false)" style="width:100%;padding:16px;background:#B8933F;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:14px;letter-spacing:.2px;">Complete Check-out</button>'
+    + '<button onclick="finalizeCheckout(true)" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;font-family:inherit;padding:8px;">Skip rating &amp; check out</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+}
+
+function selectCheckoutStar(n){
+  _checkoutStarSelected = n;
+  var stars = document.querySelectorAll('#checkout-stars span');
+  stars.forEach(function(s,i){ s.style.opacity = i < n ? '1' : '0.25'; });
+  var labels = ['','Poor','Below average','Average','Good','Excellent'];
+  var lbl = document.getElementById('checkout-star-label');
+  if(lbl) lbl.textContent = labels[n] || '';
+}
+
+async function finalizeCheckout(skipRating){
+  var btn = document.querySelector('#checkout-flow-overlay button');
+  if(btn){ btn.textContent = 'Checking you out\u2026'; btn.disabled = true; }
+  // Submit rating if selected
+  if(!skipRating && _checkoutStarSelected > 0 && db && guestId){
+    await db.from('ratings').insert({hotel_id:HOTEL_ID, guest_id:guestId, stars:_checkoutStarSelected, priority_alert:_checkoutStarSelected<=3});
+  }
+  // DB cleanup
+  if(db && guestId){
+    await db.from('guests').update({checked_out:true, checked_out_at:new Date().toISOString()}).eq('id',guestId);
+    if(state.room) await db.from('room_tokens').delete().eq('hotel_id',HOTEL_ID).eq('room',state.room);
+    await db.from('sessions').upsert({guest_id:guestId, hotel_id:HOTEL_ID, killed:true, killed_at:new Date().toISOString()},{onConflict:'guest_id'});
+  }
+  // Clear local session
+  sessionStorage.removeItem('arivo_session');
+  localStorage.removeItem('arivo_session');
+  // Show goodbye screen
+  var overlay = document.getElementById('checkout-flow-overlay');
+  if(overlay){
+    var hotelName = hotelSettings.name || 'the hotel';
+    overlay.innerHTML = '<div style="max-width:320px;width:100%;">'
+      + '<div style="font-size:56px;margin-bottom:20px;">&#128591;</div>'
+      + '<div style="font-family:Cormorant Garamond,serif;font-size:32px;color:#fff;margin-bottom:12px;">Goodbye!</div>'
+      + '<div style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.7;">Thank you for staying with ' + hotelName + '.<br>We hope to welcome you back soon.</div>'
+      + '<div style="margin-top:28px;font-size:12px;color:rgba(255,255,255,0.3);">Please return your key to reception.</div>'
+      + '</div>';
+  }
+}
+
+// Re-check checkout status when app comes back to foreground
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && state.checkout && !document.getElementById('checkout-flow-overlay')){
+    var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) || '11:00';
+    var parts = checkoutTimeStr.split(':');
+    var coDate = new Date(state.checkout);
+    coDate.setHours(parseInt(parts[0])||11, parseInt(parts[1])||0, 0, 0);
+    if(new Date() >= coDate) showCheckoutFlow();
+  }
+});
 function showCheckoutBanner(msg){document.getElementById('checkout-banner-text').textContent=msg;document.getElementById('checkout-banner').classList.add('show');}
 
 function showHotelMessage(msg){

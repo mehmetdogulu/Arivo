@@ -663,6 +663,7 @@ function enterDashboard() {
   initPing();
   loadAll();
   subscribeToAll();
+  scheduleAutoCheckout();
   // Stamp hotel_id into QR URL
   var qrUrlEl = document.getElementById('qr-url');
   if (qrUrlEl) qrUrlEl.textContent = window.location.origin + '/hotel-guest-app.html?hotel=' + HOTEL_ID;
@@ -1787,6 +1788,37 @@ function killSess(n, guestId, room) {
   toast('Session killed for ' + n);
   logEvent('session_kill', 'Session killed: ' + n, 'Manager', room || '-');
 }
+// ── AUTO CHECKOUT ──
+function scheduleAutoCheckout() {
+  processAutoCheckouts();
+  setInterval(processAutoCheckouts, 5 * 60 * 1000); // every 5 minutes
+}
+
+async function processAutoCheckouts() {
+  if (!db || !HOTEL_ID) return;
+  var settingsRes = await db.from('hotel_settings').select('checkout_time').eq('hotel_id', HOTEL_ID).single();
+  var coTimeStr = (settingsRes.data && settingsRes.data.checkout_time) || '11:00';
+  var parts = coTimeStr.split(':');
+  var coHour = parseInt(parts[0]) || 11;
+  var coMin  = parseInt(parts[1]) || 0;
+  var now = new Date();
+  // Only run after checkout time has passed today
+  if (now.getHours() < coHour || (now.getHours() === coHour && now.getMinutes() < coMin)) return;
+  var today = now.toISOString().split('T')[0];
+  var r = await db.from('guests').select('id,name,room').eq('hotel_id', HOTEL_ID).eq('checkout_date', today).eq('checked_out', false);
+  if (r.error || !r.data || !r.data.length) return;
+  for (var i = 0; i < r.data.length; i++) {
+    var g = r.data[i];
+    await db.from('guests').update({checked_out: true, checked_out_at: now.toISOString()}).eq('id', g.id);
+    await db.from('room_tokens').delete().eq('hotel_id', HOTEL_ID).eq('room', g.room);
+    await db.from('sessions').upsert({guest_id: g.id, hotel_id: HOTEL_ID, killed: true, killed_at: now.toISOString()}, {onConflict: 'guest_id'});
+    logEvent('auto_checkout', 'Auto checked out at ' + coTimeStr + ': ' + g.name, 'System', g.room);
+  }
+  loadGuests();
+  loadRoomTokens();
+  toast(r.data.length + ' guest' + (r.data.length > 1 ? 's' : '') + ' auto checked out (' + coTimeStr + ')');
+}
+
 function genBypass() {
   var name = document.getElementById('bpg').value.trim(); var room = document.getElementById('bpr').value.trim();
   if (!name || !room) { toast('Please fill in name and room', 'err'); return; }
