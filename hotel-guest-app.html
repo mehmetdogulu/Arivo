@@ -1008,6 +1008,7 @@ var _pendingLookupName=null; // queued if db not ready yet
 function enterApp(){
   hideSplash();
   showScreen('screen-app');
+  restoreRequestButtons();
   var savedTab=sessionStorage.getItem('arivo_tab');
   if(savedTab&&savedTab!=='hotel'){
     var tabEl=document.getElementById('nav-tab-'+savedTab)||document.querySelector('.tab[onclick*="\''+savedTab+'\'"]');
@@ -1726,7 +1727,7 @@ function subscribeToUpdates(){
     if(payload.new.direction==='hotel_to_guest'){showHotelMessage(payload.new.body);incrementMsgBadge();if(_activeTab==='messages')loadMessagesFromSupabase();}
   }).subscribe();
   db.channel('guest-sessions-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:'guest_id=eq.'+guestId},function(payload){if(payload.new.killed)expireGuestSession();}).subscribe();
-  db.channel('guest-requests-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'requests',filter:'guest_id=eq.'+guestId},function(payload){updateRequestStatus(payload.new.id,payload.new.status,null);}).subscribe();
+  db.channel('guest-requests-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'requests',filter:'guest_id=eq.'+guestId},function(payload){updateRequestStatus(payload.new.id,payload.new.status,payload.new.due_at||null);}).subscribe();
   // Live-sync room or checkout changes when manager moves/extends guest
   db.channel('guest-profile-'+guestId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'guests',filter:'id=eq.'+guestId},function(payload){
     var g=payload.new;var msgs=[];

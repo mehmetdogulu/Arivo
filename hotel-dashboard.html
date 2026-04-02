@@ -495,6 +495,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     </div>
     <div class="fg"><label class="fl">Hotel Phone</label><input class="fi" id="hotel-phone" value="" placeholder="e.g. +44 20 7946 0000" ></div>
     <div class="fg"><label class="fl">Checkout Time</label><input class="fi" id="hotel-checkout-time" type="time" value="11:00" style="max-width:160px"><div style="font-size:11px;color:var(--tx3);margin-top:4px;">Used for guest session expiry and checkout reminders</div></div>
+    <div class="fg"><label class="fl">Bring My Car — ETA (minutes)</label><input class="fi" id="hotel-car-eta" type="number" min="1" max="60" value="10" style="max-width:100px"><div style="font-size:11px;color:var(--tx3);margin-top:4px;">Time shown to guest when they request their car to be brought around</div></div>
   </div></div>
   <div class="card"><div class="ch"><div class="ct">Room Manager</div><div class="ca" onclick="addRoom()">+ Add Room</div></div>
     <div id="roomlist">
@@ -1317,7 +1318,7 @@ function doETA(mins) {
   // Update Supabase status to in_progress with due_at timestamp
   if (db && reqId) {
     var dueAt = new Date(Date.now() + mins * 60000).toISOString();
-    db.from('requests').update({status:'in_progress', due_at: dueAt}).eq('id', reqId).then(function(){ loadRequests(); });
+    db.from('requests').update({status:'in_progress', due_at: dueAt, eta_minutes: mins}).eq('id', reqId).then(function(){ loadRequests(); });
   }
   // Set ETA — update row UI and send ETA message to guest
   if (row) {
@@ -1415,6 +1416,7 @@ function loadHotelAddress() {
     setVal('hotel-city',       a.city);
     setVal('hotel-postcode',   a.postcode);
     setVal('hotel-phone',      a.phone);
+    if (a.carEta) { var ce = document.getElementById('hotel-car-eta'); if (ce) ce.value = a.carEta; }
     if (a.name) { var hn = document.getElementById('hname'); if (hn) hn.textContent = a.name; }
     if (a.city) { var hloc = document.getElementById('hloc'); if (hloc) { var rooms = document.querySelectorAll('#roomlist .irow').length; hloc.textContent = rooms + ' rooms \u00b7 ' + a.city + ', UK'; } }
     if (a.postcode) { var ll = document.getElementById('local-ai-label'); if (ll) ll.textContent = '\u2728 Arivo AI suggests local spots near ' + a.postcode + '.'; }
@@ -1429,7 +1431,8 @@ function saveHotelAddress() {
   var hotelName = document.getElementById('hotel-name-input') ? document.getElementById('hotel-name-input').value : 'The Maison Collective';
   var checkoutTime = document.getElementById('hotel-checkout-time') ? document.getElementById('hotel-checkout-time').value : '11:00';
   if (!db) { toast('Not connected', 'err'); return; }
-  var address = {name:hotelName, street:street, city:city, postcode:postcode, phone:phone};
+  var carEta = document.getElementById('hotel-car-eta') ? (parseInt(document.getElementById('hotel-car-eta').value)||10) : 10;
+  var address = {name:hotelName, street:street, city:city, postcode:postcode, phone:phone, carEta:carEta};
   db.from('hotel_settings').update({address: address, checkout_time: checkoutTime}).eq('hotel_id', HOTEL_ID).then(function(r) {
     if (r.error) { toast('Save failed', 'err'); return; }
     toast('Settings saved \u2014 checkout time updated');
