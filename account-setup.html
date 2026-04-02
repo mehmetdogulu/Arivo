@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arivo — Set Up Your Account</title>
+<title>Luvia — Set Up Your Account</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -14,6 +14,7 @@ body::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;heig
 body::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;border-radius:50%;background:rgba(184,147,63,0.06);pointer-events:none;}
 .card{background:var(--white);border-radius:24px;padding:40px 36px;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
 .logo{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:28px;}
+.logo em{font-style:italic;color:var(--gold-light);}
 .eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:8px;}
 .title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--charcoal);line-height:1.15;margin-bottom:6px;}
 .sub{font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:28px;}
@@ -41,7 +42,7 @@ body::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;hei
 </head>
 <body>
 <div class="card" id="main-card">
-  <div class="logo">Arivo</div>
+  <div class="logo">Lu<em>via</em></div>
   <div id="state-loading" class="state">
     <div class="state-icon">⏳</div>
     <div class="state-title">Verifying your link…</div>
@@ -53,7 +54,7 @@ body::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;hei
     <div class="state-sub">This setup link has expired or already been used. Please contact your administrator for a new one.</div>
   </div>
   <div id="state-form" style="display:none;">
-    <div class="eyebrow" id="form-eyebrow">Welcome to Arivo</div>
+    <div class="eyebrow" id="form-eyebrow">Welcome to Luvia</div>
     <div class="title" id="form-title">Set up your<br><em style="font-style:italic;color:var(--gold);">account</em></div>
     <p class="sub" id="form-sub">Create a password to access your dashboard.</p>
     <div class="name-badge" id="name-badge">👤 <span id="badge-name">Loading…</span> &nbsp;<span id="badge-email"></span></div>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arivo — Guest Consent Flow</title>
+<title>Luvia — Guest Consent</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -425,7 +425,7 @@
     <label class="id-consent-check" for="chk-id">
       <input type="checkbox" id="chk-id" onchange="updateIdBtn()">
       <span class="id-consent-label">
-        I <strong>explicitly consent</strong> to Arivo and The Maison Collective processing a copy of my identity document for the sole purpose of verifying my identity for self check-in, as described in the <a href="#" onclick="openModal('privacy'); return false;">Privacy Policy</a>.
+        I <strong>explicitly consent</strong> to Luvia and The Maison Collective processing a copy of my identity document for the sole purpose of verifying my identity for self check-in, as described in the <a href="#" onclick="openModal('privacy'); return false;">Privacy Policy</a>.
       </span>
     </label>
 
@@ -557,17 +557,17 @@
 
   function enterApp() {
     // In production: save consent record to backend with timestamp, IP, version
-    alert('Consent recorded. Redirecting to your guest app…\n\n(In production this would navigate to the main Arivo guest experience)');
+    alert('Consent recorded. Redirecting to your guest app…\n\n(In production this would navigate to the main Luvia guest experience)');
   }
 
   const policies = {
     terms: {
       title: 'Terms & Conditions — Summary',
       body: `
-        <p><strong>Part A (Hotel Terms)</strong> governs the hotel's use of the Arivo platform. The hotel is the Data Controller of your personal data.</p>
+        <p><strong>Part A (Hotel Terms)</strong> governs the hotel's use of the Luvia platform. The hotel is the Data Controller of your personal data.</p>
         <p><strong>Part B (Guest Terms)</strong> — by using this app you agree to:</p>
-        <p>• Use the app only for your stay at this hotel<br>• Provide accurate information<br>• Not misuse the self check-in feature<br>• The limitation of Arivo's liability for hotel service quality</p>
-        <p>Full terms available at arivo.app/terms</p>
+        <p>• Use the app only for your stay at this hotel<br>• Provide accurate information<br>• Not misuse the self check-in feature<br>• The limitation of Luvia's liability for hotel service quality</p>
+        <p>Full terms available at luviaguest.com/terms</p>
       `
     },
     privacy: {
@@ -576,9 +576,9 @@
         <p><strong>What we collect:</strong> Your name, reservation details, service requests, and (if you consent) a copy of your ID for self check-in.</p>
         <p><strong>Why:</strong> To deliver the guest app services on behalf of your hotel.</p>
         <p><strong>How long:</strong> Guest data is deleted 90 days after check-out. ID documents within 90 days. AI chat messages anonymised after 30 days.</p>
-        <p><strong>Your rights:</strong> Access, rectification, erasure, portability, objection. Contact privacy@arivo.app.</p>
+        <p><strong>Your rights:</strong> Access, rectification, erasure, portability, objection. Contact privacy@luviaguest.com.</p>
         <p><strong>Supervisory authority:</strong> ICO (UK) — ico.org.uk</p>
-        <p>Full policy available at arivo.app/privacy</p>
+        <p>Full policy available at luviaguest.com/privacy</p>
       `
     },
     cookies: {
@@ -588,7 +588,7 @@
         <p><strong>Functional cookies:</strong> Remember your preferences. You can decline these.</p>
         <p><strong>Analytics cookies:</strong> Anonymous usage data. You can decline these.</p>
         <p>We do not use advertising or tracking cookies.</p>
-        <p>Full policy available at arivo.app/cookies</p>
+        <p>Full policy available at luviaguest.com/cookies</p>
       `
     }
   };

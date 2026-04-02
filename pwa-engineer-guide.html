@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arivo — PWA Engineer Handoff</title>
+<title>Luvia — PWA Engineer Handoff</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -96,8 +96,8 @@ pre {
     <div class="card-title">📄 Create manifest.json</div>
     <p>Create this file at the root of your web server. Replace the inline data URI manifest link in both HTML files with <span class="inline-code">&lt;link rel="manifest" href="/manifest.json"&gt;</span></p>
     <pre>{
-  "name": "Arivo — Your Stay",
-  "short_name": "Arivo",
+  "name": "Luvia — Your Stay",
+  "short_name": "Luvia",
   "description": "Your personal hotel companion",
   "start_url": "/guest/",
   "display": "standalone",
@@ -181,7 +181,7 @@ self.addEventListener('fetch', event => {
 // Push — show notification when server sends a push
 self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || 'Arivo';
+  const title = data.title || 'Luvia';
   const options = {
     body: data.body || 'New notification',
     icon: '/icons/icon-192.png',
@@ -329,14 +329,14 @@ function urlBase64ToUint8Array(base64String) {
     <p>Hotels need to know how to tell their staff to install the dashboard as an app. Include this in your onboarding email:</p>
     <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;margin-top:8px;">
       <p style="color:var(--text);font-size:12px;font-weight:500;margin-bottom:8px;">For iPhone (Safari only):</p>
-      <p style="font-size:12px;margin-bottom:4px;">1. Open dashboard.arivo.app in Safari</p>
+      <p style="font-size:12px;margin-bottom:4px;">1. Open luviaguest.com in Safari</p>
       <p style="font-size:12px;margin-bottom:4px;">2. Tap the Share button (box with arrow)</p>
       <p style="font-size:12px;margin-bottom:0;">3. Tap "Add to Home Screen" → "Add"</p>
     </div>
     <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;margin-top:8px;">
       <p style="color:var(--text);font-size:12px;font-weight:500;margin-bottom:8px;">For Android (Chrome):</p>
-      <p style="font-size:12px;margin-bottom:4px;">1. Open dashboard.arivo.app in Chrome</p>
-      <p style="font-size:12px;margin-bottom:4px;">2. Tap the banner "Add Arivo to Home Screen" or</p>
+      <p style="font-size:12px;margin-bottom:4px;">1. Open luviaguest.com in Chrome</p>
+      <p style="font-size:12px;margin-bottom:4px;">2. Tap the banner "Add Luvia to Home Screen" or</p>
       <p style="font-size:12px;margin-bottom:0;">3. Tap ⋮ menu → "Add to Home Screen"</p>
     </div>
   </div>

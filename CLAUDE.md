@@ -1,14 +1,14 @@
-# CLAUDE.md — Arivo Codebase Guide
+# CLAUDE.md — Luvia Codebase Guide
 
-This document provides AI assistants with an accurate, up-to-date understanding of the Arivo codebase, its conventions, and development workflows.
+This document provides AI assistants with an accurate, up-to-date understanding of the Luvia codebase, its conventions, and development workflows.
 
 ---
 
 ## Project Overview
 
-**Arivo** is a hotel guest experience platform delivered as a collection of standalone single-page applications (SPAs). There is no build pipeline or framework — everything is vanilla HTML5, CSS3, and ES6+ JavaScript served directly via Cloudflare Pages, with Supabase as the database and Anthropic Claude as the AI concierge backend.
+**Luvia** is a hotel guest experience platform delivered as a collection of standalone single-page applications (SPAs). There is no build pipeline or framework — everything is vanilla HTML5, CSS3, and ES6+ JavaScript served directly via Cloudflare Pages, with Supabase as the database and Anthropic Claude as the AI concierge backend.
 
-**Deployment URL:** `https://myarivo.pages.dev/`
+**Deployment URL:** `https://luviaguest.com/`
 
 ---
 

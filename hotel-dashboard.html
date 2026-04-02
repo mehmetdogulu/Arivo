@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
-<title>Arivo &mdash; Hotel Dashboard</title>
+<title>Luvia &mdash; Hotel Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.supabase=null;console.log('Supabase CDN blocked - running in offline mode');"></script>
 <style>
@@ -248,7 +248,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 
 <div id="sl">
   <div class="lb">
-    <div class="ll">Ari<em>vo</em></div>
+    <div class="ll">Lu<em>via</em></div>
     <div class="lt">Hotel Manager Dashboard</div>
     <div class="lh">Welcome back</div>
     <div class="ls">Sign in to manage your property</div>
@@ -263,7 +263,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 <div id="sd">
   <div class="ov" id="ov" onclick="closeSidebar()"></div>
   <div class="sbar" id="sbar">
-    <div class="slogo"><div class="slogo-mark">Ari<em>vo</em></div><div class="ssub">Hotel Dashboard</div></div>
+    <div class="slogo"><div class="slogo-mark">Lu<em>via</em></div><div class="ssub">Hotel Dashboard</div></div>
     <div class="hchip"><div class="hchip-logo" id="sidebar-logo">&#127968;</div><div class="hchip-info"><div class="hcn" id="hname">Your Hotel</div><div class="hcs" id="hloc">0 rooms</div></div></div>
     <div class="nav-body">
       <div class="nlbl">Live</div>
@@ -273,7 +273,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="ni" onclick="go('sess',this)"><span class="ni-ic">&#128275;</span>Sessions &amp; Access</div>
       <div class="ni" onclick="go('msgs',this);clearMsgAlert()"><span class="ni-ic">&#128172;</span>Message Guests<span id="guest-msg-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;"></span></div>
       <div class="ni" onclick="go('staffmsgs',this);clearStaffMsgBadge()"><span class="ni-ic">&#128101;</span>Staff Messages<span id="staff-msg-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;"></span></div>
-      <div class="ni" onclick="go('adminmsgs',this);clearAdminMsgBadge()"><span class="ni-ic">&#128081;</span>From Arivo<span id="admin-msg-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;"></span></div>
+      <div class="ni" onclick="go('adminmsgs',this);clearAdminMsgBadge()"><span class="ni-ic">&#128081;</span>From Luvia<span id="admin-msg-badge" style="display:none;background:#DC2626;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;"></span></div>
       <div class="nlbl">Content</div>
       <div class="ni" onclick="go('info',this)"><span class="ni-ic">&#127968;</span>Hotel Info</div>
       <div class="ni" onclick="go('fac',this)"><span class="ni-ic">&#127796;</span>Facilities</div>
@@ -391,10 +391,10 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
 </div>
 
 <div class="sec" id="s-adminmsgs">
-  <div class="sech"><div class="sect">From Arivo</div><div class="secs">Messages and announcements from Arivo</div></div>
+  <div class="sech"><div class="sect">From Luvia</div><div class="secs">Messages and announcements from Luvia</div></div>
   <div class="card" style="display:flex;flex-direction:column;height:420px;">
     <div id="admin-msg-thread" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;">
-      <div id="admin-msg-empty" style="text-align:center;padding:32px;color:var(--tx3);font-size:12px;">No messages from Arivo yet.</div>
+      <div id="admin-msg-empty" style="text-align:center;padding:32px;color:var(--tx3);font-size:12px;">No messages from Luvia yet.</div>
     </div>
   </div>
 </div>
@@ -437,7 +437,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;" id="reclist-empty">No staff picks yet. Use the button above to add your first recommendation.</div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 8px;">
-    <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;">&#10024; Arivo AI Suggestions</div>
+    <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;">&#10024; Luvia AI Suggestions</div>
     <button class="btn btn-s" onclick="refreshAiSuggestions(this)">&#8635; Refresh AI</button>
   </div>
   <div id="local-ai-label" style="background:var(--bdim);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">&#10024; AI suggestions are generated from your hotel postcode and saved instantly for guests.</div>
@@ -624,7 +624,7 @@ var currentEditRow = null;
 var openReqs = 0;
 var photoCache = {};
 var _seenReqIds = {};
-var TITLES = {ov:'Overview',req:'Requests',guests:'Guests',sess:'Sessions & Access',msgs:'Message Guests',staffmsgs:'Staff Messages',adminmsgs:'From Arivo',info:'Hotel Info',fac:'Facilities',local:'Local Guide',qr:'QR & Links',logs:'Activity Logs',set:'Settings'};
+var TITLES = {ov:'Overview',req:'Requests',guests:'Guests',sess:'Sessions & Access',msgs:'Message Guests',staffmsgs:'Staff Messages',adminmsgs:'From Luvia',info:'Hotel Info',fac:'Facilities',local:'Local Guide',qr:'QR & Links',logs:'Activity Logs',set:'Settings'};
 
 // ── PASSWORD HASH (SHA-256 via Web Crypto) ──
 async function hashPassword(password) {
@@ -683,7 +683,7 @@ function enterDashboard() {
   scheduleAutoCheckout();
   // Stamp hotel_id into QR URL
   var qrUrlEl = document.getElementById('qr-url');
-  if (qrUrlEl) qrUrlEl.textContent = window.location.origin + '/hotel-guest-app.html?hotel=' + HOTEL_ID;
+  if (qrUrlEl) qrUrlEl.textContent = 'https://stayluvia.app/hotel-guest-app.html?hotel=' + HOTEL_ID;
 }
 
 function logout() {
@@ -789,7 +789,7 @@ function loadAdminMsgThread() {
         var d = new Date(msg.created_at);
         var timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
         var dateStr = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
-        wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">&#128081; Arivo</div>'
+        wrap.innerHTML = '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;padding:0 4px;">&#128081; Luvia</div>'
           + '<div style="max-width:85%;padding:10px 14px;border-radius:16px;border-bottom-left-radius:4px;background:rgba(184,147,63,.1);border:1px solid rgba(184,147,63,.35);color:var(--tx);font-size:13px;line-height:1.5;">' + msg.body + '</div>'
           + '<div style="font-size:10px;color:var(--tx3);padding:0 4px;margin-top:2px;">' + dateStr + ', ' + timeStr + '</div>';
         thread.appendChild(wrap);
@@ -825,7 +825,7 @@ function subscribeToStaffMessages() {
         incrementAdminMsgBadge();
         var sec2 = document.getElementById('s-adminmsgs');
         if (sec2 && sec2.classList.contains('on')) loadAdminMsgThread();
-        notify('mgr', '&#128081; Message from Arivo', payload.new.body, 'Arivo', 10000);
+        notify('mgr', '&#128081; Message from Luvia', payload.new.body, 'Luvia', 10000);
       }
     }).subscribe();
 }
@@ -1060,7 +1060,7 @@ function addGuest() {
     access_token: token
   }).then(function(r) {
     if (r.error) { toast('Error adding guest: ' + r.error.message, 'err'); return; }
-    var link = 'https://myarivo.pages.dev/hotel-guest-app.html?access_token=' + token;
+    var link = 'https://stayluvia.app/hotel-guest-app.html?access_token=' + token;
     document.getElementById('ag-link-text').textContent = link;
     document.getElementById('ag-link-wrap').style.display = 'block';
     document.getElementById('ag-form-ftr').style.display = 'none';
@@ -1446,7 +1446,7 @@ function loadHotelAddress() {
     if (a.carEta) { var ce = document.getElementById('hotel-car-eta'); if (ce) ce.value = a.carEta; }
     if (a.name) { var hn = document.getElementById('hname'); if (hn) hn.textContent = a.name; }
     if (a.city) { var hloc = document.getElementById('hloc'); if (hloc) { var rooms = document.querySelectorAll('#roomlist .irow').length; hloc.textContent = rooms + ' rooms \u00b7 ' + a.city + ', UK'; } }
-    if (a.postcode) { var ll = document.getElementById('local-ai-label'); if (ll) ll.textContent = '\u2728 Arivo AI suggests local spots near ' + a.postcode + '.'; }
+    if (a.postcode) { var ll = document.getElementById('local-ai-label'); if (ll) ll.textContent = '\u2728 Luvia AI suggests local spots near ' + a.postcode + '.'; }
   });
 }
 
@@ -1466,7 +1466,7 @@ function saveHotelAddress() {
     var hn   = document.getElementById('hname');    if (hn)   hn.textContent = hotelName;
     var hloc = document.getElementById('hloc');
     if (hloc) { var rooms = document.querySelectorAll('#roomlist .irow').length; hloc.textContent = rooms + ' rooms \u00b7 ' + city + ', UK'; }
-    var ll = document.getElementById('local-ai-label'); if (ll) ll.textContent = '\u2728 Arivo AI suggests local spots near ' + postcode + '.';
+    var ll = document.getElementById('local-ai-label'); if (ll) ll.textContent = '\u2728 Luvia AI suggests local spots near ' + postcode + '.';
   });
 }
 
@@ -2432,7 +2432,7 @@ async function addStaff() {
   var emailRes = await fetch('/api/email', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({to: email, subject: 'You\'ve been invited to join Arivo', html: emailHtml})
+    body: JSON.stringify({to: email, subject: 'You\'ve been invited to join Luvia', html: emailHtml})
   }).catch(function(){return {ok:false};});
   closeM('mstaff');
   document.getElementById('sfn').value = ''; document.getElementById('sfe').value = '';
@@ -2457,11 +2457,11 @@ function buildStaffInviteEmail(name, setupUrl) {
     + '<div style="padding:36px 40px;">'
     + '<p style="font-size:13px;color:#7A7060;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">Staff Invitation</p>'
     + '<h1 style="font-family:Georgia,serif;font-size:26px;font-weight:400;color:#1A1A1A;margin-bottom:16px;">Hello, ' + name + '</h1>'
-    + '<p style="font-size:14px;color:#5A5040;line-height:1.7;margin-bottom:24px;">You\'ve been invited to join your hotel team on Arivo. Click below to set your password and get started.</p>'
+    + '<p style="font-size:14px;color:#5A5040;line-height:1.7;margin-bottom:24px;">You\'ve been invited to join your hotel team on Luvia. Click below to set your password and get started.</p>'
     + '<div style="text-align:center;margin:28px 0;"><a href="' + setupUrl + '" style="display:inline-block;background:#1E3A2F;color:#FDFCF9;text-decoration:none;padding:14px 32px;border-radius:10px;font-size:14px;font-weight:500;">Set up my account →</a></div>'
     + '<p style="font-size:11px;color:#9A8E7E;line-height:1.6;margin-top:24px;">This link expires in 72 hours. If you were not expecting this, you can safely ignore it.</p>'
     + '</div>'
-    + '<div style="background:#F5F0E8;padding:16px 40px;text-align:center;font-size:11px;color:#9A8E7E;">Arivo · info@dogulu.co.uk</div>'
+    + '<div style="background:#F5F0E8;padding:16px 40px;text-align:center;font-size:11px;color:#9A8E7E;">Luvia · admin@luviaguest.com</div>'
     + '</div></body></html>';
 }
 
@@ -2535,7 +2535,7 @@ function genLink() {
   if(!n||!r){toast('Fill in name and room','err');return;}
   if(!db||!HOTEL_ID){toast('Not connected','err');return;}
   var token=crypto.randomUUID();
-  var base=window.location.origin+'/hotel-guest-app.html';
+  var base='https://stayluvia.app/hotel-guest-app.html';
   var url=base+'?token='+token;
   // Upsert token into room_tokens so it appears in Room QR section
   db.from('room_tokens').upsert({hotel_id:HOTEL_ID,room:r,token:token},{onConflict:'hotel_id,room'}).then(function(res){
@@ -2583,7 +2583,7 @@ function loadRoomTokens() {
     container.innerHTML = rooms.map(function(room) {
       var hasToken = !!existing[room];
       var isOccupied = !!occupiedRooms[room];
-      var url = hasToken ? (window.location.origin + '/hotel-guest-app.html?token=' + existing[room]) : '';
+      var url = hasToken ? ('https://stayluvia.app/hotel-guest-app.html?token=' + existing[room]) : '';
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bor);">'
         + '<div style="font-size:13px;font-weight:500;color:var(--tx);">' + room + '</div>'
         + '<div style="display:flex;gap:8px;align-items:center;">'
@@ -2673,7 +2673,7 @@ function notify(type, title, msg, sub, duration) {
 }
 function dismissBanner(b) { if(b&&b.parentNode){b.style.opacity='0';b.style.transform='translateX(20px)';b.style.transition='all .3s';setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},300);} }
 function toast(msg, type) { var t=document.getElementById('toast');t.className=type||'';t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800); }
-var origTitle = 'Arivo \u2014 Hotel Dashboard';
+var origTitle = 'Luvia \u2014 Hotel Dashboard';
 function flashTab(msg) { var count=0;var iv=setInterval(function(){document.title=count%2===0?msg:origTitle;count++;if(count>6){clearInterval(iv);document.title=origTitle;}},600); }
 
 // ── AUDIO ──

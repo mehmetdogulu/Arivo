@@ -26,7 +26,7 @@ export async function onRequestPost(context) {
         'Authorization': 'Bearer ' + apiKey
       },
       body: JSON.stringify({
-        from: 'Arivo <onboarding@resend.dev>',
+        from: 'Luvia <onboarding@luviaguest.com>',
         to: Array.isArray(to) ? to : [to],
         subject: subject,
         html: html

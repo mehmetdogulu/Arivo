@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>Arivo — Super Admin</title>
+<title>Luvia — Super Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -280,13 +280,13 @@ textarea.fi{resize:vertical;min-height:80px;}
 <div class="login-screen active" id="screen-login">
   <div class="login-wrap">
     <div class="login-brand">
-      <div class="login-logo">Ari<em>vo</em></div>
+      <div class="login-logo">Lu<em>via</em></div>
       <div class="login-badge">Super Admin</div>
     </div>
     <div class="login-card">
       <div class="login-title">Platform Control</div>
       <div class="login-sub">Restricted access — authorised personnel only</div>
-      <div class="lf"><label>Admin Email</label><input type="email" id="l-email" placeholder="admin@arivo.app" autocomplete="email"></div>
+      <div class="lf"><label>Admin Email</label><input type="email" id="l-email" placeholder="admin@luviaguest.com" autocomplete="email"></div>
       <div class="lf"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
       <div class="login-err" id="l-err">Incorrect credentials. Try: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3253565f5b5c7253405b445d1c534242">[email&#160;protected]</a> / admin2026</div>
@@ -302,7 +302,7 @@ textarea.fi{resize:vertical;min-height:80px;}
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="sb-brand">
-      <div class="sb-logo">Ari<em>vo</em></div>
+      <div class="sb-logo">Lu<em>via</em></div>
       <div class="sb-badge">Super Admin</div>
     </div>
     <div class="sb-admin-chip">
@@ -555,7 +555,7 @@ textarea.fi{resize:vertical;min-height:80px;}
       <div class="sec" id="s-settings">
         <div class="sec-hdr">
           <div class="sec-title">Platform Settings</div>
-          <div class="sec-sub">Global Arivo configuration</div>
+          <div class="sec-sub">Global Luvia configuration</div>
         </div>
         <div class="two-col">
           <div class="card">
@@ -581,7 +581,7 @@ textarea.fi{resize:vertical;min-height:80px;}
             <div class="card-hdr"><div class="card-title">Admin Account</div></div>
             <div class="card-body">
               <div class="fg"><label class="fl">Admin Name</label><input class="fi" value="Platform Owner"></div>
-              <div class="fg"><label class="fl">Admin Email</label><input class="fi" type="email" value="admin@arivo.app"></div>
+              <div class="fg"><label class="fl">Admin Email</label><input class="fi" type="email" value="admin@luviaguest.com"></div>
               <div class="fg"><label class="fl">New Password</label><input class="fi" type="password" placeholder="Change password..."></div>
               <button class="btn btn-g" onclick="toast('Admin account updated')">Save Changes</button>
             </div>
@@ -589,7 +589,7 @@ textarea.fi{resize:vertical;min-height:80px;}
           <div class="card">
             <div class="card-hdr"><div class="card-title">Legal & Compliance</div></div>
             <div class="card-body">
-              <div class="fg"><label class="fl">Company Name</label><input class="fi" value="Arivo Ltd"></div>
+              <div class="fg"><label class="fl">Company Name</label><input class="fi" value="MD Hospitality & Management Consultancy"></div>
               <div class="fg"><label class="fl">Company Number</label><input class="fi" placeholder="UK Companies House number"></div>
               <div class="fg"><label class="fl">ICO Registration Number</label><input class="fi" placeholder="ZB000000 — register at ico.org.uk"></div>
               <div class="fg"><label class="fl">VAT Number (if registered)</label><input class="fi" placeholder="GB000000000"></div>
@@ -729,7 +729,7 @@ function doLogin(){
   var email=document.getElementById('l-email').value.trim();
   var pass=document.getElementById('l-pass').value;
   var err=document.getElementById('l-err');
-  if(email==='admin@arivo.app' && pass==='admin2026'){
+  if(email==='admin@luviaguest.com' && pass==='admin2026'){
     err.style.display='none';
     sessionStorage.setItem('arivo_admin_session',JSON.stringify({email:email,ts:Date.now()}));
     enterAdmin();
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(saved){
     try{
       var s=JSON.parse(saved);
-      if(s.email==='admin@arivo.app'){enterAdmin();return;}
+      if(s.email==='admin@luviaguest.com'){enterAdmin();return;}
     }catch(e){}
     sessionStorage.removeItem('arivo_admin_session');
   }
@@ -841,8 +841,8 @@ async function resendManagerInvite(){
   if(!info){toast('No manager found for this hotel','err');return;}
   var setupUrl=window.location.origin+'/account-setup.html?token='+info.token;
   var hotelName=(document.getElementById('detail-title')||{}).textContent||'';
-  var html='<p>Hi '+info.name+',</p><p>Your Arivo setup link has been regenerated. Click below to set your password and access your dashboard:</p><p><a href="'+setupUrl+'">Set up your account</a></p><p>This link expires in 72 hours.</p>';
-  var res=await fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:info.email,subject:'Arivo — Your dashboard setup link',html:html})});
+  var html='<p>Hi '+info.name+',</p><p>Your Luvia setup link has been regenerated. Click below to set your password and access your dashboard:</p><p><a href="'+setupUrl+'">Set up your account</a></p><p>This link expires in 72 hours.</p>';
+  var res=await fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:info.email,subject:'Luvia — Your dashboard setup link',html:html})});
   if(res.ok){toast('Setup email sent to '+info.email);}
   else{
     // email failed — copy link instead
@@ -1165,7 +1165,7 @@ async function sendBroadcast(){
   var r=await query;
   if(r.error||!r.data||!r.data.length){toast('No hotels found for this audience','err');return;}
   var fullBody=subject+'\n\n'+body;
-  var inserts=r.data.map(function(h){return{hotel_id:h.id,direction:'admin_to_hotel',sender_name:'Arivo Admin',body:fullBody};});
+  var inserts=r.data.map(function(h){return{hotel_id:h.id,direction:'admin_to_hotel',sender_name:'Luvia Admin',body:fullBody};});
   var ins=await db.from('messages').insert(inserts);
   if(ins.error){toast('Send failed: '+ins.error.message,'err');return;}
   toast('Message sent to '+r.data.length+' hotel(s)');
