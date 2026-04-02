@@ -51,14 +51,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 .f-err{font-size:11px;color:var(--red);margin-top:5px;display:none;}
 .f-err.show{display:block;}
 .privacy-note{background:rgba(30,58,47,0.06);border:1px solid rgba(30,58,47,0.12);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--forest);font-weight:300;line-height:1.6;margin-bottom:20px;}
-.bypass-screen{background:var(--cream);align-items:center;justify-content:center;padding:40px 28px;text-align:center;}
-.bypass-title{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--forest);margin-bottom:8px;}
-.bypass-sub{font-size:13px;color:var(--muted);font-weight:300;margin-bottom:28px;line-height:1.6;}
-.bypass-inputs{display:flex;gap:10px;justify-content:center;margin-bottom:20px;}
-.bypass-digit{width:56px;height:64px;background:var(--white);border:2px solid var(--cream-dark);border-radius:12px;font-size:28px;font-weight:600;text-align:center;color:var(--forest);outline:none;-webkit-appearance:none;}
-.bypass-digit:focus{border-color:var(--forest);}
-.bypass-btn{background:var(--forest);color:white;border:none;border-radius:12px;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:12px;}
-.bypass-link{font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;}
 .welcome-screen{background:var(--forest);align-items:center;justify-content:center;text-align:center;padding:40px 28px;position:relative;overflow:hidden;}
 .welcome-screen::before{content:'';position:absolute;top:-100px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(184,147,63,0.1);}
 .w-icon{font-size:56px;margin-bottom:24px;position:relative;z-index:1;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;}
@@ -303,22 +295,7 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
     </div>
 
     <button class="btn-primary" id="reg-submit-btn" onclick="submitReg()" style="margin-top:8px;">Let's go</button>
-    <div style="text-align:center;margin-top:16px;"><button class="bypass-link" onclick="showScreen('screen-bypass')">Have a bypass code? Enter it here</button></div>
   </div>
-</div>
-
-<!-- SCREEN 2B: BYPASS CODE -->
-<div class="screen bypass-screen" id="screen-bypass">
-  <div class="bypass-title">Enter bypass code</div>
-  <div class="bypass-sub">Your hotel reception can provide a 4-digit code to restore your access.</div>
-  <div class="bypass-inputs">
-    <input class="bypass-digit" id="bp1" maxlength="1" inputmode="numeric" oninput="bypassNext(this,'bp2')">
-    <input class="bypass-digit" id="bp2" maxlength="1" inputmode="numeric" oninput="bypassNext(this,'bp3')">
-    <input class="bypass-digit" id="bp3" maxlength="1" inputmode="numeric" oninput="bypassNext(this,'bp4')">
-    <input class="bypass-digit" id="bp4" maxlength="1" inputmode="numeric" oninput="bypassNext(this,null)">
-  </div>
-  <button class="bypass-btn" onclick="submitBypass()">Restore Access</button><br>
-  <button class="bypass-link" onclick="showScreen('screen-reg')">Back to registration</button>
 </div>
 
 <!-- SCREEN 3: WELCOME -->
@@ -1105,34 +1082,6 @@ function enterApp(){
   localStorage.setItem('arivo_last_checkout',state.checkout);
 }
 
-function bypassNext(el,nextId){if(el.value.length>=1&&nextId)document.getElementById(nextId).focus();}
-function submitBypass(){
-  var code=['bp1','bp2','bp3','bp4'].map(function(id){return document.getElementById(id).value;}).join('');
-  if(code.length<4){toast('Please enter your 4-digit code.');return;}
-  if(!db){toast('Connection error. Please try again.');return;}
-  db.from('sessions').select('guest_id,bypass_expires_at,killed').eq('hotel_id',HOTEL_ID).eq('bypass_code',code).single().then(function(r){
-    if(r.error||!r.data){toast('Invalid code. Please ask reception for a new code.');return;}
-    if(r.data.killed){toast('This code has been cancelled. Please ask reception for a new one.');return;}
-    if(r.data.bypass_expires_at&&new Date(r.data.bypass_expires_at)<new Date()){toast('This code has expired. Please ask reception for a new one.');return;}
-    db.from('guests').select('id,name,room,checkout_date').eq('id',r.data.guest_id).single().then(function(gr){
-      if(gr.error||!gr.data){toast('Could not restore your session. Please ask reception for help.');return;}
-      var g=gr.data;
-      var co=g.checkout_date?g.checkout_date.split('T')[0]:'';
-      state.name=g.name;state.room=g.room;state.checkout=co;
-      guestId=g.id;
-      setGuestContext(g.name,g.room);
-      saveSession(g.name,g.room,co,g.id);
-      var fn=g.name.split(' ')[0];
-      var fmt=co?new Date(co).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'TBC';
-      document.getElementById('app-name').textContent=fn;
-      document.getElementById('app-room').textContent=g.room;
-      document.getElementById('app-co').textContent='Out '+fmt;
-      document.getElementById('chat-greeting').textContent='Welcome back, '+fn+'! How can I help you today?';
-      enterApp();
-      toast('Access restored. Welcome back, '+fn+'!');
-    });
-  });
-}
 
 function startCheckoutReminders(coDateStr){
   var checkoutTimeStr = (hotelSettings && hotelSettings.checkoutTime) ? hotelSettings.checkoutTime : '11:00';
