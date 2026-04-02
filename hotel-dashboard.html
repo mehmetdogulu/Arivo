@@ -1352,26 +1352,53 @@ function doETA(mins) {
 }
 
 function etaGuestMessage(taskTitle, mins) {
-  var t = (taskTitle || '').toLowerCase();
-  var when = mins > 0 ? 'in around ' + mins + ' minutes' : 'now';
-  if (t.indexOf('clean') >= 0 || t.indexOf('housekeep') >= 0)
-    return mins > 0 ? 'Your room will be freshened up ' + when + '. We will be as quick as possible.' : 'Housekeeping has completed your room. Enjoy the fresh space!';
-  if (t.indexOf('towel') >= 0 || t.indexOf('pillow') >= 0 || t.indexOf('linen') >= 0 || t.indexOf('blanket') >= 0)
-    return mins > 0 ? 'Your ' + taskTitle + ' are on their way and will be with you ' + when + '.' : 'Your ' + taskTitle + ' have been delivered. Enjoy!';
-  if (t.indexOf('breakfast') >= 0 || t.indexOf('food') >= 0 || t.indexOf('room service') >= 0 || t.indexOf('drink') >= 0)
-    return mins > 0 ? 'Your order is being prepared and will arrive ' + when + '. We hope you enjoy it.' : 'Your order has been delivered. Bon app\u00e9tit!';
-  if (t.indexOf('taxi') >= 0 || t.indexOf('transfer') >= 0 || t.indexOf('transport') >= 0)
-    return mins > 0 ? 'Your taxi has been arranged and will be ready ' + when + '.' : 'Your taxi is waiting outside. Have a wonderful journey!';
-  if (t.indexOf('maintenance') >= 0 || t.indexOf('repair') >= 0 || t.indexOf('fix') >= 0)
-    return mins > 0 ? 'Our maintenance team will attend to your room ' + when + '. We apologise for any inconvenience.' : 'The issue in your room has been resolved. Please let us know if anything else needs attention.';
-  if (t.indexOf('checkout') >= 0 || t.indexOf('late') >= 0)
-    return 'We have noted your request and will be in touch shortly to confirm the details.';
-  if (t.indexOf('reservation') >= 0 || t.indexOf('restaurant') >= 0 || t.indexOf('booking') >= 0)
-    return mins > 0 ? 'We are taking care of your booking and will confirm ' + when + '.' : 'Your reservation has been confirmed. Enjoy your experience!';
-  // Generic
+  var t = (taskTitle || '').trim();
+  var when = mins > 0 ? 'in around ' + mins + ' minute' + (mins === 1 ? '' : 's') : 'shortly';
+
+  // Extra towels
+  if (t === 'Extra towels')
+    return mins > 0 ? 'Your extra towels are on their way and will be with you ' + when + '.' : 'Your extra towels have been delivered. Let us know if you need anything else!';
+
+  // Room cleaning
+  if (t === 'Room cleaning')
+    return mins > 0 ? 'Housekeeping will be with you to clean your room ' + when + '. We will be as quick as possible.' : 'Your room has been freshened up. We hope you enjoy the fresh space!';
+
+  // Extra pillows
+  if (t === 'Extra pillows')
+    return mins > 0 ? 'Your extra pillows are on their way and will be with you ' + when + '.' : 'Your extra pillows have been delivered. Sleep well!';
+
+  // Extra blanket
+  if (t === 'Extra blanket')
+    return mins > 0 ? 'Your extra blanket is on its way and will be with you ' + when + '.' : 'Your extra blanket has been delivered. Stay cosy!';
+
+  // Late checkout
+  if (t === 'Late checkout')
+    return mins > 0 ? 'We are checking availability for your late checkout and will confirm ' + when + '.' : 'Great news \u2014 your late checkout has been confirmed. Please check out by 1 PM and enjoy the extra time!';
+
+  // Taxi booking
+  if (t === 'Taxi booking')
+    return mins > 0 ? 'We are arranging your taxi. It will be ready at the entrance ' + when + '.' : 'Your taxi is ready and waiting outside. Have a wonderful journey!';
+
+  // Bring my car around
+  if (t === 'Bring my car around')
+    return mins > 0 ? 'Your car is being brought around and will be at the entrance ' + when + '.' : 'Your car is now waiting at the entrance. Safe travels!';
+
+  // Restaurant reservation
+  if (t === 'Restaurant reservation')
+    return mins > 0 ? 'We are making your restaurant reservation and will confirm ' + when + '.' : 'Your restaurant reservation has been confirmed. Enjoy your meal!';
+
+  // Room upgrade
+  if (t === 'Room upgrade')
+    return mins > 0 ? 'We are checking room availability for your upgrade and will get back to you ' + when + '.' : 'Great news \u2014 we have arranged a room upgrade for you. Please visit reception to complete the change.';
+
+  // Maintenance / reported issues
+  if (t === 'Maintenance Issue' || t.toLowerCase().indexOf('maintenance') >= 0)
+    return mins > 0 ? 'Our maintenance team will attend to the issue in your room ' + when + '. We apologise for any inconvenience.' : 'The issue in your room has been resolved. Please let us know if anything else needs attention.';
+
+  // Custom / fallback
   return mins > 0
-    ? 'Your request is being taken care of and will be ready ' + when + '. Thank you for your patience.'
-    : 'Your request has been completed. We hope everything is to your satisfaction \u2014 please do not hesitate to ask if you need anything else.';
+    ? 'We are taking care of your request and will be with you ' + when + '. Thank you for your patience.'
+    : 'Your request has been completed. Please do not hesitate to ask if you need anything else.';
 }
 
 // ── SETTINGS ──
