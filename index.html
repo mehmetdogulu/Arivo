@@ -26,6 +26,8 @@ nav {
 }
 nav.scrolled { background:rgba(252,251,249,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--cream-dark); }
 .nav-logo { font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--white); font-weight:400; transition:color 0.3s ease; letter-spacing:-0.5px; }
+.nav-logo .lg { font-weight:300; opacity:0.7; transition:opacity 0.3s ease; }
+nav.scrolled .nav-logo .lg { opacity:0.6; }
 .nav-logo span { color:var(--gold-light); font-style:italic; transition:color 0.3s ease; }
 .nav-logo em { color:var(--gold-light); font-style:italic; transition:color 0.3s ease; }
 nav.scrolled .nav-logo { color:var(--forest); }
@@ -286,7 +288,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
 
 <!-- NAV -->
 <nav id="navbar">
-  <div class="nav-logo">Lu<em>via</em></div>
+  <div class="nav-logo">Lu<em>via</em><span class="lg">Guest</span></div>
   <div class="nav-links">
     <a href="#features" class="nav-link">Features</a>
     <a href="#how" class="nav-link">How it works</a>
@@ -299,7 +301,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
 
 <!-- HERO -->
 <section class="hero">
-  <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--white);letter-spacing:-1px;margin-bottom:20px;position:relative;z-index:1;animation:fadeUp 0.5s ease 0.05s both;">Lu<em style="font-style:italic;color:var(--gold-light);">via</em></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--white);letter-spacing:-1px;margin-bottom:20px;position:relative;z-index:1;animation:fadeUp 0.5s ease 0.05s both;">Lu<em style="font-style:italic;color:var(--gold-light);">via</em><span style="font-weight:300;opacity:0.6;">Guest</span></div>
   <div class="hero-eyebrow">For boutique &amp; independent hotels</div>
   <h1 class="hero-title">Your guests deserve<br>better than a <em>paper folder</em></h1>
   <p class="hero-sub">Luvia replaces the tatty welcome book in your rooms with a beautiful, AI-powered guest app. Set up in 30 minutes. No technical knowledge required.</p>
@@ -539,7 +541,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <div class="footer-logo">Lu<em>via</em></div>
+    <div class="footer-logo">Lu<em>via</em><span style="font-weight:300;opacity:0.6;">Guest</span></div>
     <div class="footer-links">
       <span class="footer-link">Privacy Policy</span>
       <span class="footer-link">Terms of Service</span>
