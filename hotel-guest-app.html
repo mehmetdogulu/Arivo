@@ -1252,7 +1252,7 @@ function renderHotelInfoSections(hi){
     if(!sec||!sec.rows||!sec.rows.length)return;
     var validRows=sec.rows.map(_rowKV).filter(function(r){return r.k&&r.k!=='undefined'&&r.v&&r.v!=='undefined';});
     if(!validRows.length)return;
-    var icon=_secIcons[secId]||'&#8505;&#65039;';
+    var icon=sec.icon||_secIcons[secId]||'&#8505;&#65039;';
     var title=_cleanTitle(sec.title||secId);
     var rowsHtml=validRows.map(function(r){
       return '<div class="ir"><span class="ir-lbl">'+r.k+'</span><span class="ir-val">'+r.v+'</span></div>';

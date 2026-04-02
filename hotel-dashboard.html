@@ -1985,14 +1985,20 @@ function saveHotelInfo() {
   // Collect all info sections into a JSON object
   var info = {};
   document.querySelectorAll('.isec').forEach(function(sec) {
-    var title = sec.querySelector('.ist') ? sec.querySelector('.ist').textContent.trim() : sec.id;
+    var ithEl = sec.querySelector('.ith');
+    var icon = ithEl ? ithEl.textContent.trim() : '';
+    var istEl = sec.querySelector('.ist');
+    var rawTitle = istEl ? istEl.textContent.trim() : sec.id;
+    // Strip the emoji prefix that .ith contributes to .ist textContent
+    var title = icon ? rawTitle.replace(icon, '').trim() : rawTitle;
+    if (!title) title = sec.id;
     var rows = [];
     sec.querySelectorAll('.irow').forEach(function(row) {
       var k = row.querySelector('.irk') ? row.querySelector('.irk').textContent.trim() : '';
       var v = row.querySelector('.irv') ? row.querySelector('.irv').textContent.trim() : '';
       if (k) rows.push({k: k, v: v});
     });
-    if (rows.length) info[sec.id] = {title: title, rows: rows};
+    info[sec.id] = {title: title, icon: icon, rows: rows};
   });
   db.from('hotel_settings').update({hotel_info: info}).eq('hotel_id', HOTEL_ID).then(function(r) {
     if (r.error) console.log('hotel_info save error:', r.error.message);
@@ -2006,10 +2012,23 @@ function loadHotelInfo() {
     if (!r.data) return;
     // Restore hotel info sections
     if (r.data.hotel_info) {
+      var sInfoCard = document.getElementById('s-info').querySelector('.card');
       Object.keys(r.data.hotel_info).forEach(function(secId) {
         var sec = document.getElementById(secId);
         var data = r.data.hotel_info[secId];
-        if (!sec || !data.rows) return;
+        if (!data) return;
+        if (!sec) {
+          // Custom section not in static HTML — recreate it
+          var icon = data.icon || '&#128203;';
+          var title = data.title || secId;
+          sec = document.createElement('div'); sec.className = 'isec'; sec.id = secId;
+          sec.innerHTML = '<div class="ish"><div class="ist"><div class="ith">' + icon + '</div>' + title + '</div>'
+                        + '<div style="display:flex;gap:5px"><div class="icb" onclick="openAR(\'' + secId + '\',\'' + title + '\')">&#65291;</div>'
+                        + '<div class="icb del" onclick="delSec(\'' + secId + '\')">&#10005;</div></div></div>'
+                        + '<button class="addrow" onclick="openAR(\'' + secId + '\',\'' + title + '\')">&#65291; Add row</button>';
+          document.getElementById('s-info').insertBefore(sec, sInfoCard);
+        }
+        if (!data.rows || !data.rows.length) return;
         // Remove existing irows and repopulate
         sec.querySelectorAll('.irow').forEach(function(row) { row.remove(); });
         var addBtn = sec.querySelector('.addrow');
@@ -2066,9 +2085,9 @@ function addSec() {
                 + '<div class="icb del" onclick="delSec(\'' + id + '\')">&#10005;</div></div></div>'
                 + '<button class="addrow" onclick="openAR(\'' + id + '\',\'' + t + '\')">&#65291; Add row</button>';
   document.getElementById('s-info').insertBefore(sec, document.getElementById('s-info').querySelector('.card'));
-  closeM('msec'); toast('Section added');
+  closeM('msec'); saveHotelInfo();
 }
-function delSec(id) { document.getElementById(id).remove(); }
+function delSec(id) { document.getElementById(id).remove(); saveHotelInfo(); }
 
 // ── FACILITIES / PLACES ──
 function addFac() {
