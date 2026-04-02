@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Arivo — Your Stay</title>
+<title>Luvia — Your Stay</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Arivo">
+<meta name="apple-mobile-web-app-title" content="Luvia">
 <meta name="theme-color" content="#1E3A2F">
 <style>
 :root{--forest:#1E3A2F;--forest-mid:#2C5040;--gold:#B8933F;--gold-light:#D4AF6A;--cream:#F5F0E8;--cream-dark:#EDE6D6;--charcoal:#1A1A1A;--muted:#7A7060;--white:#FDFCF9;--red:#DC2626;--green:#16A34A;--amber:#D97706;--shadow:rgba(30,58,47,0.12);}
@@ -250,7 +250,7 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
 
 <!-- SPLASH LOADER -->
 <div id="splash">
-  <div class="splash-logo">Ari<em>vo</em></div>
+  <div class="splash-logo">Lu<em>via</em></div>
   <div class="splash-ring"></div>
 </div>
 
@@ -326,7 +326,7 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
       <span class="app-chip" id="app-room"></span>
       <span class="app-chip" id="app-co"></span>
     </div>
-    <div class="powered-by">Powered by <span>Arivo</span></div>
+    <div class="powered-by">Powered by <span>Luvia</span></div>
   </div>
   <div class="checkout-banner" id="checkout-banner">
     <span class="cb-icon">&#9201;</span>
@@ -369,7 +369,7 @@ var _lockedRoom=null; // Set when entry is via room QR token — cannot be overr
   </div>
   <!-- LOCAL TAB -->
   <div class="tc" id="tab-local">
-    <div class="ai-banner" id="local-ai-label">&#10024; Powered by Arivo AI &bull; Loading local suggestions...</div>
+    <div class="ai-banner" id="local-ai-label">&#10024; Powered by Luvia AI &bull; Loading local suggestions...</div>
     <div id="local-suggestions-container"><div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;"><div style="font-size:28px;margin-bottom:12px">&#10024;</div>Loading local suggestions...</div></div>
   </div>
   <!-- REQUESTS TAB -->
@@ -1046,7 +1046,7 @@ function enterApp(){
           var hotelName=r.data.address.name||'Your Hotel';
           // Update AI banner
           var aiLabel=document.querySelector('.ai-banner');
-          if(aiLabel&&pc){aiLabel.textContent='\u2728 Powered by Arivo AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
+          if(aiLabel&&pc){aiLabel.textContent='\u2728 Powered by Luvia AI \u2022 Suggestions based on your hotel\u2019s location in '+city+' '+pc;}
           // Update hotel name everywhere
           var consentName=document.getElementById('consent-hotel-name');
           if(consentName)consentName.textContent=hotelName+(city?' \u00b7 '+city:'');
@@ -1499,7 +1499,7 @@ function renderLocalSuggestions(places,cityName,append){
     cats[cat].forEach(function(p){
       var mapsUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.name+' '+cityName);
       var tags=(p.tags||[]).map(function(t){return '<span class="rc-tag">'+t+'</span>';}).join('');
-      html+='<div class="rc"><div class="rc-thumb">'+(p.emoji||'&#128205;')+'</div><div><div class="rc-n"><a href="'+mapsUrl+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">'+p.name+' &#8599;</a></div><div class="rc-d">'+p.description+'</div><div class="rc-tags">'+tags+'<span class="rc-tag ai">&#10024; Arivo AI</span></div></div></div>';
+      html+='<div class="rc"><div class="rc-thumb">'+(p.emoji||'&#128205;')+'</div><div><div class="rc-n"><a href="'+mapsUrl+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,168,76,0.4);">'+p.name+' &#8599;</a></div><div class="rc-d">'+p.description+'</div><div class="rc-tags">'+tags+'<span class="rc-tag ai">&#10024; Luvia AI</span></div></div></div>';
     });
   });
   // Append to container (staff picks may already be there)
