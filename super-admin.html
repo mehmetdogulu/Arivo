@@ -625,7 +625,7 @@ textarea.fi{resize:vertical;min-height:80px;}
         <select class="fi" id="ah-plan">
           <option value="trial">Free Trial (30 days)</option>
           <option value="starter">Starter — £99/mo</option>
-          <option value="pro">Professional — £299/mo</option>
+          <option value="professional">Professional — £249/mo</option>
           <option value="complete">Complete — £499/mo</option>
         </select>
       </div>
@@ -656,7 +656,7 @@ textarea.fi{resize:vertical;min-height:80px;}
         <select class="fi" id="detail-plan-select">
           <option value="trial">Free Trial</option>
           <option value="starter">Starter — £99/mo</option>
-          <option value="pro">Professional — £299/mo</option>
+          <option value="professional">Professional — £249/mo</option>
           <option value="complete">Complete — £499/mo</option>
         </select>
       </div>
@@ -717,8 +717,8 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 var TITLES = {overview:'Overview',hotels:'All Hotels',revenue:'Revenue',trials:'Trials',activity:'Activity Log',messages:'Broadcast',support:'Support Inbox',settings:'Platform Settings'};
-var PLAN_LABELS = {starter:'Starter',pro:'Professional',complete:'Complete',trial:'Trial'};
-var PLAN_MRR = {starter:'£99/mo',pro:'£299/mo',complete:'£499/mo',trial:'Free trial'};
+var PLAN_LABELS = {starter:'Starter',professional:'Professional',pro:'Professional',complete:'Complete',trial:'Trial'};
+var PLAN_MRR = {starter:'£99/mo',professional:'£249/mo',pro:'£249/mo',complete:'£499/mo',trial:'Free trial'};
 
 // ── UTIL ──
 function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
@@ -803,7 +803,7 @@ function openHotelDetail(id){
   document.getElementById('detail-plan').textContent=PLAN_LABELS[h.plan]||h.plan;
   document.getElementById('detail-status').textContent=h.status==='active'?'Active':h.status==='trial'?'On Trial':h.status;
   document.getElementById('detail-status').style.color=h.status==='active'?'var(--green)':h.status==='trial'?'var(--amber)':'var(--red)';
-  var mrr={starter:99,pro:299,complete:499,trial:0};
+  var mrr={starter:99,professional:249,pro:249,complete:499,trial:0};
   document.getElementById('detail-mrr').textContent=h.status==='trial'?'Free trial':'£'+(mrr[h.plan]||0)+'/mo';
   document.getElementById('detail-since').textContent=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
   var sel=document.getElementById('detail-plan-select');
@@ -914,12 +914,12 @@ function loadHotels(){
     tbody.innerHTML='';
     r.data.forEach(function(h){
       var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
-      var planCls=h.plan==='pro'?'pro':h.plan==='complete'?'complete':'starter';
+      var planCls=h.plan==='pro'||h.plan==='professional'?'pro':h.plan==='complete'?'complete':'starter';
       var planLabel=PLAN_LABELS[h.plan]||h.plan||'—';
       var statusCls=h.status==='active'?'active':h.status==='trial'?'trial':'overdue';
       var statusLbl=h.status==='active'?'Active':h.status==='trial'?'Trial':'Overdue';
-      var mrrVal={starter:99,pro:299,complete:499}[h.plan];
-      var mrrStr=h.status==='active'&&mrrVal?'£'+mrrVal:'-';
+      var mrrVal={starter:99,professional:249,pro:249,complete:499}[h.plan];
+      var mrrStr=(h.status==='active'||h.status==='trial')&&mrrVal?'£'+mrrVal:'-';
       var tr=document.createElement('tr');
       tr.innerHTML='<td><div class="h-name">'+h.name+'</div><div class="h-loc">'+(h.city||'')+(h.country?', '+h.country:'')+'</div></td>'+
         '<td><span class="plan-tag '+planCls+'">'+planLabel+'</span></td>'+
@@ -941,7 +941,7 @@ function loadHotels(){
 // ── OVERVIEW ──
 function loadOverview(){
   if(!db)return;
-  var MRR={starter:99,pro:299,complete:499,trial:0};
+  var MRR={starter:99,professional:249,pro:249,complete:499,trial:0};
   db.from('hotels').select('id,name,city,country,plan,status,created_at').then(function(r){
     if(!r.data)return;
     var hotels=r.data;
@@ -949,7 +949,7 @@ function loadOverview(){
     var trials=hotels.filter(function(h){return h.status==='trial';});
     var mrr=active.reduce(function(sum,h){return sum+(MRR[h.plan]||0);},0);
     var starter=active.filter(function(h){return h.plan==='starter';});
-    var pro=active.filter(function(h){return h.plan==='pro';});
+    var pro=active.filter(function(h){return h.plan==='pro'||h.plan==='professional';});
     var complete=active.filter(function(h){return h.plan==='complete';});
 
     // MRR banner
@@ -958,7 +958,7 @@ function loadOverview(){
     setEl('mrr-starter-count',starter.length);
     setEl('mrr-starter-val','£'+(starter.length*99)+'/mo');
     setEl('mrr-pro-count',pro.length);
-    setEl('mrr-pro-val','£'+(pro.length*299)+'/mo');
+    setEl('mrr-pro-val','£'+(pro.length*249)+'/mo');
     setEl('mrr-complete-count',complete.length);
     setEl('mrr-complete-val','£'+(complete.length*499)+'/mo');
     setEl('mrr-trial-count',trials.length);
@@ -993,7 +993,7 @@ function loadOverview(){
       }else{
         var rows='';
         if(starter.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--blue);">Starter ('+starter.length+' hotel'+(starter.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(starter.length*99)+'/mo</span></div>';
-        if(pro.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional ('+pro.length+' hotel'+(pro.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(pro.length*299)+'/mo</span></div>';
+        if(pro.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--gold);">Professional ('+pro.length+' hotel'+(pro.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(pro.length*249)+'/mo</span></div>';
         if(complete.length) rows+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--purple);">Complete ('+complete.length+' hotel'+(complete.length>1?'s':'')+')</span><span style="color:var(--white);font-weight:600;">£'+(complete.length*499)+'/mo</span></div>';
         rows+='<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:14px;font-weight:700;"><span style="color:var(--text2);">Total MRR</span><span style="color:var(--gold);">£'+mrr+'/mo</span></div>';
         rpEl.innerHTML=rows;
@@ -1073,7 +1073,15 @@ function loadTrials(){
     container.innerHTML=trials.map(function(h){
       var since=h.created_at?new Date(h.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
       var loc=(h.city||'')+(h.country?', '+h.country:'');
-      return '<div class="trial-row" style="min-height:70px;"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown')+' · Signed up '+since+'</div></div><div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;"><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">&#128065; View</button><button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast(\'Contact '+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' about their trial\')">&#9993; Chase</button></div></div>';
+      var daysLeft='—';var expColor='var(--text3)';
+      if(h.created_at){
+        var trialEnd=new Date(h.created_at).getTime()+30*24*60*60*1000;
+        var remaining=Math.ceil((trialEnd-Date.now())/(24*60*60*1000));
+        if(remaining>0){daysLeft=remaining+' day'+(remaining!==1?'s':'')+' left';expColor=remaining<=5?'var(--red)':remaining<=10?'var(--amber)':'var(--green)';}
+        else{daysLeft='Expired';expColor='var(--red)';}
+      }
+      var planLabel=PLAN_LABELS[h.plan]||h.plan||'—';
+      return '<div class="trial-row" style="min-height:70px;"><div class="trial-info"><div class="trial-name">'+h.name+'</div><div class="trial-sub">'+(loc||'Unknown')+' · '+planLabel+' · Started '+since+'</div></div><div style="display:flex;align-items:center;gap:10px;margin-left:8px;flex-wrap:wrap;"><span style="font-size:12px;font-weight:600;color:'+expColor+';white-space:nowrap;">'+daysLeft+'</span><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-s" style="font-size:11px;padding:5px 10px;" onclick="window.open(\'hotel-dashboard.html?hotel='+h.id+'\',\'_blank\')">&#128065; View</button><button class="btn btn-r" style="font-size:11px;padding:5px 10px;" onclick="toast(\'Contact '+h.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')+' about their trial\')">&#9993; Chase</button></div></div></div>';
     }).join('');
   });
 }

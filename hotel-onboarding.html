@@ -328,25 +328,17 @@ select.fi { cursor:pointer; }
           <div class="plan-radio"></div>
           <div class="plan-info">
             <div class="plan-name">Starter</div>
-            <div class="plan-desc">Guest app, welcome book, local guide, requests</div>
+            <div class="plan-desc">Guest app, welcome book, request hub with live ETA, messaging</div>
           </div>
           <div class="plan-price">£99<span>/mo</span></div>
         </div>
         <div class="plan-card selected" onclick="selectPlan(this)" data-plan="professional">
           <div class="plan-radio"></div>
           <div class="plan-info">
-            <div class="plan-name">Professional <span class="plan-popular">Most popular</span></div>
-            <div class="plan-desc">Everything + AI concierge, WhatsApp routing, analytics</div>
+            <div class="plan-name">Professional <span class="plan-popular">Best for growth</span></div>
+            <div class="plan-desc">Everything + AI concierge, upsell engine, analytics, WhatsApp</div>
           </div>
-          <div class="plan-price">£299<span>/mo</span></div>
-        </div>
-        <div class="plan-card" onclick="selectPlan(this)" data-plan="complete">
-          <div class="plan-radio"></div>
-          <div class="plan-info">
-            <div class="plan-name">Complete</div>
-            <div class="plan-desc">Everything + mini PMS, upsell engine, multi-language AI</div>
-          </div>
-          <div class="plan-price">£499<span>/mo</span></div>
+          <div class="plan-price">£249<span>/mo</span></div>
         </div>
       </div>
     </div>
@@ -521,6 +513,22 @@ function selectPlan(card) {
   card.classList.add('selected');
 }
 
+function getSelectedPlan() {
+  var sel = document.querySelector('.plan-card.selected');
+  return sel ? sel.dataset.plan : 'professional';
+}
+
+// Pre-select plan from URL parameter
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var plan = params.get('plan');
+  if (plan) {
+    document.querySelectorAll('.plan-card').forEach(function(c){ c.classList.remove('selected'); });
+    var card = document.querySelector('.plan-card[data-plan="'+plan+'"]');
+    if (card) card.classList.add('selected');
+  }
+})();
+
 // ── INVITE EMAIL TEMPLATE ──
 function buildInviteEmail(name, hotelName, setupUrl, role) {
   var roleLabel = role === 'manager' ? 'hotel manager' : 'staff member';
@@ -572,9 +580,10 @@ async function completeOnboarding() {
     if (!db) throw new Error('Database not available');
 
     // 1. Create hotel record
+    var selectedPlan = getSelectedPlan();
     var hotelRes = await db.from('hotels').insert({
       name: hotelName, slug: slug, city: city, country: country,
-      whatsapp: mgrWa, status: 'active', plan: 'starter'
+      whatsapp: mgrWa, status: 'trial', plan: selectedPlan
     }).select('id').single();
     if (hotelRes.error) throw hotelRes.error;
     var hotelId = hotelRes.data.id;

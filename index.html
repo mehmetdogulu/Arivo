@@ -292,9 +292,9 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
     <a href="#how" class="nav-link">How it works</a>
     <a href="#pricing" class="nav-link">Pricing</a>
     <a href="#faq" class="nav-link">FAQ</a>
-    <a href="hotel-onboarding.html" class="nav-cta">Get started free →</a>
+    <a href="hotel-onboarding.html?plan=professional" class="nav-cta">Get started free →</a>
   </div>
-  <a href="hotel-onboarding.html" class="nav-cta nav-mobile-cta">Get started →</a>
+  <a href="hotel-onboarding.html?plan=professional" class="nav-cta nav-mobile-cta">Get started →</a>
 </nav>
 
 <!-- HERO -->
@@ -304,7 +304,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
   <h1 class="hero-title">Your guests deserve<br>better than a <em>paper folder</em></h1>
   <p class="hero-sub">Luvia replaces the tatty welcome book in your rooms with a beautiful, AI-powered guest app. Set up in 30 minutes. No technical knowledge required.</p>
   <div class="hero-ctas">
-    <a href="hotel-onboarding.html" class="cta-primary">Start free trial — no card needed</a>
+    <a href="hotel-onboarding.html?plan=professional" class="cta-primary">Start free trial — no card needed</a>
     <a href="hotel-guest-app.html" class="cta-secondary">See the guest experience →</a>
   </div>
   <div class="hero-social-proof">QR code in rooms · No app download · Works on every phone</div>
@@ -456,7 +456,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
           <div class="pf">Real-time guest–staff–manager messaging</div>
           <div class="pf">Hotel admin dashboard + staff app</div>
         </div>
-        <button class="price-cta" onclick="window.location.href='hotel-onboarding.html'">Start free trial</button>
+        <button class="price-cta" onclick="window.location.href='hotel-onboarding.html?plan=starter'">Start free trial</button>
       </div>
       <div class="price-card featured">
         <div class="price-badge">Best for growth</div>
@@ -468,12 +468,15 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
           <div class="pf">Everything in Starter</div>
           <div class="pf">AI concierge, 24/7 (Claude-powered)</div>
           <div class="pf">Guest push notifications</div>
-          <div class="pf">WhatsApp guest messaging</div>
+          <div class="pf">One-tap WhatsApp guest contact</div>
+          <div class="pf">Guest satisfaction ratings &amp; instant alerts</div>
           <div class="pf">Analytics dashboard</div>
           <div class="pf">AI upsell engine</div>
           <div class="pf">Review nudge automation</div>
+          <div class="pf">White-label hotel branding</div>
+          <div class="pf">Priority onboarding &amp; support</div>
         </div>
-        <button class="price-cta" onclick="window.location.href='hotel-onboarding.html'">Start free trial</button>
+        <button class="price-cta" onclick="window.location.href='hotel-onboarding.html?plan=professional'">Start free trial</button>
       </div>
     </div>
     <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:24px;font-weight:300;">All plans include a 30-day free trial. No credit card required to start.</p>
@@ -527,7 +530,7 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
   <h2 class="final-cta-title">Ready to leave the<br>paper folder <em>behind?</em></h2>
   <p class="final-cta-sub">Join boutique hotels across the UK and Europe who have already made the switch.</p>
   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;">
-    <a href="hotel-onboarding.html" class="cta-primary">Start your free trial →</a>
+    <a href="hotel-onboarding.html?plan=professional" class="cta-primary">Start your free trial →</a>
     <a href="hotel-guest-app.html" class="cta-secondary">See the guest app</a>
   </div>
   <p style="font-size:12px;color:rgba(255,255,255,0.25);margin-top:24px;position:relative;z-index:1;">30-day free trial · No credit card · Cancel anytime</p>
@@ -538,26 +541,35 @@ footer { background:var(--charcoal); border-top:1px solid rgba(255,255,255,0.06)
   <div class="footer-inner">
     <div class="footer-logo">Lu<em>via</em></div>
     <div class="footer-links">
-      <a href="#" class="footer-link">Privacy Policy</a>
-      <a href="#" class="footer-link">Terms of Service</a>
-      <a href="#" class="footer-link">Cookie Policy</a>
-      <a href="/cdn-cgi/l/email-protection#bed6dbd2d2d1fecdcadfc7d1cd90dfcece" class="footer-link"><span class="__cf_email__" data-cfemail="b6ded3dadad9f6c5c2d7cfd9c598d7c6c6">[email&#160;protected]</span></a>
+      <a href="privacy-policy.html" class="footer-link">Privacy Policy</a>
+      <a href="terms-and-conditions.html" class="footer-link">Terms of Service</a>
+      <a href="cookie-policy.html" class="footer-link">Cookie Policy</a>
+      <a href="mailto:admin@luviaguest.com" class="footer-link">admin@luviaguest.com</a>
     </div>
     <div class="footer-copy">© 2026 MD Hospitality & Management Consultancy</div>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// Navbar scroll effect
-window.addEventListener('scroll', function() {
+<script>
+// Navbar scroll effect — also runs on load so hash-link arrivals are handled
+function updateNav() {
   var nav = document.getElementById('navbar');
   if (window.scrollY > 60) {
     nav.classList.add('scrolled');
   } else {
     nav.classList.remove('scrolled');
   }
-});
+}
+window.addEventListener('scroll', updateNav);
+updateNav();
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-  a.addEventListener('click'
+  a.addEventListener('click', function(e) {
+    var href = a.getAttribute('href');
+    if (href === '#') return;
+    var target = document.querySelector(href);
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+</script>
